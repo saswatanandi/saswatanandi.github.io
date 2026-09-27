@@ -1,0 +1,145 @@
+---
+import type { Publication } from '../lib/bibtex';
+import Icon from './Icon.astro';
+
+interface Props {
+  pub: Publication;
+  headingLevel?: 'h3' | 'h4';
+}
+const { pub, headingLevel: H = 'h3' } = Astro.props;
+const doiUrl = pub.doi ? `https://doi.org/${pub.doi}` : pub.url;
+const details = [pub.volume && (pub.issue ? `${pub.volume}(${pub.issue})` : pub.volume), pub.pages].filter(Boolean).join(', ');
+---
+
+<article class="pub">
+  <div class="pub__year" aria-hidden="true">{pub.year}</div>
+  <div class="pub__body">
+    <H class="pub__title">
+      {doiUrl ? <a href={doiUrl}>{pub.title}</a> : pub.title}
+    </H>
+    <p class="pub__authors">
+      {
+        pub.authors.map((a, i) => (
+          <>
+            {a.isSelf ? <strong class="pub__self">{a.display}</strong> : a.display}
+            {i < pub.authors.length - 2 ? ', ' : i === pub.authors.length - 2 ? ' & ' : ''}
+          </>
+        ))
+      }
+    </p>
+    <p class="pub__venue">
+      {pub.venue && <em>{pub.venue}</em>}{details && <span>, {details}</span>}
+      <span class="visually-hidden"> ({pub.year})</span>
+    </p>
+    <p class="pub__actions">
+      {
+        pub.doi && (
+          <a class="pub__btn" href={`https://doi.org/${pub.doi}`}>
+            DOI<span class="visually-hidden">: {pub.doi}</span>
+          </a>
+        )
+      }
+      {pub.pdf && <a class="pub__btn" href={pub.pdf}>PDF</a>}
+      {
+        pub.code && (
+          <a class="pub__btn" href={pub.code}>
+            <Icon name="github" size={13} /> Code
+          </a>
+        )
+      }
+      {pub.data && <a class="pub__btn" href={pub.data}>Data</a>}
+    </p>
+  </div>
+</article>
+
+<style>
+  .pub {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .pub:first-child {
+    padding-top: var(--space-2);
+  }
+  .pub__year {
+    padding-top: 0.2rem;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--color-accent);
+  }
+  .pub__title {
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    font-weight: 580;
+    line-height: var(--leading-snug);
+    letter-spacing: 0;
+    text-wrap: pretty;
+  }
+  .pub__title a {
+    color: var(--color-text);
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition:
+      background-size 300ms var(--ease),
+      color var(--duration) var(--ease);
+  }
+  .pub__title a:hover {
+    color: var(--color-accent);
+    background-size: 100% 1px;
+  }
+  .pub__authors {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .pub__self {
+    color: var(--color-text);
+    font-weight: 650;
+  }
+  .pub__venue {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .pub__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  .pub__actions:empty {
+    display: none;
+  }
+  .pub__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.2rem 0.65rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+  }
+  .pub__btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  @media (max-width: 40rem) {
+    .pub {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+    }
+    .pub__year {
+      font-size: var(--text-sm);
+    }
+  }
+</style>

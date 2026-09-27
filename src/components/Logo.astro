@@ -1,0 +1,25 @@
+---
+/** Site mark: a small summit drawn as contour rings (same generator as the page motif). */
+import { peakPaths } from '../lib/motifs';
+
+interface Props {
+  size?: number;
+  class?: string;
+}
+const { size = 30, class: className } = Astro.props;
+const rings = peakPaths({ size: 64, radii: [0.2, 0.5, 0.8], seed: 5, wobble: 0.12, cell: 1 });
+---
+
+<svg
+  class:list={['logo-mark', className]}
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  fill="none"
+  stroke="currentColor"
+  stroke-linecap="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {rings.map((r, i) => <path d={r.d} stroke-width={i === 0 ? 4.2 : 3.4} opacity={1 - i * 0.22} />)}
+</svg>

@@ -1,0 +1,71 @@
+---
+import ComingSoon from '../../components/ComingSoon.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPosts } from '../../lib/collections';
+import { formatDate, isoDate } from '../../lib/format';
+
+const posts = await getPosts();
+---
+
+<PageLayout
+  title="Blog"
+  eyebrow="Blog"
+  intro="Notes on hydrological modelling, climate data and open-source tools — tutorials, workflows and the occasional notebook."
+  contour="85% 60%"
+>
+  {
+    posts.length > 0 && (
+      <ol role="list" class="posts">
+        {posts.map((p) => (
+          <li>
+            <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date)}</time>
+            <h2>
+              <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+              {p.data.draft && <span class="chip">draft</span>}
+            </h2>
+            <p>{p.data.description}</p>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+
+  <ComingSoon phase={3} icon="docs" title="Posts are on their way">
+    <p>
+      Tutorials on working with IMD data, installing CDO, computing climate indices with IMDLIB and more — migrated and
+      refreshed from the old site, with maths, highlighted code and Jupyter notebooks. An RSS feed is already at
+      <a href="/rss.xml">/rss.xml</a>.
+    </p>
+  </ComingSoon>
+</PageLayout>
+
+<style>
+  .posts {
+    display: grid;
+    gap: var(--space-6);
+    max-width: var(--width-prose);
+    margin-bottom: var(--space-7);
+  }
+  .posts time {
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .posts h2 {
+    font-size: var(--text-lg);
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+  }
+  .posts h2 a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .posts h2 a:hover {
+    color: var(--color-accent);
+  }
+  .posts p {
+    color: var(--color-text-muted);
+  }
+</style>

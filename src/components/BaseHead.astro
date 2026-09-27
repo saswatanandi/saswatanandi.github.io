@@ -1,0 +1,131 @@
+---
+/**
+ * <head> contents: meta/SEO/Open Graph, fonts (self-hosted, latin subsets),
+ * theme bootstrapping (no flash of the wrong theme), analytics (only if configured).
+ */
+import { site } from '../lib/config';
+import { profileLinks } from '../lib/links';
+import '../styles/global.css';
+
+// Self-hosted fonts (latin + latin-ext only; the browser fetches latin-ext only if needed).
+import serifLatin from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2?url';
+import serifLatinExt from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-ext-wght-normal.woff2?url';
+import serifItalicLatin from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-italic.woff2?url';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import interLatinExt from '@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2?url';
+import interItalicLatin from '@fontsource-variable/inter/files/inter-latin-wght-italic.woff2?url';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'profile';
+  noindex?: boolean;
+  /** Extra JSON-LD objects for this page. */
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { title, description = site.description, image = '/og-default.png', type = 'website', noindex = false, jsonLd = [] } =
+  Astro.props;
+
+const fullTitle = title ? `${title} · ${site.name}` : `${site.name} — ${site.role.split('·')[0]!.trim()}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const imageUrl = new URL(image, Astro.site);
+
+const LATIN =
+  'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
+const LATIN_EXT =
+  'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF';
+const face = (family: string, url: string, range: string, style = 'normal', weight = '100 900') =>
+  `@font-face{font-family:'${family}';font-style:${style};font-display:swap;font-weight:${weight};src:url(${url}) format('woff2-variations'),url(${url}) format('woff2');unicode-range:${range}}`;
+const fontCss = [
+  face('Source Serif 4 Variable', serifLatin, LATIN, 'normal', '200 900'),
+  face('Source Serif 4 Variable', serifLatinExt, LATIN_EXT, 'normal', '200 900'),
+  face('Source Serif 4 Variable', serifItalicLatin, LATIN, 'italic', '200 900'),
+  face('Inter Variable', interLatin, LATIN),
+  face('Inter Variable', interLatinExt, LATIN_EXT),
+  face('Inter Variable', interItalicLatin, LATIN, 'italic'),
+].join('');
+
+// Optional accent overrides from site.config.yaml (validated as CSS colours).
+const accentCss = [
+  site.theme.accent ? `:root{--color-accent:${site.theme.accent};--color-contour:${site.theme.accent}}` : '',
+  site.theme.accent_dark
+    ? `:root[data-theme='dark']{--color-accent:${site.theme.accent_dark};--color-contour:${site.theme.accent_dark}}@media (prefers-color-scheme:dark){:root:not([data-theme='light']){--color-accent:${site.theme.accent_dark};--color-contour:${site.theme.accent_dark}}}`
+    : '',
+].join('');
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: Astro.site?.toString(),
+  image: new URL('/images/headshot.jpg', Astro.site).toString(),
+  jobTitle: site.role.split('·')[0]!.trim(),
+  description: site.description,
+  ...(site.affiliation.name
+    ? { affiliation: { '@type': 'Organization', name: site.affiliation.name, ...(site.affiliation.url ? { url: site.affiliation.url } : {}) } }
+    : {}),
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Indian Institute of Technology Bombay' },
+  knowsAbout: ['Hydrology', 'Land surface modelling', 'Hydrological forecasting', 'Climate change impacts', 'Wildfire hydrology', 'Open-source software'],
+  sameAs: profileLinks(site).map((l) => l.href),
+};
+
+// Theme bootstrap: runs before first paint. Reads a remembered choice (if any) —
+// otherwise the CSS follows the OS preference. Also flags that JS is available.
+const themeScript = `(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')d.dataset.theme=t;}catch(e){}})();`;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex" />}
+<meta name="generator" content={Astro.generator} />
+<meta name="author" content={site.name} />
+
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#f7f9fa" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0e181e" media="(prefers-color-scheme: dark)" />
+
+<script is:inline set:html={themeScript} />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" type="application/rss+xml" title={`${site.name} — Blog`} href="/rss.xml" />
+
+<link rel="preload" href={serifLatin} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+<style is:inline set:html={fontCss + accentCss}></style>
+
+<!-- Open Graph / social cards -->
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={`${site.name} — ${site.role}`} />
+<meta property="og:locale" content="en_GB" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+
+{[person, ...jsonLd].map((obj) => <script type="application/ld+json" is:inline set:html={JSON.stringify(obj)} />)}
+
+{
+  site.analytics.goatcounter && (
+    <script
+      is:inline
+      async
+      data-goatcounter={`https://${site.analytics.goatcounter}.goatcounter.com/count`}
+      src="//gc.zgo.at/count.js"
+    />
+  )
+}

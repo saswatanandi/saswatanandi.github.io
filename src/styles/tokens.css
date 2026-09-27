@@ -1,0 +1,136 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Design tokens — "Topographic"
+   Slate ink, teal water, one warm amber accent (used sparingly), paper white.
+   Every colour in the site comes from here. Dark values are defined twice:
+   for the system preference (unless the visitor forced light) and for an
+   explicit [data-theme="dark"] choice.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: light;
+
+  /* Palette — light */
+  --color-bg: #f7f9fa;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef3f4;
+  --color-text: #1b2a33;
+  --color-text-muted: #45565f;
+  --color-text-faint: #5d6d76;
+  --color-border: #dbe3e7;
+  --color-border-strong: #c3d0d6;
+
+  --color-accent: #0f6e56;
+  --color-accent-hover: #0a5442;
+  --color-accent-2: #1d9e75;
+  --color-accent-3: #5dcaa5;
+  --color-accent-soft: #e3f2ec;
+  --color-on-accent: #ffffff;
+
+  --color-warm: #ba7517;
+  --color-warm-text: #8a5510;
+  --color-warm-soft: #fbefdc;
+
+  --color-contour: #0f6e56;
+  --contour-opacity: 0.16;
+  --color-focus: #ba7517;
+  --shadow-sm: 0 1px 2px rgb(27 42 51 / 0.06), 0 1px 1px rgb(27 42 51 / 0.04);
+  --shadow-md: 0 6px 24px -8px rgb(27 42 51 / 0.18), 0 2px 6px -2px rgb(27 42 51 / 0.08);
+
+  /* Typography */
+  --font-display: 'Source Serif 4 Variable', 'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'Inter Variable', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  /* Type scale (1.2 minor third, fluid at the top end) */
+  --text-xs: 0.8125rem;   /* 13px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1.0625rem; /* 17px */
+  --text-md: 1.1875rem;   /* 19px */
+  --text-lg: clamp(1.3rem, 1.15rem + 0.6vw, 1.5rem);
+  --text-xl: clamp(1.6rem, 1.35rem + 1vw, 2rem);
+  --text-2xl: clamp(2rem, 1.6rem + 1.8vw, 2.75rem);
+  --text-3xl: clamp(2.4rem, 1.8rem + 2.6vw, 3.5rem);
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-body: 1.65;
+
+  /* Spacing (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Layout */
+  --width-prose: 72ch;
+  --width-layout: 1100px;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2rem);
+  --header-height: 4rem;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --duration: 180ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --color-bg: #0e181e;
+    --color-surface: #142129;
+    --color-surface-2: #1a2a33;
+    --color-text: #e4ebee;
+    --color-text-muted: #aebcc3;
+    --color-text-faint: #93a3ab;
+    --color-border: #243741;
+    --color-border-strong: #334a55;
+    --color-accent: #5dcaa5;
+    --color-accent-hover: #86dcbe;
+    --color-accent-2: #3fb58d;
+    --color-accent-3: #1d9e75;
+    --color-accent-soft: rgb(93 202 165 / 0.12);
+    --color-on-accent: #0b1f19;
+    --color-warm: #e0a04a;
+    --color-warm-text: #ebb56b;
+    --color-warm-soft: rgb(224 160 74 / 0.14);
+    --color-contour: #5dcaa5;
+    --contour-opacity: 0.13;
+    --color-focus: #e0a04a;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-md: 0 8px 28px -10px rgb(0 0 0 / 0.6), 0 2px 6px -2px rgb(0 0 0 / 0.3);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #0e181e;
+  --color-surface: #142129;
+  --color-surface-2: #1a2a33;
+  --color-text: #e4ebee;
+  --color-text-muted: #aebcc3;
+  --color-text-faint: #93a3ab;
+  --color-border: #243741;
+  --color-border-strong: #334a55;
+  --color-accent: #5dcaa5;
+  --color-accent-hover: #86dcbe;
+  --color-accent-2: #3fb58d;
+  --color-accent-3: #1d9e75;
+  --color-accent-soft: rgb(93 202 165 / 0.12);
+  --color-on-accent: #0b1f19;
+  --color-warm: #e0a04a;
+  --color-warm-text: #ebb56b;
+  --color-warm-soft: rgb(224 160 74 / 0.14);
+  --color-contour: #5dcaa5;
+  --contour-opacity: 0.13;
+  --color-focus: #e0a04a;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 8px 28px -10px rgb(0 0 0 / 0.6), 0 2px 6px -2px rgb(0 0 0 / 0.3);
+}

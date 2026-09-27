@@ -1,0 +1,21 @@
+# CV data (Phase 2 renders /cv and builds cv.pdf from this file + publications.bib).
+# Each item: title, org, location, start, end, details, url — all but `title` optional.
+
+education:
+  - title: PhD, Water Resources Engineering (Civil Engineering)
+    org: Indian Institute of Technology Bombay
+    location: Mumbai, India
+    start: ""   # TODO(Saswata)
+    end: ""     # TODO(Saswata)
+
+positions:
+  - title: Postdoctoral Researcher
+    org: Sierra Nevada Research Institute, University of California, Merced
+    location: Merced, CA, USA
+    start: ""   # TODO(Saswata)
+    end: ""     # TODO(Saswata): end date, and add your current position above this one
+
+awards: []
+service: []
+mentoring: []
+teaching: []

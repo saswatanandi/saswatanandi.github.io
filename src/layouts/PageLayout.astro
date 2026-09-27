@@ -1,0 +1,52 @@
+---
+/** Standard inner page: contour-textured header (eyebrow, title, intro) + content. */
+import type { Props as HeadProps } from '../components/BaseHead.astro';
+import ContourBand from '../components/ContourBand.astro';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props extends HeadProps {
+  title: string;
+  eyebrow?: string;
+  intro?: string;
+  /** Terrain window for the header texture, e.g. "20% 70%". */
+  contour?: string;
+}
+const { title, eyebrow, intro, contour = '50% 40%', ...head } = Astro.props;
+---
+
+<BaseLayout title={title} description={head.description ?? intro} {...head}>
+  <header class="page-header">
+    <ContourBand fade="left" position={contour} />
+    <div class="container">
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      <h1>{title}</h1>
+      {intro && <p class="page-header__intro">{intro}</p>}
+      <slot name="header" />
+    </div>
+  </header>
+  <div class="container page-body">
+    <slot />
+  </div>
+</BaseLayout>
+
+<style>
+  .page-header {
+    position: relative;
+    isolation: isolate;
+    padding-block: var(--space-8) var(--space-7);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .page-header h1 {
+    margin-top: var(--space-2);
+    max-width: 22ch;
+  }
+  .page-header__intro {
+    margin-top: var(--space-4);
+    max-width: 60ch;
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+  }
+  .page-body {
+    padding-top: var(--space-7);
+  }
+</style>

@@ -1,0 +1,30 @@
+---
+/**
+ * Obfuscated email link. The address is stored reversed + base64 in a data attribute
+ * and turned into a mailto: link by a tiny script, so simple scrapers don't find it.
+ */
+import { encodeEmail } from '../lib/links';
+
+interface Props {
+  email: string;
+  class?: string;
+  label?: string;
+}
+const { email, class: className, label = 'Email' } = Astro.props;
+---
+
+<a class={className} href="/#contact" data-email={encodeEmail(email)} aria-label={label} rel="nofollow">
+  <slot />
+</a>
+
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('a[data-email]').forEach((a) => {
+    try {
+      const addr = [...atob(a.dataset.email ?? '')].reverse().join('');
+      a.href = `mailto:${addr}`;
+      a.title = addr;
+    } catch {
+      /* leave the fallback link */
+    }
+  });
+</script>

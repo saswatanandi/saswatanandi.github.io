@@ -1,0 +1,131 @@
+---
+import { site } from '../lib/config';
+import { profileLinks } from '../lib/links';
+import EmailLink from './EmailLink.astro';
+import Icon from './Icon.astro';
+
+const links = profileLinks(site);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__id">
+      <p class="site-footer__name">{site.name}</p>
+      <p class="site-footer__role">
+        {site.role}{site.affiliation.name && <> · {site.affiliation.name}</>}
+      </p>
+    </div>
+
+    <ul role="list" class="site-footer__social" aria-label="Profiles and feeds">
+      {
+        site.email && (
+          <li>
+            <EmailLink email={site.email} class="icon-link" label="Email">
+              <Icon name="mail" size={20} />
+            </EmailLink>
+          </li>
+        )
+      }
+      {
+        links.map((l) => (
+          <li>
+            <a class="icon-link" href={l.href} aria-label={l.label} title={l.label} rel="me noopener">
+              <Icon name={l.icon} size={18} />
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a class="icon-link" href="/rss.xml" aria-label="RSS feed" title="RSS feed">
+          <Icon name="rss" size={20} />
+        </a>
+      </li>
+    </ul>
+
+    <p class="site-footer__meta">
+      <span>© {year} {site.name}</span>
+      <span aria-hidden="true" class="site-footer__sep">·</span>
+      <span>
+        Built with <a href="https://astro.build">Astro</a>{
+          site.repo && (
+            <>
+              {' '}· <a href={site.repo}>source on GitHub</a>
+            </>
+          )
+        }
+      </span>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-9);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .site-footer__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--space-4) var(--space-6);
+    padding-block: var(--space-6) var(--space-6);
+  }
+  .site-footer__name {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .site-footer__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+  .site-footer__social :global(.icon-link) {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    transition:
+      color var(--duration) var(--ease),
+      background var(--duration) var(--ease);
+  }
+  .site-footer__social :global(.icon-link:hover) {
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+  .site-footer__meta {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text-faint);
+    font-size: var(--text-xs);
+  }
+  .site-footer__meta a {
+    color: inherit;
+  }
+  .site-footer__meta a:hover {
+    color: var(--color-accent);
+  }
+  @media (max-width: 40rem) {
+    .site-footer__meta {
+      flex-direction: column;
+      gap: 0.25em;
+    }
+    .site-footer__sep {
+      display: none;
+    }
+    .site-footer__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

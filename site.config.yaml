@@ -1,0 +1,75 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  site.config.yaml — the one file for "who I am" and site-wide settings.
+#  Edit on GitHub, commit to `main`, and the site rebuilds automatically.
+#  Anything marked  # TODO(Saswata)  is a placeholder waiting for real info.
+#  Optional fields can be deleted or left empty ("") — they simply won't render.
+#  The build validates this file and prints a readable error if a field is wrong.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Saswata Nandi
+role: Postdoctoral Researcher · Hydrology          # TODO(Saswata): current title
+affiliation:
+  name: ""                                          # TODO(Saswata): current institution (empty = hidden)
+  url: ""                                           # TODO(Saswata): institution / lab URL
+location: California, USA                           # TODO(Saswata): confirm
+email: withsaswata@gmail.com                        # TODO(Saswata): confirm (shown obfuscated, never as plain text in HTML)
+
+# Short bio (Markdown). Shown on the home page and used for the meta description.
+bio: |
+  I am a hydrologist working at the interface of **land-surface modelling, remote sensing and climate**.
+  My research asks how forests, fire and a changing climate reshape the water balance — from
+  evapotranspiration in the Sierra Nevada to floods, droughts and streamflow forecasts in Indian river basins.
+  I did my PhD in Water Resources Engineering at IIT Bombay and I care about open, reproducible science:
+  I created and maintain [IMDLIB](/software/), an open-source Python library for Indian gridded weather data.
+
+# One-line description used in search results / social cards (≤ 160 characters).
+description: Hydrologist working on land-surface modelling, forests & fire, forecasting and climate impacts. Creator of the open-source IMDLIB Python library.
+
+# Profile links — all optional. Empty or missing = not rendered.
+links:
+  scholar: ""            # TODO(Saswata): https://scholar.google.com/citations?user=XXXX
+  orcid: ""              # TODO(Saswata): https://orcid.org/0000-0000-0000-0000
+  github: https://github.com/iamsaswata      # TODO(Saswata): confirm handle
+  linkedin: ""           # TODO(Saswata): https://www.linkedin.com/in/…
+  bluesky: ""            # TODO(Saswata): https://bsky.app/profile/…
+  x: ""                  # TODO(Saswata): https://x.com/…
+  researchgate: ""       # TODO(Saswata): https://www.researchgate.net/profile/…
+
+# Path to the CV (Phase 2 generates /cv.pdf from cv.yaml; the /cv page exists now).
+cv: /cv/
+
+# Main navigation (order = display order).
+nav:
+  - { label: Research, href: /research/ }
+  - { label: Publications, href: /publications/ }
+  - { label: Software, href: /software/ }
+  - { label: Blog, href: /blog/ }
+  - { label: Reading, href: /reading/ }
+  - { label: CV, href: /cv/ }
+
+# Citation metrics — entered manually (no live API calls during the build).
+metrics:
+  citations: null        # TODO(Saswata): e.g. 350
+  h_index: null          # TODO(Saswata)
+  i10: null              # TODO(Saswata)
+  source: Google Scholar
+  updated: null          # TODO(Saswata): date you copied the numbers, e.g. 2026-09-01
+
+# Source repository (footer link + "edit" links later).
+repo: https://github.com/saswatanandi/saswatanandi.github.io
+
+# Cookie-free analytics. Put your GoatCounter code (the "xyz" in xyz.goatcounter.com) to enable.
+analytics:
+  goatcounter: ""        # TODO(Saswata): create account at goatcounter.com
+
+# giscus comments (Phase 3). Get the ids from https://giscus.app after enabling Discussions.
+giscus:
+  repo: ""
+  repo_id: ""
+  category: ""
+  category_id: ""
+
+# Optional colour overrides (any CSS colour). Leave empty to use the Topographic palette.
+theme:
+  accent: ""
+  accent_dark: ""

@@ -1,0 +1,59 @@
+---
+/** Friendly placeholder for sections that arrive in a later build phase. */
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  phase: number;
+  icon?: IconName;
+  title?: string;
+}
+const { phase, icon = 'layers', title = 'This section is being built' } = Astro.props;
+---
+
+<section class="soon" aria-labelledby="soon-title">
+  <span class="soon__icon"><Icon name={icon} size={26} /></span>
+  <div>
+    <p class="eyebrow">Coming in phase {phase}</p>
+    <h2 id="soon-title" class="soon__title">{title}</h2>
+    <div class="soon__body"><slot /></div>
+  </div>
+</section>
+
+<style>
+  .soon {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-5);
+    max-width: 46rem;
+    padding: var(--space-6);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+  .soon__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--color-warm-soft);
+    color: var(--color-warm-text);
+  }
+  .soon__title {
+    margin-top: var(--space-1);
+    font-size: var(--text-lg);
+  }
+  .soon__body {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+  }
+  .soon__body :global(p + p) {
+    margin-top: var(--space-3);
+  }
+  @media (max-width: 36rem) {
+    .soon {
+      grid-template-columns: 1fr;
+      padding: var(--space-5);
+    }
+  }
+</style>

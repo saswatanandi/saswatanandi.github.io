@@ -1,0 +1,174 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render, type CollectionEntry } from 'astro:content';
+import ComingSoon from '../../components/ComingSoon.astro';
+import Icon from '../../components/Icon.astro';
+import PublicationItem from '../../components/PublicationItem.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPublications } from '../../lib/bibtex';
+import { getThemes } from '../../lib/collections';
+
+export const getStaticPaths = (async () => {
+  const themes = await getThemes();
+  return themes.map((theme, i) => ({
+    params: { slug: theme.id },
+    props: { theme, prev: themes[i - 1], next: themes[i + 1], index: i },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  theme: CollectionEntry<'research'>;
+  prev?: CollectionEntry<'research'>;
+  next?: CollectionEntry<'research'>;
+  index: number;
+}
+const { theme, prev, next, index } = Astro.props;
+const { Content } = await render(theme);
+const pubs = getPublications().filter((p) => p.topics.includes(theme.data.key));
+const positions = ['15% 30%', '80% 20%', '40% 80%', '90% 70%', '5% 90%'];
+---
+
+<PageLayout
+  title={theme.data.title}
+  eyebrow={`Research theme ${String(index + 1).padStart(2, '0')}`}
+  intro={theme.data.summary}
+  description={theme.data.summary}
+  contour={positions[index % positions.length]}
+>
+  <nav aria-label="Breadcrumb" class="crumbs" slot="header">
+    <a href="/research/">← All research themes</a>
+  </nav>
+
+  <div class="layout">
+    <div class="prose">
+      <Content />
+    </div>
+    {
+      theme.data.regions.length > 0 && (
+        <aside class="facts" aria-label="Study areas">
+          <p class="eyebrow">
+            <Icon name="pin" size={14} /> Study areas
+          </p>
+          <ul role="list">
+            {theme.data.regions.map((r) => (
+              <li>{r}</li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+  </div>
+
+  {
+    pubs.length > 0 && (
+      <section class="related" aria-labelledby="related-pubs">
+        <h2 id="related-pubs">Selected papers</h2>
+        <div>
+          {pubs.map((p) => (
+            <PublicationItem pub={p} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <div class="related">
+    <ComingSoon phase={4} icon={theme.data.icon} title="Everything on this theme">
+      <p>This page will automatically list every paper, talk, blog post and reading note tagged with this theme.</p>
+    </ComingSoon>
+  </div>
+
+  <nav class="pager" aria-label="Research themes">
+    {
+      prev ? (
+        <a href={`/research/${prev.id}/`} rel="prev">
+          <span>Previous</span>
+          {prev.data.title}
+        </a>
+      ) : (
+        <span />
+      )
+    }
+    {
+      next && (
+        <a href={`/research/${next.id}/`} rel="next" class="pager__next">
+          <span>Next</span>
+          {next.data.title}
+        </a>
+      )
+    }
+  </nav>
+</PageLayout>
+
+<style>
+  .crumbs {
+    margin-top: var(--space-5);
+    font-size: var(--text-sm);
+  }
+  .crumbs a {
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 16rem;
+    gap: var(--space-8);
+    align-items: start;
+  }
+  .prose {
+    font-size: var(--text-md);
+  }
+  .facts {
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+  .facts ul {
+    margin-top: var(--space-3);
+    display: grid;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .related {
+    margin-top: var(--space-8);
+    max-width: 58rem;
+  }
+  .related h2 {
+    margin-bottom: var(--space-4);
+  }
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+  .pager a {
+    display: grid;
+    gap: var(--space-1);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .pager a span {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .pager__next {
+    text-align: right;
+  }
+  @media (max-width: 52rem) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+  }
+</style>

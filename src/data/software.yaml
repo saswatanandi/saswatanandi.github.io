@@ -1,0 +1,24 @@
+# Software cards. Stats are entered by hand (no API calls at build time) —
+# update `stars`, `downloads` and `stats_updated` whenever you like; null = hidden.
+
+- name: IMDLIB
+  repo: https://github.com/iamsaswata/imdlib
+  description: Open-source Python library to download, process and explore India Meteorological Department (IMD) gridded rainfall and temperature data — from raw binaries to xarray, NetCDF and GeoTIFF in a few lines.
+  language: Python
+  pypi: imdlib
+  # conda: imdlib            # TODO(Saswata): conda channel, if any
+  docs: https://imdlib.readthedocs.io
+  paper_doi: 10.1016/j.envsoft.2023.105869
+  stars: null                # TODO(Saswata): GitHub stars
+  downloads: null            # TODO(Saswata): total PyPI downloads (e.g. from pepy.tech)
+  stats_updated: null
+  featured: true
+  snippet: |
+    # install
+    $ pip install imdlib
+
+    # daily rainfall over India, 2020–2023
+    >>> import imdlib as imd
+    >>> data = imd.get_data('rain', 2020, 2023)
+    >>> ds = data.get_xarray()
+  tags: [python, climate-data, india, xarray]

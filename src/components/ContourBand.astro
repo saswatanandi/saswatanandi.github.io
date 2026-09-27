@@ -1,0 +1,49 @@
+---
+/**
+ * Decorative topographic texture behind a page header.
+ * The SVG (/images/contours.svg) is used as a CSS mask over a token colour,
+ * so it follows the light/dark theme without duplicating the artwork.
+ */
+interface Props {
+  /** Where the lines fade out. */
+  fade?: 'bottom' | 'left' | 'radial';
+  class?: string;
+  /** Background-position of the terrain (pick a different "map area" per page). */
+  position?: string;
+}
+const { fade = 'bottom', class: className, position = '50% 40%' } = Astro.props;
+---
+
+<div class:list={['contour-band', `contour-band--${fade}`, className]} style={`--contour-pos:${position};--contour-url:url(/images/contours.svg)`} aria-hidden="true">
+</div>
+
+<style>
+  .contour-band {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .contour-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-contour);
+    opacity: var(--contour-opacity);
+    -webkit-mask: var(--contour-url) var(--contour-pos) / cover no-repeat;
+    mask: var(--contour-url) var(--contour-pos) / cover no-repeat;
+  }
+  .contour-band--bottom {
+    -webkit-mask-image: linear-gradient(to bottom, #000 20%, transparent 95%);
+    mask-image: linear-gradient(to bottom, #000 20%, transparent 95%);
+  }
+  .contour-band--left {
+    -webkit-mask-image: linear-gradient(to left, #000 25%, transparent 85%);
+    mask-image: linear-gradient(to left, #000 25%, transparent 85%);
+  }
+  .contour-band--radial {
+    -webkit-mask-image: radial-gradient(ellipse 70% 90% at 75% 40%, #000 20%, transparent 80%);
+    mask-image: radial-gradient(ellipse 70% 90% at 75% 40%, #000 20%, transparent 80%);
+  }
+</style>

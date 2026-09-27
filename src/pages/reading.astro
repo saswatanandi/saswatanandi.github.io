@@ -1,0 +1,76 @@
+---
+import ComingSoon from '../components/ComingSoon.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { getReading } from '../lib/collections';
+import { formatYearMonth } from '../lib/format';
+
+const items = await getReading();
+---
+
+<PageLayout
+  title="Reading"
+  eyebrow="Reading"
+  intro="Papers I have read and think are worth your time — one line on why, and longer notes on some of them."
+  contour="10% 20%"
+>
+  {
+    items.length > 0 && (
+      <ol role="list" class="reading">
+        {items.map((r) => (
+          <li>
+            <p class="reading__meta">
+              read {formatYearMonth(r.data.read)}
+              {r.data.draft && <span class="chip">draft</span>}
+            </p>
+            <h2>
+              {r.data.doi ? <a href={`https://doi.org/${r.data.doi}`}>{r.data.title}</a> : r.data.url ? <a href={r.data.url}>{r.data.title}</a> : r.data.title}
+            </h2>
+            <p class="reading__src">
+              {r.data.authors} ({r.data.year}){r.data.journal && <>. <em>{r.data.journal}</em></>}
+            </p>
+            <p class="reading__why">{r.data.why}</p>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+
+  <ComingSoon phase={3} icon="book" title="A reading log">
+    <p>
+      Entries grouped by month with tag filters, shared tags with the blog, and a “Read note →” link where I have written
+      more.
+    </p>
+  </ComingSoon>
+</PageLayout>
+
+<style>
+  .reading {
+    display: grid;
+    gap: var(--space-6);
+    max-width: var(--width-prose);
+    margin-bottom: var(--space-7);
+  }
+  .reading__meta {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .reading h2 {
+    font-size: var(--text-lg);
+  }
+  .reading h2 a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .reading__src {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .reading__why {
+    margin-top: var(--space-2);
+  }
+</style>

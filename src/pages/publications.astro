@@ -1,0 +1,47 @@
+---
+import ComingSoon from '../components/ComingSoon.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { getPublications } from '../lib/bibtex';
+import { site } from '../lib/config';
+
+const pubs = getPublications();
+---
+
+<PageLayout
+  title="Publications"
+  eyebrow="Publications"
+  intro="Journal articles, book chapters, conference papers and talks on hydrological modelling, forecasting, forests and climate."
+  contour="70% 30%"
+>
+  <ComingSoon phase={2} icon="book" title="The full publication list">
+    <p>
+      All papers, chapters, proceedings and talks — with filters by type, year and research theme, DOI / PDF / code
+      links, one-click BibTeX, and a page for every paper.
+    </p>
+    {
+      site.links.scholar && (
+        <p>
+          Meanwhile, see <a href={site.links.scholar}>Google Scholar</a>.
+        </p>
+      )
+    }
+  </ComingSoon>
+
+  <section class="list" aria-labelledby="sel">
+    <h2 id="sel">Selected papers</h2>
+    <div>
+      {pubs.map((p) => <PublicationItem pub={p} />)}
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .list {
+    margin-top: var(--space-8);
+    max-width: 58rem;
+  }
+  .list h2 {
+    margin-bottom: var(--space-4);
+  }
+</style>

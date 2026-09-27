@@ -1,0 +1,101 @@
+---
+import { getEntry } from 'astro:content';
+import ComingSoon from '../components/ComingSoon.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import type { CvItem } from '../schemas/content';
+
+const cv = await getEntry('cv', 'cv');
+const sections: { title: string; items: CvItem[] }[] = cv
+  ? [
+      { title: 'Positions', items: cv.data.positions },
+      { title: 'Education', items: cv.data.education },
+      { title: 'Awards', items: cv.data.awards },
+      { title: 'Service', items: cv.data.service },
+      { title: 'Mentoring', items: cv.data.mentoring },
+      { title: 'Teaching', items: cv.data.teaching },
+    ].filter((s) => s.items.length > 0)
+  : [];
+const when = (i: CvItem) => [i.start, i.end].filter(Boolean).join(' – ');
+---
+
+<PageLayout
+  title="Curriculum vitae"
+  eyebrow="CV"
+  intro="Positions, education, publications, service and teaching — the web version of my CV."
+  contour="60% 90%"
+>
+  <div class="cv">
+    {
+      sections.map((s) => (
+        <section aria-labelledby={`cv-${s.title}`}>
+          <h2 id={`cv-${s.title}`}>{s.title}</h2>
+          <ul role="list">
+            {s.items.map((i) => (
+              <li>
+                <p class="cv__when">{when(i)}</p>
+                <div>
+                  <p class="cv__title">{i.title}</p>
+                  {(i.org || i.location) && <p class="cv__org">{[i.org, i.location].filter(Boolean).join(', ')}</p>}
+                  {i.details && <p class="cv__details">{i.details}</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+
+  <div class="soon">
+    <ComingSoon phase={2} icon="cv" title="Full CV and PDF download">
+      <p>
+        The complete CV — including every publication, awards, service, mentoring and teaching — rendered here and as a
+        typeset PDF, both generated from the same data.
+      </p>
+    </ComingSoon>
+  </div>
+</PageLayout>
+
+<style>
+  .cv {
+    display: grid;
+    gap: var(--space-7);
+    max-width: 52rem;
+  }
+  .cv h2 {
+    padding-bottom: var(--space-2);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-lg);
+  }
+  .cv li {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: var(--space-4);
+  }
+  .cv li + li {
+    margin-top: var(--space-4);
+  }
+  .cv__when {
+    color: var(--color-text-faint);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  .cv__title {
+    font-weight: 600;
+  }
+  .cv__org,
+  .cv__details {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .soon {
+    margin-top: var(--space-8);
+  }
+  @media (max-width: 36rem) {
+    .cv li {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+</style>

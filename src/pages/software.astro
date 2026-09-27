@@ -1,0 +1,38 @@
+---
+import ComingSoon from '../components/ComingSoon.astro';
+import SoftwareCard from '../components/SoftwareCard.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { getSoftware } from '../lib/collections';
+
+const items = await getSoftware();
+---
+
+<PageLayout
+  title="Software"
+  eyebrow="Open source"
+  intro="Tools I build and maintain so that hydro-climatic data is easier to get, check and use — openly licensed and developed in public."
+  contour="30% 20%"
+>
+  <div class="grid">
+    {items.map((item) => <SoftwareCard item={item} feature={item.data.featured} />)}
+  </div>
+
+  <div class="soon">
+    <ComingSoon phase={3} icon="package" title="The IMDLIB showcase">
+      <p>
+        A full page for IMDLIB: installation, a quick-start walkthrough, features, how to cite it, and links to the
+        documentation — plus cards for my other repositories.
+      </p>
+    </ComingSoon>
+  </div>
+</PageLayout>
+
+<style>
+  .grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .soon {
+    margin-top: var(--space-8);
+  }
+</style>

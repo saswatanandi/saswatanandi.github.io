@@ -1,0 +1,118 @@
+---
+import ComingSoon from '../../components/ComingSoon.astro';
+import Icon from '../../components/Icon.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getThemes } from '../../lib/collections';
+
+const themes = await getThemes();
+---
+
+<PageLayout
+  title="Research"
+  eyebrow="Research"
+  intro="I study how land, vegetation and climate shape the water cycle — with physically based models, satellite data and open tools. My work is organised around five themes."
+  contour="20% 60%"
+>
+  <ol role="list" class="themes">
+    {
+      themes.map((t, i) => (
+        <li class="theme">
+          <span class="theme__num" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <span class="theme__icon">
+            <Icon name={t.data.icon} size={24} />
+          </span>
+          <div>
+            <h2 class="theme__title">
+              <a href={`/research/${t.id}/`}>{t.data.title}</a>
+            </h2>
+            <p class="theme__summary">{t.data.summary}</p>
+            {t.data.regions.length > 0 && (
+              <p class="theme__regions">
+                <Icon name="pin" size={14} /> {t.data.regions.join(' · ')}
+              </p>
+            )}
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="soon-wrap">
+    <ComingSoon phase={4} icon="pin" title="Study-basin map">
+      <p>
+        An interactive map of the river basins I have worked in — from the Upper Bhima and Mahanadi in India to the Kings
+        River in the Sierra Nevada — each linked to the papers behind it.
+      </p>
+    </ComingSoon>
+  </div>
+</PageLayout>
+
+<style>
+  .themes {
+    display: grid;
+    gap: 0;
+    max-width: 58rem;
+  }
+  .theme {
+    display: grid;
+    grid-template-columns: 2.5rem 3rem 1fr;
+    gap: var(--space-4);
+    align-items: start;
+    padding-block: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .theme:first-child {
+    padding-top: 0;
+  }
+  .theme__num {
+    padding-top: 0.55rem;
+    font-family: var(--font-display);
+    color: var(--color-text-faint);
+    font-variant-numeric: oldstyle-nums;
+  }
+  .theme__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+  .theme__title {
+    font-size: var(--text-xl);
+  }
+  .theme__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .theme__title a:hover {
+    color: var(--color-accent);
+  }
+  .theme__summary {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+    max-width: 62ch;
+  }
+  .theme__regions {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
+  }
+  .soon-wrap {
+    margin-top: var(--space-8);
+  }
+  @media (max-width: 36rem) {
+    .theme {
+      grid-template-columns: 3rem 1fr;
+    }
+    .theme__num {
+      display: none;
+    }
+  }
+</style>

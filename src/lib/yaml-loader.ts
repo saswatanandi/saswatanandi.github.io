@@ -1,0 +1,108 @@
+/**
+ * A small content-layer loader for the hand-edited YAML files in `src/data/`.
+ *
+ * Why not Astro's built-in `file()` loader?
+ *  - It needs an `id` on every list item (annoying to type by hand) — we derive ids.
+ *  - A YAML syntax error there is only logged; here it stops the build with the
+ *    line/column so the mistake is obvious in the GitHub Actions log.
+ *
+ * Modes:
+ *  - "list":   the file is a YAML list; every item becomes one entry.
+ *  - "single": the whole file is one entry (id = `singleId`), e.g. cv.yaml.
+ */
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { parse, YAMLParseError } from 'yaml';
+import type { Loader } from 'astro/loaders';
+
+type Item = Record<string, unknown>;
+
+interface Options {
+  /** Path relative to the project root, e.g. "src/data/news.yaml". */
+  path: string;
+  mode?: 'list' | 'single';
+  /** Build an id for a list item (defaults to a slug of `id` / `name` / `title`, else the index). */
+  id?: (item: Item, index: number) => string;
+  /** Id used in "single" mode. */
+  singleId?: string;
+}
+
+export function slugify(input: string): string {
+  return input
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
+function defaultId(item: Item, index: number): string {
+  for (const key of ['id', 'slug', 'name', 'title']) {
+    const v = item[key];
+    if (typeof v === 'string' && v.trim()) return slugify(v);
+  }
+  return String(index + 1);
+}
+
+export function yamlLoader(opts: Options): Loader {
+  const mode = opts.mode ?? 'list';
+  return {
+    name: 'yaml-data-loader',
+    load: async ({ config, store, parseData, logger, watcher }) => {
+      const url = new URL(opts.path, config.root);
+      const filePath = fileURLToPath(url);
+
+      const sync = async () => {
+        const text = await readFile(filePath, 'utf-8');
+        let data: unknown;
+        try {
+          data = parse(text);
+        } catch (err) {
+          const detail = err instanceof YAMLParseError ? err.message : String(err);
+          throw new Error(`\n✖ ${opts.path} is not valid YAML:\n  ${detail}\n`);
+        }
+
+        store.clear();
+        if (mode === 'single') {
+          const id = opts.singleId ?? 'default';
+          const parsed = await parseData({ id, data: (data ?? {}) as Item, filePath });
+          store.set({ id, data: parsed, filePath: opts.path });
+          return;
+        }
+
+        if (data == null) data = [];
+        if (!Array.isArray(data)) {
+          throw new Error(`\n✖ ${opts.path} must be a YAML list (each item starts with "- ").\n`);
+        }
+        const seen = new Map<string, number>();
+        for (const [index, raw] of data.entries()) {
+          if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
+            throw new Error(`\n✖ ${opts.path}: item #${index + 1} must be a mapping of "key: value" fields.\n`);
+          }
+          const item = raw as Item;
+          let id = (opts.id ?? defaultId)(item, index);
+          // Keep ids unique without making the author care about it.
+          const n = seen.get(id) ?? 0;
+          seen.set(id, n + 1);
+          if (n > 0) id = `${id}-${n + 1}`;
+          const parsed = await parseData({ id, data: item, filePath });
+          store.set({ id, data: parsed, filePath: opts.path });
+        }
+      };
+
+      await sync();
+      watcher?.add(filePath);
+      watcher?.on('change', async (changed) => {
+        if (changed === filePath) {
+          logger.info(`Reloading ${opts.path}`);
+          try {
+            await sync();
+          } catch (err) {
+            logger.error(String(err));
+          }
+        }
+      });
+    },
+  };
+}

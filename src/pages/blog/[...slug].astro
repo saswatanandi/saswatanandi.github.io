@@ -1,0 +1,31 @@
+---
+/** Minimal post page (Phase 3 adds ToC, tags, maths, code copy, comments). */
+import type { GetStaticPaths } from 'astro';
+import { render, type CollectionEntry } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPosts } from '../../lib/collections';
+import { formatDate } from '../../lib/format';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<PageLayout
+  title={post.data.title}
+  eyebrow={formatDate(post.data.date)}
+  intro={post.data.description}
+  description={post.data.description}
+  type="article"
+>
+  <article class="prose">
+    <Content />
+  </article>
+</PageLayout>

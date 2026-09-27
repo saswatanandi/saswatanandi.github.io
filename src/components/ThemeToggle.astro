@@ -1,0 +1,84 @@
+---
+import Icon from './Icon.astro';
+---
+
+<button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch colour theme" title="Switch colour theme">
+  <Icon name="moon" size={18} class="theme-toggle__moon" />
+  <Icon name="sun" size={18} class="theme-toggle__sun" />
+</button>
+
+<script>
+  // Toggle between light and dark. Default follows the OS; a click remembers the choice.
+  const root = document.documentElement;
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  const current = () => (root.dataset.theme as 'light' | 'dark' | undefined) ?? (media.matches ? 'dark' : 'light');
+
+  function label() {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
+      btn.setAttribute('aria-label', `Switch to ${next} theme`);
+      btn.title = `Switch to ${next} theme`;
+    });
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const next = current() === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch {
+        /* storage unavailable (private mode) — the choice lasts for this page only */
+      }
+      label();
+    }),
+  );
+  media.addEventListener('change', label);
+  label();
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition:
+      color var(--duration) var(--ease),
+      background var(--duration) var(--ease);
+  }
+  .theme-toggle:hover {
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+  .theme-toggle :global(svg) {
+    grid-area: 1 / 1;
+  }
+  /* Show the moon in light mode (→ go dark), the sun in dark mode (→ go light). */
+  .theme-toggle :global(.theme-toggle__sun) {
+    display: none;
+  }
+  :global(:root[data-theme='dark']) .theme-toggle :global(.theme-toggle__sun) {
+    display: block;
+  }
+  :global(:root[data-theme='dark']) .theme-toggle :global(.theme-toggle__moon) {
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .theme-toggle :global(.theme-toggle__sun) {
+      display: block;
+    }
+    :global(:root:not([data-theme='light'])) .theme-toggle :global(.theme-toggle__moon) {
+      display: none;
+    }
+  }
+  /* Without JavaScript the toggle can't work — hide it. */
+  :global(html:not(.js)) .theme-toggle {
+    display: none;
+  }
+</style>

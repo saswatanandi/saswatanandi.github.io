@@ -1,0 +1,109 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+
+interface Props {
+  theme: CollectionEntry<'research'>;
+  index: number;
+}
+const { theme, index } = Astro.props;
+const { title, summary, icon } = theme.data;
+---
+
+<a class="tile" href={`/research/${theme.id}/`}>
+  <span class="tile__top">
+    <span class="tile__icon"><Icon name={icon} size={22} /></span>
+    <span class="tile__num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+  </span>
+  <span class="tile__title">{title}</span>
+  <span class="tile__summary">{summary}</span>
+  <span class="tile__more" aria-hidden="true">Explore →</span>
+</a>
+
+<style>
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    height: 100%;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition:
+      border-color var(--duration) var(--ease),
+      box-shadow var(--duration) var(--ease),
+      transform var(--duration) var(--ease);
+  }
+  .tile:hover {
+    color: var(--color-text);
+    border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .tile__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+  }
+  .tile__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+  .tile__num {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-variant-numeric: oldstyle-nums;
+    color: var(--color-text-faint);
+  }
+  .tile__title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: var(--leading-snug);
+  }
+  .tile__summary {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+  }
+  /* Compact rows on small screens. */
+  @media (max-width: 36rem) {
+    .tile {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: var(--space-4);
+      row-gap: var(--space-1);
+      padding: var(--space-4);
+    }
+    .tile__top {
+      grid-row: span 2;
+      margin: 0;
+      align-self: start;
+    }
+    .tile__num,
+    .tile__more {
+      display: none;
+    }
+    .tile__title {
+      font-size: 1.125rem;
+    }
+  }
+  .tile__more {
+    margin-top: auto;
+    padding-top: var(--space-3);
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+</style>

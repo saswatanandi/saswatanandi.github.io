@@ -1,0 +1,224 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { compactNumber, formatMonth } from '../lib/format';
+import Icon from './Icon.astro';
+
+interface Props {
+  item: CollectionEntry<'software'>;
+  /** Large showcase variant (home page feature). */
+  feature?: boolean;
+}
+const { item, feature = false } = Astro.props;
+const s = item.data;
+// Tiny highlighter for the snippet: comments, prompts, strings, numbers, keywords.
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const highlight = (line: string) => {
+  if (/^\s*#/.test(line)) return `<span class="c">${esc(line)}</span>`;
+  const m = line.match(/^(\$|>>>|\.\.\.)(\s?)(.*)$/);
+  const prompt = m ? `<span class="p">${esc(m[1]!)}</span>${m[2]}` : '';
+  const code = esc(m ? m[3]! : line)
+    .replace(/('[^']*'|"[^"]*")/g, '<span class="s">$1</span>')
+    .replace(/\b(import|from|as|def|return|for|in)\b/g, '<span class="k">$1</span>')
+    .replace(/\b(\d+)\b/g, '<span class="n">$1</span>');
+  return prompt + code;
+};
+const snippetHtml = s.snippet?.trimEnd().split('\n').map(highlight).join('\n');
+---
+
+<article class:list={['sw', { 'sw--feature': feature }]} aria-labelledby={`sw-${item.id}`}>
+  <div class="sw__main">
+    <p class="sw__meta">
+      {s.featured && <span class="sw__badge">Featured</span>}
+      {s.language && <span>{s.language}</span>}
+      <span>Open source</span>
+    </p>
+    <h3 id={`sw-${item.id}`} class="sw__name">{s.name}</h3>
+    <p class="sw__desc">{s.description}</p>
+    {
+      (s.stars !== null || s.downloads !== null) && (
+        <p class="sw__stats">
+          {s.stars !== null && (
+            <span>
+              <Icon name="star" size={15} /> {compactNumber(s.stars)} stars
+            </span>
+          )}
+          {s.downloads !== null && (
+            <span>
+              <Icon name="download" size={15} /> {compactNumber(s.downloads)} downloads
+            </span>
+          )}
+          {s.stats_updated && <span class="sw__updated">as of {formatMonth(s.stats_updated)}</span>}
+        </p>
+      )
+    }
+    <p class="sw__links">
+      <a class="btn btn--primary" href={s.repo}>
+        <Icon name="github" /> Repository
+      </a>
+      {
+        s.docs && (
+          <a class="btn" href={s.docs}>
+            <Icon name="docs" /> Documentation
+          </a>
+        )
+      }
+      {
+        s.pypi && (
+          <a class="btn" href={`https://pypi.org/project/${s.pypi}/`}>
+            <Icon name="package" /> PyPI
+          </a>
+        )
+      }
+      {
+        s.paper_doi && (
+          <a class="btn" href={`https://doi.org/${s.paper_doi}`}>
+            <Icon name="quote" /> Paper
+          </a>
+        )
+      }
+    </p>
+  </div>
+  {
+    feature && snippetHtml && (
+      <div class="sw__code">
+        <div class="sw__code-bar" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        <pre tabindex="0" aria-label={`${s.name} usage example`}><code set:html={snippetHtml} /></pre>
+      </div>
+    )
+  }
+</article>
+
+<style>
+  .sw {
+    display: grid;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .sw--feature {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: center;
+    padding: var(--space-6);
+    gap: var(--space-6);
+  }
+  .sw__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    color: var(--color-text-faint);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sw__badge {
+    padding: 0.15rem 0.55rem;
+    border-radius: var(--radius-full);
+    background: var(--color-warm-soft);
+    color: var(--color-warm-text);
+  }
+  .sw__name {
+    margin-top: var(--space-2);
+    font-size: var(--text-2xl);
+    letter-spacing: -0.02em;
+  }
+  .sw__desc {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    max-width: 52ch;
+  }
+  .sw__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .sw__stats span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+  }
+  .sw__updated {
+    color: var(--color-text-faint);
+  }
+  .sw__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+  .sw__code {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: #13232b;
+    color: #d8e4e8;
+    box-shadow: var(--shadow-md);
+  }
+  :global(:root[data-theme='dark']) .sw__code {
+    background: #0a1318;
+    outline: 1px solid var(--color-border);
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .sw__code {
+      background: #0a1318;
+      outline: 1px solid var(--color-border);
+    }
+  }
+  .sw__code-bar {
+    display: flex;
+    gap: 6px;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid rgb(255 255 255 / 0.07);
+  }
+  .sw__code-bar span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.16);
+  }
+  .sw__code pre {
+    margin: 0;
+    padding: var(--space-4) var(--space-5) var(--space-5);
+    overflow-x: auto;
+    font-size: 0.84rem;
+    line-height: 1.7;
+  }
+  .sw__code .c {
+    color: #8aa3ad;
+  }
+  .sw__code .p {
+    color: #5dcaa5;
+    user-select: none;
+  }
+  .sw__code .k {
+    color: #e9b872;
+  }
+  .sw__code .s {
+    color: #9fdcc3;
+  }
+  .sw__code .n {
+    color: #f2c894;
+  }
+  @media (max-width: 36rem) {
+    .sw__code pre {
+      font-size: 0.75rem;
+      padding-inline: var(--space-4);
+    }
+  }
+  @media (max-width: 52rem) {
+    .sw--feature {
+      grid-template-columns: 1fr;
+      padding: var(--space-5);
+    }
+  }
+</style>
