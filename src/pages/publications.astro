@@ -11,21 +11,19 @@ const pubs = getPublications();
 <PageLayout
   title="Publications"
   eyebrow="Publications"
-  intro="Journal articles, book chapters, conference papers and talks on hydrological modelling, forecasting, forests and climate."
+  intro="My papers, book chapters and talks."
   contour="70% 30%"
 >
-  <ComingSoon phase={2} icon="book" title="The full publication list">
+  <ComingSoon phase={2} icon="book" title="Full list coming soon">
     <p>
-      All papers, chapters, proceedings and talks — with filters by type, year and research theme, DOI / PDF / code
-      links, one-click BibTeX, and a page for every paper.
+      This page is being rebuilt. The full list will be here soon.{
+        site.links.scholar && (
+          <>
+            {' '}Meanwhile, see my <a href={site.links.scholar}>Google Scholar</a> page.
+          </>
+        )
+      }
     </p>
-    {
-      site.links.scholar && (
-        <p>
-          Meanwhile, see <a href={site.links.scholar}>Google Scholar</a>.
-        </p>
-      )
-    }
   </ComingSoon>
 
   <section class="list" aria-labelledby="sel">

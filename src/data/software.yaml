@@ -3,7 +3,7 @@
 
 - name: IMDLIB
   repo: https://github.com/iamsaswata/imdlib
-  description: Open-source Python library to download, process and explore India Meteorological Department (IMD) gridded rainfall and temperature data — from raw binaries to xarray, NetCDF and GeoTIFF in a few lines.
+  description: A Python library for the gridded rainfall and temperature data from the India Meteorological Department (IMD). It downloads the files and gives you xarray, NetCDF or GeoTIFF in a few lines of code.
   language: Python
   pypi: imdlib
   # conda: imdlib            # TODO(Saswata): conda channel, if any

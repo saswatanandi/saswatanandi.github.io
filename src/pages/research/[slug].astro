@@ -30,13 +30,13 @@ const positions = ['15% 30%', '80% 20%', '40% 80%', '90% 70%', '5% 90%'];
 
 <PageLayout
   title={theme.data.title}
-  eyebrow={`Research theme ${String(index + 1).padStart(2, '0')}`}
+  eyebrow="Research"
   intro={theme.data.summary}
   description={theme.data.summary}
   contour={positions[index % positions.length]}
 >
   <nav aria-label="Breadcrumb" class="crumbs" slot="header">
-    <a href="/research/">← All research themes</a>
+    <a href="/research/">← All research</a>
   </nav>
 
   <div class="layout">
@@ -62,7 +62,7 @@ const positions = ['15% 30%', '80% 20%', '40% 80%', '90% 70%', '5% 90%'];
   {
     pubs.length > 0 && (
       <section class="related" aria-labelledby="related-pubs">
-        <h2 id="related-pubs">Selected papers</h2>
+        <h2 id="related-pubs">Papers</h2>
         <div>
           {pubs.map((p) => (
             <PublicationItem pub={p} />
@@ -73,8 +73,8 @@ const positions = ['15% 30%', '80% 20%', '40% 80%', '90% 70%', '5% 90%'];
   }
 
   <div class="related">
-    <ComingSoon phase={4} icon={theme.data.icon} title="Everything on this theme">
-      <p>This page will automatically list every paper, talk, blog post and reading note tagged with this theme.</p>
+    <ComingSoon phase={4} icon={theme.data.icon} title="More on this topic">
+      <p>This page will soon also list talks, blog posts and reading notes on this topic.</p>
     </ComingSoon>
   </div>
 

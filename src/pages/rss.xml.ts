@@ -6,8 +6,8 @@ import { site } from '../lib/config';
 export const GET: APIRoute = async (context) => {
   const posts = (await getPosts()).filter((p) => !p.data.draft);
   return rss({
-    title: `${site.name} — Blog`,
-    description: `Notes on hydrology, climate data and open-source tools by ${site.name}.`,
+    title: `${site.name}: Blog`,
+    description: `Blog posts by ${site.name} on hydrology and climate data.`,
     site: context.site!,
     items: posts.map((p) => ({
       title: p.data.title,

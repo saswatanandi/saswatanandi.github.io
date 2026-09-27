@@ -10,7 +10,7 @@ const posts = await getPosts();
 <PageLayout
   title="Blog"
   eyebrow="Blog"
-  intro="Notes on hydrological modelling, climate data and open-source tools — tutorials, workflows and the occasional notebook."
+  intro="Notes and how-to posts on hydrology and climate data."
   contour="85% 60%"
 >
   {
@@ -30,11 +30,9 @@ const posts = await getPosts();
     )
   }
 
-  <ComingSoon phase={3} icon="docs" title="Posts are on their way">
+  <ComingSoon phase={3} icon="docs" title="Posts coming soon">
     <p>
-      Tutorials on working with IMD data, installing CDO, computing climate indices with IMDLIB and more — migrated and
-      refreshed from the old site, with maths, highlighted code and Jupyter notebooks. An RSS feed is already at
-      <a href="/rss.xml">/rss.xml</a>.
+      I am moving my old posts here, including the IMDLIB tutorials. The RSS feed is at <a href="/rss.xml">/rss.xml</a>.
     </p>
   </ComingSoon>
 </PageLayout>

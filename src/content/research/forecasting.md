@@ -3,8 +3,10 @@ title: Forecasting
 key: forecasting
 icon: forecast
 order: 3
-summary: Improving short-to-medium-range precipitation and streamflow forecasts with multimodel ensembles (TIGGE) and bias-corrected satellite rainfall, towards reliable flood early warning.
+summary: I work on better rainfall and streamflow forecasts for flood warning, using TIGGE ensemble weather forecasts and bias-corrected satellite rainfall.
 regions: [Upper Bhima]
 ---
 
-A flood warning is only as good as the forecast behind it. I evaluate and post-process multimodel ensemble weather forecasts from the TIGGE archive and feed them through hydrological models to produce more accurate and more reliable short-to-medium-range streamflow forecasts, with the Upper Bhima river basin in India as a long-running testbed.
+A flood warning is only as good as the forecast behind it. I take ensemble weather forecasts from several forecast centres (the TIGGE archive), correct their biases, and run them through hydrological models to forecast streamflow a few days ahead.
+
+The Upper Bhima basin in India has been my main test case for this work.

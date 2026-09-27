@@ -4,14 +4,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../lib/config';
 ---
 
-<BaseLayout title="Page not found" description="This page does not exist." noindex>
+<BaseLayout title="Page not found" description="Page not found." noindex>
   <section class="nf">
     <ContourBand fade="radial" position="40% 50%" />
     <div class="container">
-      <p class="eyebrow">Error 404 · off the map</p>
-      <h1>This page isn’t on the map.</h1>
+      <p class="eyebrow">Error 404</p>
+      <h1>Page not found</h1>
       <p class="nf__text">
-        The link may be old — this site was rebuilt in 2026 and some addresses changed. Try one of these instead:
+        This link may be from my old site. I rebuilt the site in 2026 and some addresses changed. Try one of these:
       </p>
       <ul role="list" class="nf__links">
         <li><a class="btn btn--primary" href="/">Home</a></li>

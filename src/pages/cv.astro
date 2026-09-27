@@ -21,7 +21,7 @@ const when = (i: CvItem) => [i.start, i.end].filter(Boolean).join(' – ');
 <PageLayout
   title="Curriculum vitae"
   eyebrow="CV"
-  intro="Positions, education, publications, service and teaching — the web version of my CV."
+  intro="The web version of my CV."
   contour="60% 90%"
 >
   <div class="cv">
@@ -47,11 +47,8 @@ const when = (i: CvItem) => [i.start, i.end].filter(Boolean).join(' – ');
   </div>
 
   <div class="soon">
-    <ComingSoon phase={2} icon="cv" title="Full CV and PDF download">
-      <p>
-        The complete CV — including every publication, awards, service, mentoring and teaching — rendered here and as a
-        typeset PDF, both generated from the same data.
-      </p>
+    <ComingSoon phase={2} icon="cv" title="Full CV coming soon">
+      <p>This page is being rebuilt. The full CV and a PDF copy will be here soon.</p>
     </ComingSoon>
   </div>
 </PageLayout>

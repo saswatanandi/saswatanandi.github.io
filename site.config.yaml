@@ -9,17 +9,16 @@
 name: Saswata Nandi
 role: Postdoctoral Researcher · Hydrology          # TODO(Saswata): current title
 affiliation:
-  name: ""                                          # TODO(Saswata): current institution (empty = hidden)
-  url: ""                                           # TODO(Saswata): institution / lab URL
+  name: "University of California, Merced"          # TODO(Saswata): current institution (empty = hidden)
+  url: "https://ecohydrology.ucmerced.edu/"                                           # TODO(Saswata): institution / lab URL
 location: California, USA                           # TODO(Saswata): confirm
 email: withsaswata@gmail.com                        # TODO(Saswata): confirm (shown obfuscated, never as plain text in HTML)
 
 # Short bio (Markdown). Shown on the home page and used for the meta description.
 bio: |
-  I am a hydrologist working at the interface of **land-surface modelling, remote sensing and climate**.
-  My research asks how forests, fire and a changing climate reshape the water balance — from
-  evapotranspiration in the Sierra Nevada to floods, droughts and streamflow forecasts in Indian river basins.
-  I did my PhD in Water Resources Engineering at IIT Bombay and I care about open, reproducible science:
+  I am a hydrologist working at the interface of **hydrology, land-surface modelling, remote sensing and climate impacts**.
+  My research focuses on how forests, fire and a changing climate reshape our water.
+  I did my PhD in Water Resources Engineering at IIT Bombay and I support open, reproducible science:
   I created and maintain [IMDLIB](/software/), an open-source Python library for Indian gridded weather data.
 
 # One-line description used in search results / social cards (≤ 160 characters).
@@ -27,13 +26,13 @@ description: Hydrologist working on land-surface modelling, forests & fire, fore
 
 # Profile links — all optional. Empty or missing = not rendered.
 links:
-  scholar: ""            # TODO(Saswata): https://scholar.google.com/citations?user=XXXX
-  orcid: ""              # TODO(Saswata): https://orcid.org/0000-0000-0000-0000
-  github: https://github.com/iamsaswata      # TODO(Saswata): confirm handle
-  linkedin: ""           # TODO(Saswata): https://www.linkedin.com/in/…
+  scholar: "https://scholar.google.com/citations?user=hXkanPEAAAAJ"            # TODO(Saswata): https://scholar.google.com/citations?user=XXXX
+  orcid: "0000-0003-3833-966X"              # TODO(Saswata): https://orcid.org/0000-0000-0000-0000
+  github: "https://github.com/iamsaswata"      # TODO(Saswata): confirm handle
+  linkedin: "https://www.linkedin.com/in/nandisaswata"           # TODO(Saswata): https://www.linkedin.com/in/…
   bluesky: ""            # TODO(Saswata): https://bsky.app/profile/…
-  x: ""                  # TODO(Saswata): https://x.com/…
-  researchgate: ""       # TODO(Saswata): https://www.researchgate.net/profile/…
+  x: "https://x.com/saswatanandi"                  # TODO(Saswata): https://x.com/…
+  researchgate: "https://www.researchgate.net/profile/Saswata-Nandi"       # TODO(Saswata): https://www.researchgate.net/profile/…
 
 # Path to the CV (Phase 2 generates /cv.pdf from cv.yaml; the /cv page exists now).
 cv: /cv/
@@ -49,9 +48,9 @@ nav:
 
 # Citation metrics — entered manually (no live API calls during the build).
 metrics:
-  citations: null        # TODO(Saswata): e.g. 350
-  h_index: null          # TODO(Saswata)
-  i10: null              # TODO(Saswata)
+  citations: 600        # TODO(Saswata): e.g. 350 (null = hidden; no ""quotes"")
+  h_index: 11          # TODO(Saswata)
+  i10: 11              # TODO(Saswata)
   source: Google Scholar
   updated: null          # TODO(Saswata): date you copied the numbers, e.g. 2026-09-01
 
@@ -60,7 +59,7 @@ repo: https://github.com/saswatanandi/saswatanandi.github.io
 
 # Cookie-free analytics. Put your GoatCounter code (the "xyz" in xyz.goatcounter.com) to enable.
 analytics:
-  goatcounter: ""        # TODO(Saswata): create account at goatcounter.com
+  goatcounter: "snandi"        # TODO(Saswata): create account at goatcounter.com
 
 # giscus comments (Phase 3). Get the ids from https://giscus.app after enabling Discussions.
 giscus:

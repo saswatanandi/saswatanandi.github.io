@@ -1,5 +1,5 @@
 ---
-/** Friendly placeholder for sections that arrive in a later build phase. */
+/** Placeholder for sections that arrive in a later build phase. */
 import Icon, { type IconName } from './Icon.astro';
 
 interface Props {
@@ -7,13 +7,13 @@ interface Props {
   icon?: IconName;
   title?: string;
 }
-const { phase, icon = 'layers', title = 'This section is being built' } = Astro.props;
+const { phase, icon = 'layers', title = 'Coming soon' } = Astro.props;
 ---
 
 <section class="soon" aria-labelledby="soon-title">
   <span class="soon__icon"><Icon name={icon} size={26} /></span>
   <div>
-    <p class="eyebrow">Coming in phase {phase}</p>
+    <p class="eyebrow">Coming soon</p>
     <h2 id="soon-title" class="soon__title">{title}</h2>
     <div class="soon__body"><slot /></div>
   </div>

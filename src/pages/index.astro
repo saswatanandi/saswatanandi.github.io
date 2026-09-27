@@ -39,7 +39,7 @@ const metrics = [
       <div class="hero__text">
         <p class="eyebrow hero__eyebrow">
           <span class="hero__dot" aria-hidden="true"></span>
-          Hydrology · Land surface · Climate
+          Hydrology
         </p>
         <h1 id="hero-name" class="hero__name">{site.name}</h1>
         <p class="hero__role">
@@ -130,7 +130,7 @@ const metrics = [
         }
       </div>
       <div class="hero__photo">
-        <HeadshotPeak src="/images/headshot.jpg" alt={`Portrait of ${site.name}`} />
+        <HeadshotPeak src="/images/headshot.jpg" alt={`Photo of ${site.name}`} />
       </div>
     </div>
   </section>
@@ -139,7 +139,7 @@ const metrics = [
   {
     themes.length > 0 && (
       <section class="container section" aria-labelledby="research">
-        <SectionHeader id="research" eyebrow="What I work on" title="Research themes" more={{ href: '/research/', label: 'All research' }} />
+        <SectionHeader id="research" title="Research" more={{ href: '/research/', label: 'All research' }} />
         <ul role="list" class="tiles">
           {themes.map((t, i) => (
             <li>
@@ -156,7 +156,7 @@ const metrics = [
     {
       news.length > 0 && (
         <section class="split__news" aria-labelledby="news">
-          <SectionHeader id="news" eyebrow="Latest" title="News" />
+          <SectionHeader id="news" title="News" />
           <ol role="list" class="news">
             {news.map((n, i) => (
               <li class="news__item">
@@ -183,7 +183,7 @@ const metrics = [
     {
       selected.length > 0 && (
         <section class="split__pubs" aria-labelledby="selected-pubs">
-          <SectionHeader id="selected-pubs" eyebrow="Selected" title="Publications" more={{ href: '/publications/', label: 'All publications' }} />
+          <SectionHeader id="selected-pubs" title="Selected papers" more={{ href: '/publications/', label: 'All publications' }} />
           <div class="pubs">
             {selected.map((p) => (
               <PublicationItem pub={p} />
@@ -198,7 +198,7 @@ const metrics = [
   {
     featured && (
       <section class="container section" aria-labelledby="software">
-        <SectionHeader id="software" eyebrow="Open source" title="Featured software" more={{ href: '/software/', label: 'All software' }} />
+        <SectionHeader id="software" title="Software" more={{ href: '/software/', label: 'All software' }} />
         <SoftwareCard item={featured} feature />
       </section>
     )
@@ -208,7 +208,7 @@ const metrics = [
   {
     (latestPost || latestReading) && (
       <section class="container section" aria-labelledby="writing">
-        <SectionHeader id="writing" eyebrow="Notebook" title="Writing & reading" />
+        <SectionHeader id="writing" title="Blog and reading" />
         <div class="notes">
           {latestPost && (
             <a class="note-card" href={`/blog/${latestPost.id}/`}>

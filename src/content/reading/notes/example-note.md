@@ -1,5 +1,5 @@
 ---
-title: Example reading note — copy me
+title: Example reading note (copy me)
 date: 2026-09-27
 entry: a-manifesto-for-the-equifinality-thesis
 tags: [example]

@@ -10,7 +10,7 @@ const items = await getReading();
 <PageLayout
   title="Reading"
   eyebrow="Reading"
-  intro="Papers I have read and think are worth your time — one line on why, and longer notes on some of them."
+  intro="Papers I have read and liked, with a line on why."
   contour="10% 20%"
 >
   {
@@ -35,11 +35,8 @@ const items = await getReading();
     )
   }
 
-  <ComingSoon phase={3} icon="book" title="A reading log">
-    <p>
-      Entries grouped by month with tag filters, shared tags with the blog, and a “Read note →” link where I have written
-      more.
-    </p>
+  <ComingSoon phase={3} icon="book" title="Coming soon">
+    <p>I have just started this list. Papers will show up here as I read them.</p>
   </ComingSoon>
 </PageLayout>
 

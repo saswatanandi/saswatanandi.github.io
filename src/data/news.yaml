@@ -6,20 +6,20 @@
 #   link: https://doi.org/…     # optional
 
 - date: 2026-06-01   # TODO(Saswata): exact publication date
-  text: New paper in **Frontiers in Water** comparing crop evapotranspiration methods to evaluate the water-saving potential of alternative land uses in the San Joaquin Valley, California.
+  text: New paper in **Frontiers in Water** on crop water use in the San Joaquin Valley, and how much water other land uses could save.
   link: https://doi.org/10.3389/frwa.2026.1879797
 
 - date: 2025-12-15
-  text: At **AGU Fall Meeting 2025** — the multiscale influence of drought characteristics on ecosystem water-use efficiency across CONUS (with A. Chakraborty, J. Abatzoglou and M. Safeeq).
+  text: At **AGU Fall Meeting 2025** with work on how drought affects ecosystem water-use efficiency across the US (with A. Chakraborty, J. Abatzoglou and M. Safeeq).
 
 - date: 2025-11-01   # TODO(Saswata): exact publication date
-  text: New paper in **Journal of Water and Climate Change** on climate-change impacts on runoff and hydrological drought risk in the Upper Bhima basin, using VIC-3L and four-variate D-vine copulas.
+  text: New paper in **Journal of Water and Climate Change** on how climate change may affect runoff and drought risk in the Upper Bhima basin.
   link: https://doi.org/10.2166/wcc.2025.135
 
 - date: 2025-01-15   # TODO(Saswata): exact publication date
-  text: New paper in **Ecohydrology** on how forest management changes the water balance across a water–energy gradient in the upper Kings River Basin.
+  text: New paper in **Ecohydrology** on how forest management changes the water balance of the upper Kings River Basin.
   link: https://doi.org/10.1002/eco.2753
 
 - date: 2024-01-15   # TODO(Saswata): exact publication date
-  text: The **IMDLIB** paper is out in *Environmental Modelling & Software* — an open-source Python library for India's gridded meteorological data.
+  text: The **IMDLIB** paper is out in *Environmental Modelling & Software*.
   link: https://doi.org/10.1016/j.envsoft.2023.105869

@@ -3,8 +3,10 @@ title: Open Data & Tools
 key: open-data
 icon: code
 order: 5
-summary: Open-source software and reproducible workflows that make gridded climate data easy to use — led by IMDLIB, a Python library for India Meteorological Department datasets.
+summary: I write open-source tools for climate data. The main one is IMDLIB, a Python library for the gridded rainfall and temperature data from the India Meteorological Department (IMD).
 regions: [India]
 ---
 
-Good science needs good tools that everyone can use. I created and maintain [IMDLIB](/software/), an open-source Python library that downloads, processes and explores the India Meteorological Department's gridded rainfall and temperature datasets, and I write about reproducible hydro-climatic workflows on the [blog](/blog/).
+I built [IMDLIB](/software/) because getting IMD gridded data into a usable form took too much work. It downloads the rainfall and temperature files, reads them, and gives you xarray, NetCDF or GeoTIFF output. It is free and open source, and I still maintain it.
+
+I also write short how-to posts on the [blog](/blog/).
