@@ -1,22 +1,22 @@
 ---
-/** Standard inner page: contour-textured header (eyebrow, title, intro) + content. */
+/** Standard inner page: header (eyebrow, title, intro) with quiet hydrograph ridgelines + content. */
 import type { Props as HeadProps } from '../components/BaseHead.astro';
-import ContourBand from '../components/ContourBand.astro';
+import Ridgelines from '../components/Ridgelines.astro';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props extends HeadProps {
   title: string;
   eyebrow?: string;
   intro?: string;
-  /** Terrain window for the header texture, e.g. "20% 70%". */
-  contour?: string;
+  /** Seed for the header ridgelines (a different storm pattern per page). */
+  ridges?: number;
 }
-const { title, eyebrow, intro, contour = '50% 40%', ...head } = Astro.props;
+const { title, eyebrow, intro, ridges = 1, ...head } = Astro.props;
 ---
 
 <BaseLayout title={title} description={head.description ?? intro} {...head}>
   <header class="page-header">
-    <ContourBand fade="left" position={contour} />
+    <Ridgelines variant="page" seed={ridges} />
     <div class="container">
       {eyebrow && <p class="eyebrow">{eyebrow}</p>}
       <h1>{title}</h1>
@@ -33,7 +33,7 @@ const { title, eyebrow, intro, contour = '50% 40%', ...head } = Astro.props;
   .page-header {
     position: relative;
     isolation: isolate;
-    padding-block: var(--space-8) var(--space-7);
+    padding-block: var(--space-8) calc(var(--space-7) + 24px);
     border-bottom: 1px solid var(--color-border);
   }
   .page-header h1 {

@@ -1,9 +1,9 @@
 ---
-import ContourBand from '../components/ContourBand.astro';
 import EmailLink from '../components/EmailLink.astro';
-import HeadshotPeak from '../components/HeadshotPeak.astro';
+import HeadshotFrame from '../components/HeadshotFrame.astro';
 import Icon from '../components/Icon.astro';
 import PublicationItem from '../components/PublicationItem.astro';
+import Ridgelines from '../components/Ridgelines.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import SoftwareCard from '../components/SoftwareCard.astro';
 import ThemeTile from '../components/ThemeTile.astro';
@@ -34,7 +34,7 @@ const metrics = [
 <BaseLayout type="profile">
   <!-- ── Profile ─────────────────────────────────────────────── -->
   <section class="hero" aria-labelledby="hero-name">
-    <ContourBand fade="radial" position="62% 45%" />
+    <Ridgelines variant="hero" />
     <div class="container hero__inner">
       <div class="hero__text">
         <p class="eyebrow hero__eyebrow">
@@ -130,7 +130,7 @@ const metrics = [
         }
       </div>
       <div class="hero__photo">
-        <HeadshotPeak src="/images/headshot.jpg" alt={`Photo of ${site.name}`} />
+        <HeadshotFrame src="/images/headshot.jpg" alt={`Photo of ${site.name}`} />
       </div>
     </div>
   </section>
@@ -246,7 +246,8 @@ const metrics = [
   .hero {
     position: relative;
     isolation: isolate;
-    padding-block: var(--space-8) var(--space-7);
+    /* the bottom padding is the room the ridgelines live in */
+    padding-block: var(--space-8) calc(var(--space-5) + 128px);
   }
   .hero__inner {
     display: grid;
@@ -493,7 +494,7 @@ const metrics = [
   }
   @media (max-width: 46rem) {
     .hero {
-      padding-block: var(--space-6) var(--space-7);
+      padding-block: var(--space-6) calc(var(--space-5) + 104px);
     }
     .hero__inner {
       grid-template-columns: 1fr;

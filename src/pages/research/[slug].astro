@@ -25,7 +25,6 @@ interface Props {
 const { theme, prev, next, index } = Astro.props;
 const { Content } = await render(theme);
 const pubs = getPublications().filter((p) => p.topics.includes(theme.data.key));
-const positions = ['15% 30%', '80% 20%', '40% 80%', '90% 70%', '5% 90%'];
 ---
 
 <PageLayout
@@ -33,7 +32,7 @@ const positions = ['15% 30%', '80% 20%', '40% 80%', '90% 70%', '5% 90%'];
   eyebrow="Research"
   intro={theme.data.summary}
   description={theme.data.summary}
-  contour={positions[index % positions.length]}
+  ridges={11 + index}
 >
   <nav aria-label="Breadcrumb" class="crumbs" slot="header">
     <a href="/research/">← All research</a>

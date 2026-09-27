@@ -11,7 +11,7 @@ const items = await getSoftware();
   title="Software"
   eyebrow="Open source"
   intro="Open-source tools I have written and still look after."
-  contour="30% 20%"
+  ridges={3}
 >
   <div class="grid">
     {items.map((item) => <SoftwareCard item={item} feature={item.data.featured} />)}

@@ -1,0 +1,68 @@
+---
+/**
+ * Hydrograph ridgelines along the bottom edge of a header (see src/lib/ridgelines.ts).
+ * Absolutely positioned: the parent must be `position: relative` and reserve
+ * room at the bottom (`--ridge-h` is exposed for that).
+ *
+ * - variant="hero": full motif; a lighter 9-line version is swapped in on phones.
+ * - variant="page": quiet 7-line version for inner-page headers; `seed` varies the storms.
+ */
+import { HERO_NARROW, HERO_WIDE, pageRidges, ridgeHeight, ridgelinesSvg } from '../lib/ridgelines';
+
+interface Props {
+  variant?: 'hero' | 'page';
+  seed?: number;
+  class?: string;
+}
+const { variant = 'page', seed = 1, class: className } = Astro.props;
+
+const wide = variant === 'hero' ? HERO_WIDE : pageRidges(seed);
+const wideSvg = ridgelinesSvg({ ...wide, id: `rw${variant}${seed}`, class: 'ridges__svg ridges__svg--wide' });
+const wideH = ridgeHeight(wide);
+const narrowSvg =
+  variant === 'hero' ? ridgelinesSvg({ ...HERO_NARROW, id: `rn${seed}`, class: 'ridges__svg ridges__svg--narrow' }) : '';
+const narrowH = ridgeHeight(HERO_NARROW);
+---
+
+<div
+  class:list={['ridges', `ridges--${variant}`, className]}
+  style={`--ridge-h:${wideH}px;--ridge-h-narrow:${narrowH}px;--ridge-ratio:${(wideH / wide.width).toFixed(4)}`}
+  aria-hidden="true"
+>
+  <Fragment set:html={wideSvg} />
+  {narrowSvg && <Fragment set:html={narrowSvg} />}
+</div>
+
+<style>
+  .ridges {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: -1;
+    pointer-events: none;
+    color: var(--color-contour);
+    /* Wider than the viewBox: grow with the viewport so nothing is cropped at the top. */
+    height: max(var(--ridge-h), calc(100vw * var(--ridge-ratio)));
+    overflow: hidden;
+  }
+  .ridges :global(.ridges__svg) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .ridges :global(.ridges__svg--narrow) {
+    display: none;
+  }
+  @media (max-width: 46rem) {
+    .ridges--hero {
+      height: var(--ridge-h-narrow);
+    }
+    .ridges--hero :global(.ridges__svg--wide) {
+      display: none;
+    }
+    .ridges--hero :global(.ridges__svg--narrow) {
+      display: block;
+    }
+  }
+</style>

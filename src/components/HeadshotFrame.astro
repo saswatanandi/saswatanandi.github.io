@@ -1,0 +1,55 @@
+---
+/**
+ * Circular headshot with a map-neatline frame: one hairline ring and four
+ * N/E/S/W ticks (geometry in src/lib/headshot-frame.ts).
+ */
+import { frameGeometry } from '../lib/headshot-frame';
+
+interface Props {
+  src: string;
+  alt: string;
+}
+const { src, alt } = Astro.props;
+const g = frameGeometry(42);
+---
+
+<div class="frame" style={`--photo:${g.photoR * 2}%`}>
+  <img class="frame__photo" src={src} alt={alt} width="256" height="256" loading="eager" fetchpriority="high" decoding="async" />
+  <svg class="frame__lines" viewBox="0 0 100 100" fill="none" aria-hidden="true" focusable="false">
+    <circle class="frame__ring" cx="50" cy="50" r={g.ring} vector-effect="non-scaling-stroke" />
+    <path class="frame__ticks" d={g.ticks} vector-effect="non-scaling-stroke" />
+  </svg>
+</div>
+
+<style>
+  .frame {
+    position: relative;
+    width: min(100%, 320px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+  }
+  .frame__photo {
+    width: var(--photo);
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 50%;
+    background: var(--color-surface-2);
+  }
+  .frame__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    stroke: var(--color-accent);
+    stroke-width: 1;
+    stroke-linecap: round;
+  }
+  .frame__ring {
+    opacity: 0.45;
+  }
+  .frame__ticks {
+    opacity: 0.7;
+  }
+</style>

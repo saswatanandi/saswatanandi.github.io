@@ -31,7 +31,6 @@
   --color-warm-soft: #fbefdc;
 
   --color-contour: #0f6e56;
-  --contour-opacity: 0.16;
   --color-focus: #ba7517;
   --shadow-sm: 0 1px 2px rgb(27 42 51 / 0.06), 0 1px 1px rgb(27 42 51 / 0.04);
   --shadow-md: 0 6px 24px -8px rgb(27 42 51 / 0.18), 0 2px 6px -2px rgb(27 42 51 / 0.08);
@@ -102,7 +101,6 @@
     --color-warm-text: #ebb56b;
     --color-warm-soft: rgb(224 160 74 / 0.14);
     --color-contour: #5dcaa5;
-    --contour-opacity: 0.13;
     --color-focus: #e0a04a;
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
     --shadow-md: 0 8px 28px -10px rgb(0 0 0 / 0.6), 0 2px 6px -2px rgb(0 0 0 / 0.3);
@@ -129,7 +127,6 @@
   --color-warm-text: #ebb56b;
   --color-warm-soft: rgb(224 160 74 / 0.14);
   --color-contour: #5dcaa5;
-  --contour-opacity: 0.13;
   --color-focus: #e0a04a;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
   --shadow-md: 0 8px 28px -10px rgb(0 0 0 / 0.6), 0 2px 6px -2px rgb(0 0 0 / 0.3);

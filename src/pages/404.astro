@@ -1,12 +1,12 @@
 ---
-import ContourBand from '../components/ContourBand.astro';
+import Ridgelines from '../components/Ridgelines.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../lib/config';
 ---
 
 <BaseLayout title="Page not found" description="Page not found." noindex>
   <section class="nf">
-    <ContourBand fade="radial" position="40% 50%" />
+    <Ridgelines variant="page" seed={404} />
     <div class="container">
       <p class="eyebrow">Error 404</p>
       <h1>Page not found</h1>
