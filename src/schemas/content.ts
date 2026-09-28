@@ -5,12 +5,19 @@
  */
 import { z } from 'astro/zod';
 
-/** Research topic keys. Used by research themes, publications (bib `topic`), posts and reading. */
-export const TOPICS = ['forest-fire', 'lsm-modelling', 'forecasting', 'climate-impact', 'open-data'] as const;
-export const topic = z.enum(TOPICS, {
-  error: () => `topic must be one of: ${TOPICS.join(', ')}`,
+/**
+ * Research theme slugs = the file names in src/content/research/ (without .md).
+ * Publications (bib `topic`), posts and reading entries refer to themes by slug,
+ * so adding or renaming a theme file is all it takes; a stale slug fails the build.
+ */
+export const TOPICS: string[] = Object.keys(import.meta.glob('../content/research/*.md'))
+  .map((p) => p.split('/').pop()!.replace(/\.md$/, ''))
+  .sort();
+export const topic = z.string().refine((v) => TOPICS.includes(v), {
+  error: (iss) =>
+    `"${String(iss.input)}" is not a research theme. Use one of: ${TOPICS.join(', ')} (the file names in src/content/research/)`,
 });
-export type Topic = z.infer<typeof topic>;
+export type Topic = string;
 
 const url = z.url({ protocol: /^https?$/, error: 'must be a full URL starting with https://' });
 const tags = z.array(z.string().trim().toLowerCase().min(1)).default([]);
@@ -48,18 +55,64 @@ export const readingNoteSchema = z
   })
   .strict();
 
+/** Built-in figures that are Astro components rather than image files (src/components/research/). */
+export const FIGURE_COMPONENTS = ['cwis-pipeline'] as const;
+/**
+ * A theme figure: a file in src/assets/research/ (".svg" is drawn inline and follows light/dark mode;
+ * ".png", ".jpg", ".webp", ".avif" are optimised photos/plots), a path in public/ starting with "/",
+ * or one of FIGURE_COMPONENTS.
+ */
+const figure = z
+  .string()
+  .trim()
+  .refine((v) => /\.(svg|png|jpe?g|webp|avif)$/i.test(v) || (FIGURE_COMPONENTS as readonly string[]).includes(v), {
+    error: `image must be a file name ending in .svg, .png, .jpg, .webp or .avif (put the file in src/assets/research/), or one of: ${FIGURE_COMPONENTS.join(', ')}`,
+  });
+const optionalUrl = z
+  .string()
+  .trim()
+  .refine((v) => v === '' || /^https?:\/\//.test(v) || v.startsWith('/'), {
+    error: 'url must start with https:// or / (or leave it empty for no link)',
+  })
+  .optional()
+  .transform((v) => v || undefined);
+
 export const researchSchema = z
   .object({
     title: z.string().min(1),
-    /** Topic key — must match the `topic` field used in publications.bib. */
-    key: topic,
-    /** One of the icon names in src/components/ThemeIcon.astro. */
-    icon: z.enum(['fire', 'layers', 'forecast', 'thermometer', 'code']),
-    /** 1–2 sentence summary shown on tiles and cards. */
-    summary: z.string().min(1).max(320),
+    /** Position on the home page and /research/ (1 = first). */
     order: z.number().int().default(99),
-    /** Study areas (for the Phase 4 basin map). */
-    regions: z.array(z.string()).default([]),
+    /** 1–2 sentences shown on the home-page card and under the page title. */
+    summary: z.string().min(1).max(320),
+    /** Small glyph from src/components/Icon.astro. */
+    icon: z.enum(['fire', 'layers', 'forecast', 'thermometer', 'code'], {
+      error: 'icon must be one of: fire, layers, forecast, thermometer, code',
+    }),
+    /** The theme's picture (see `figure` above). */
+    image: figure,
+    /** Describe the picture for screen readers (required). */
+    image_alt: z.string().min(10, 'image_alt: describe the picture in a sentence'),
+    image_caption: z.string().optional(),
+    /** Optional link under the figure, e.g. to a full-size original. */
+    image_full: optionalUrl,
+    /** Optional smaller picture for the home-page card (defaults to `image`). */
+    thumbnail: figure.optional(),
+    /** Optional highlighted tool, dataset or project. Leave `url` empty for no link. */
+    feature: z
+      .object({
+        title: z.string().min(1),
+        subtitle: z.string().optional(),
+        description: z.string().min(1),
+        url: optionalUrl,
+      })
+      .strict()
+      .optional(),
+    /** Hidden when empty. */
+    collaborators: z
+      .array(z.object({ name: z.string().min(1), affiliation: z.string().optional(), url: optionalUrl }).strict())
+      .default([]),
+    /** Hidden when empty. One line per grant/funder. */
+    funding: z.array(z.string().min(1)).default([]),
   })
   .strict();
 

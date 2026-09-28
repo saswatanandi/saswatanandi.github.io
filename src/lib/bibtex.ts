@@ -12,7 +12,7 @@
 import { parse } from '@retorquere/bibtex-parser';
 import { z } from 'astro/zod';
 import raw from '../data/publications.bib?raw';
-import { TOPICS, topic } from '../schemas/content';
+import { topic } from '../schemas/content';
 
 /** How to recognise "me" in author lists (bolded everywhere). */
 export const SELF = { lastName: 'Nandi', firstInitial: 'S' } as const;
@@ -44,7 +44,8 @@ export interface Publication {
   doi?: string;
   url?: string;
   selected: boolean;
-  topics: (typeof TOPICS)[number][];
+  /** Research theme slugs (file names in src/content/research/). */
+  topics: string[];
   pdf?: string;
   code?: string;
   data?: string;

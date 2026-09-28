@@ -11,13 +11,31 @@ Personal academic website of **Saswata Nandi** — built with [Astro](https://as
 | Publications (and "selected" on home) | `src/data/publications.bib` (`selected = {true}`) |
 | Software cards / IMDLIB stats         | `src/data/software.yaml`               |
 | Reading list                          | `src/data/reading.yaml` (+ notes in `src/content/reading/notes/`) |
-| Research themes                       | `src/content/research/*.md`            |
+| Research themes (text, picture, featured tool) | `src/content/research/<slug>.md` — see below |
 | Blog posts                            | `src/content/blog/<slug>/index.md` (copy `example-post/`) |
 | CV entries                            | `src/data/cv.yaml`                     |
 | Headshot / social card                | `public/images/headshot.jpg`, `public/og-default.png` |
 
 Every file is validated at build time: a typo produces an error naming the file and field
 (see the "Build" step log in the Actions tab). Set `draft: true` to hide an item on the live site.
+
+## Research themes
+
+One Markdown file per theme in `src/content/research/`; the file name is the theme's slug
+(used in the URL and in the BibTeX `topic` field, e.g. `topic = {fire-and-water, climate-extremes}`,
+see `docs/topic-mapping.md`). Papers tagged with a theme are listed on its page automatically.
+
+**Swapping a theme picture:** put your file in `src/assets/research/` and set `image:` to its name.
+
+- `.png` / `.jpg` / `.webp` — photos, maps, plots (resized and optimised automatically).
+- `.svg` — drawn inline; use `currentColor` or the site colours (`var(--color-accent)`, …) so it follows dark mode.
+- Update `image_alt` (what the picture shows, for screen readers) and optionally `image_caption`.
+- The home-page card uses `thumbnail:` if set, otherwise `image` (text labels in inline SVGs are hidden on cards).
+- `image_full:` adds a "View full diagram" link (e.g. `/images/research/cwis-flowchart.png` in `public/`).
+
+The CWIS workflow on theme 2 is an HTML component (`image: cwis-pipeline`,
+wording in `src/components/research/CwisPipeline.astro`); replace it with an image file name the same way.
+`feature.url`, `collaborators` and `funding` are optional; empty ones are hidden.
 
 ## Local development
 

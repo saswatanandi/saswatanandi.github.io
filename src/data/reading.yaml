@@ -1,6 +1,6 @@
 # Papers I've read and recommend. One entry per paper; newest `read` first is automatic.
 # Fields: title, authors, journal, year, doi (no https:// prefix), read (YYYY-MM),
-#         tags, topics (research theme keys), why (one line), note (optional slug of a
+#         tags, topics (research theme slugs = file names in src/content/research/), why (one line), note (optional slug of a
 #         longer note in src/content/reading/notes/), draft (true = hidden on the live site).
 
 # EXAMPLE — shows the format. It is a draft, so it never appears on the live site.
@@ -11,6 +11,6 @@
   doi: 10.1016/j.jhydrol.2005.07.007
   read: 2026-09
   tags: [uncertainty, calibration]
-  topics: [lsm-modelling]
+  topics: [modelling-water-cycle]
   why: Example entry. Replace it with a paper you have just read.
   draft: true

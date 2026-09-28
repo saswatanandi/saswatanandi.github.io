@@ -7,7 +7,9 @@
 %  Custom fields (all optional, ignored by LaTeX):
 %    pubtype  = {journal | chapter | proceedings | abstract | talk}
 %    selected = {true}                 → shown under "Selected publications" on home
-%    topic    = {forest-fire, lsm-modelling, forecasting, climate-impact, open-data}
+%    topic    = {one or more research theme slugs, comma-separated}
+%               fire-and-water, modelling-water-cycle, climate-extremes
+%               (= file names in src/content/research/; see docs/topic-mapping.md)
 %    pdf, code, data, slides = {https://…}
 %    summary  = {one plain-language sentence}
 % ─────────────────────────────────────────────────────────────────────────────
@@ -22,7 +24,7 @@
   doi      = {10.3389/frwa.2026.1879797},
   pubtype  = {journal},
   selected = {true},
-  topic    = {lsm-modelling, climate-impact}
+  topic    = {modelling-water-cycle}
 }
 
 @article{casirati2025forest,
@@ -36,7 +38,7 @@
   doi      = {10.1002/eco.2753},
   pubtype  = {journal},
   selected = {true},
-  topic    = {forest-fire}
+  topic    = {fire-and-water}
 }
 
 @article{nandi2024imdlib,
@@ -49,7 +51,7 @@
   doi      = {10.1016/j.envsoft.2023.105869},
   pubtype  = {journal},
   selected = {true},
-  topic    = {open-data},
+  topic    = {modelling-water-cycle},
   code     = {https://github.com/iamsaswata/imdlib}
 }
 
@@ -63,5 +65,5 @@
   doi      = {10.1016/j.jhydrol.2022.127842},
   pubtype  = {journal},
   selected = {true},
-  topic    = {lsm-modelling, forecasting}
+  topic    = {modelling-water-cycle}
 }

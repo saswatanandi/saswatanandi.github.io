@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { render, type CollectionEntry } from 'astro:content';
 import ComingSoon from '../../components/ComingSoon.astro';
 import Icon from '../../components/Icon.astro';
+import ThemeFigure from '../../components/ThemeFigure.astro';
 import PublicationItem from '../../components/PublicationItem.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
 import { getPublications } from '../../lib/bibtex';
@@ -24,7 +25,10 @@ interface Props {
 }
 const { theme, prev, next, index } = Astro.props;
 const { Content } = await render(theme);
-const pubs = getPublications().filter((p) => p.topics.includes(theme.data.key));
+const { image, image_alt, image_caption, image_full, feature, collaborators, funding } = theme.data;
+// getPublications() is already newest first.
+const pubs = getPublications().filter((p) => p.topics.includes(theme.id));
+const hasAside = Boolean(feature) || collaborators.length > 0 || funding.length > 0;
 ---
 
 <PageLayout
@@ -38,21 +42,68 @@ const pubs = getPublications().filter((p) => p.topics.includes(theme.data.key));
     <a href="/research/">← All research</a>
   </nav>
 
-  <div class="layout">
+  <figure class="figure">
+    <ThemeFigure src={image} alt={image_alt} />
+    {
+      (image_caption || image_full) && (
+        <figcaption>
+          {image_caption}
+          {image_full && (
+            <>
+              {' '}
+              <a href={image_full}>
+                View full diagram<span aria-hidden="true"> ↗</span>
+              </a>
+            </>
+          )}
+        </figcaption>
+      )
+    }
+  </figure>
+
+  <div class:list={['layout', { 'layout--aside': hasAside }]}>
     <div class="prose">
       <Content />
     </div>
     {
-      theme.data.regions.length > 0 && (
-        <aside class="facts" aria-label="Study areas">
-          <p class="eyebrow">
-            <Icon name="pin" size={14} /> Study areas
-          </p>
-          <ul role="list">
-            {theme.data.regions.map((r) => (
-              <li>{r}</li>
-            ))}
-          </ul>
+      hasAside && (
+        <aside class="aside" aria-label="Related">
+          {feature && (
+            <section class="card feature">
+              <p class="eyebrow">Featured</p>
+              <h2 class="feature__title">{feature.title}</h2>
+              {feature.subtitle && <p class="feature__subtitle">{feature.subtitle}</p>}
+              <p class="feature__desc">{feature.description}</p>
+              {feature.url && (
+                <a class="btn btn--primary feature__link" href={feature.url}>
+                  Open {feature.title} <Icon name="external" size={14} />
+                </a>
+              )}
+            </section>
+          )}
+          {collaborators.length > 0 && (
+            <section class="card">
+              <h2 class="eyebrow">Collaborators</h2>
+              <ul role="list" class="card__list">
+                {collaborators.map((c) => (
+                  <li>
+                    {c.url ? <a href={c.url}>{c.name}</a> : c.name}
+                    {c.affiliation && <span class="muted"> · {c.affiliation}</span>}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          {funding.length > 0 && (
+            <section class="card">
+              <h2 class="eyebrow">Funding</h2>
+              <ul role="list" class="card__list">
+                {funding.map((f) => (
+                  <li>{f}</li>
+                ))}
+              </ul>
+            </section>
+          )}
         </aside>
       )
     }
@@ -108,27 +159,81 @@ const pubs = getPublications().filter((p) => p.topics.includes(theme.data.key));
     text-decoration: none;
     font-weight: 600;
   }
+  .figure {
+    margin: 0 0 var(--space-7);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .figure :global(.tfig > svg) {
+    max-width: 46rem;
+    margin-inline: auto;
+  }
+  .figure figcaption {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .figure figcaption a {
+    font-weight: 600;
+    white-space: nowrap;
+  }
   .layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 16rem;
     gap: var(--space-8);
     align-items: start;
+  }
+  .layout--aside {
+    grid-template-columns: minmax(0, 1fr) 18rem;
   }
   .prose {
     font-size: var(--text-md);
   }
-  .facts {
+  .aside {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .card {
     padding: var(--space-5);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     background: var(--color-surface);
   }
-  .facts ul {
+  .feature {
+    border-top: 3px solid var(--color-accent);
+  }
+  .feature__title {
+    margin-top: var(--space-2);
+    font-size: var(--text-xl);
+    letter-spacing: 0.01em;
+  }
+  .feature__subtitle {
+    margin-top: var(--space-1);
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: var(--leading-snug);
+  }
+  .feature__desc {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .feature__link {
+    margin-top: var(--space-4);
+  }
+  .card__list {
     margin-top: var(--space-3);
     display: grid;
     gap: var(--space-2);
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+  }
+  .muted {
+    color: var(--color-text-faint);
   }
   .related {
     margin-top: var(--space-8);
@@ -165,9 +270,22 @@ const pubs = getPublications().filter((p) => p.topics.includes(theme.data.key));
     text-align: right;
   }
   @media (max-width: 52rem) {
-    .layout {
+    .layout--aside {
       grid-template-columns: 1fr;
       gap: var(--space-6);
+    }
+  }
+  /* Phones: the figure uses the full screen width. */
+  @media (max-width: 36rem) {
+    .figure {
+      margin-inline: calc(-1 * var(--gutter));
+      padding: var(--space-4) var(--space-3);
+      border-inline: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .figure figcaption {
+      padding-inline: var(--space-2);
     }
   }
 </style>

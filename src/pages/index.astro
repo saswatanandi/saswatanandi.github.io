@@ -350,33 +350,13 @@ const metrics = [
   .section {
     margin-top: var(--space-8);
   }
-  /* 5 tiles: 3 on the first row, 2 wider ones on the second. */
+  /* Research cards: three across, stacked on small screens. */
   .tiles {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
   }
-  .tiles > li {
-    grid-column: span 2;
-  }
-  .tiles > li:nth-child(4):nth-last-child(2),
-  .tiles > li:nth-child(5):last-child {
-    grid-column: span 3;
-  }
-  @media (max-width: 60rem) {
-    .tiles {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .tiles > li,
-    .tiles > li:nth-child(4):nth-last-child(2),
-    .tiles > li:nth-child(5):last-child {
-      grid-column: auto;
-    }
-    .tiles > li:last-child:nth-child(odd) {
-      grid-column: 1 / -1;
-    }
-  }
-  @media (max-width: 36rem) {
+  @media (max-width: 48rem) {
     .tiles {
       grid-template-columns: 1fr;
     }

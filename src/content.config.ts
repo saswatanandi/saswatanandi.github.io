@@ -25,7 +25,7 @@ const readingNotes = defineCollection({
   schema: readingNoteSchema,
 });
 
-/** The five research themes. */
+/** Research themes: src/content/research/<slug>.md */
 const research = defineCollection({
   loader: glob({ base: './src/content/research', pattern: '*.md' }),
   schema: researchSchema,

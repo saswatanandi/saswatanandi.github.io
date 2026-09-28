@@ -1,0 +1,89 @@
+---
+/**
+ * Renders a research theme's picture from the `image` (or `thumbnail`) front-matter value:
+ *   • "name.svg"            → src/assets/research/name.svg, drawn inline so it follows light/dark mode
+ *   • "name.png|jpg|webp|avif" → src/assets/research/name.*, optimised by astro:assets
+ *   • "/images/…"           → a file in public/, used as-is
+ *   • "cwis-pipeline"       → a built-in figure component (src/components/research/)
+ * variant "full" = the figure on the theme page; "thumb" = decorative crop on cards (labels hidden).
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import CwisPipeline from './research/CwisPipeline.astro';
+
+interface Props {
+  src: string;
+  alt: string;
+  variant?: 'full' | 'thumb';
+  class?: string;
+}
+const { src, alt, variant = 'full', class: className } = Astro.props;
+const thumb = variant === 'thumb';
+
+const svgs = import.meta.glob<string>('/src/assets/research/*.svg', { query: '?raw', import: 'default', eager: true });
+const rasters = import.meta.glob<{ default: ImageMetadata }>('/src/assets/research/*.{png,jpg,jpeg,webp,avif,PNG,JPG,JPEG}', {
+  eager: true,
+});
+const components = { 'cwis-pipeline': CwisPipeline } as const;
+
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const key = `/src/assets/research/${src}`;
+
+let svg: string | undefined;
+let raster: ImageMetadata | undefined;
+let Component: (typeof components)[keyof typeof components] | undefined;
+
+if (src.startsWith('/')) {
+  // public/ file — rendered below as a plain <img>
+} else if (src in components) {
+  Component = components[src as keyof typeof components];
+} else if (key in svgs) {
+  const attrs = thumb
+    ? 'aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice"'
+    : `role="img" aria-label="${esc(alt)}"`;
+  svg = svgs[key]!.replace(/<\?xml[^>]*>\s*/, '').replace('<svg ', `<svg ${attrs} `);
+} else if (key in rasters) {
+  raster = rasters[key]!.default;
+} else {
+  const available = [...Object.keys(svgs), ...Object.keys(rasters)].map((k) => k.split('/').pop()).join(', ');
+  throw new Error(
+    `\n✖ Research image "${src}" not found. Put the file in src/assets/research/ (available: ${available || 'none'}).\n`,
+  );
+}
+---
+
+<div class:list={['tfig', `tfig--${variant}`, className]}>
+  {svg && <Fragment set:html={svg} />}
+  {
+    raster && (
+      <Image
+        src={raster}
+        alt={thumb ? '' : alt}
+        widths={thumb ? [480, 800] : [800, 1200, 1800]}
+        sizes={thumb ? '(max-width: 48rem) 100vw, 360px' : '(max-width: 72rem) 100vw, 1040px'}
+      />
+    )
+  }
+  {src.startsWith('/') && <img src={src} alt={thumb ? '' : alt} loading="lazy" decoding="async" />}
+  {Component && !thumb && <Component label={alt} />}
+</div>
+
+<style>
+  .tfig > :global(svg),
+  .tfig > :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .tfig--thumb {
+    height: 100%;
+  }
+  .tfig--thumb > :global(svg),
+  .tfig--thumb > :global(img) {
+    height: 100%;
+    object-fit: cover;
+  }
+  .tfig--thumb > :global(svg text) {
+    display: none;
+  }
+</style>

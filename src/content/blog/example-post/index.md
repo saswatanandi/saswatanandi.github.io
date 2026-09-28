@@ -3,7 +3,7 @@ title: Example post (copy me)
 description: A template showing the front-matter fields every post uses. It is a draft, so it never appears on the live site.
 date: 2026-09-27
 tags: [example]
-topics: [open-data]
+topics: [modelling-water-cycle]
 draft: true
 ---
 
