@@ -11,7 +11,6 @@ figures:
     caption: Coupling a land-surface model (VIC) with river routing (RAPID) and floodplain hydraulics (LISFLOOD-FP).
 image_alt: The CWIS workflow in six stages. Data acquisition and assimilation (meteorological, satellite vegetation and AI vegetation-forecast toolboxes) feeds hydrologic simulation with the VIC model at 1 km, daily, and a forecast run. Results are verified against CDEC and SNOTEL stations, with re-calibration when unsatisfactory, stored in a hydrologic data bank with an API, and delivered through a web application.
 image_caption: The California Water Information System (CWIS), from data acquisition to the web application.
-image_full: /images/research/cwis-flowchart.png
 feature:
   title: CWIS
   subtitle: California Water Information System
