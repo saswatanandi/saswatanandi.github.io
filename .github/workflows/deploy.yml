@@ -42,9 +42,15 @@ jobs:
       # - run: pip install nbconvert
       # - run: python scripts/convert_notebooks.py
 
-      # ── Phase 2: CV PDF from cv.yaml + publications.bib ──
-      # - uses: typst-community/setup-typst@v4
-      # - run: typst compile cv/cv.typ public/cv.pdf
+      # CV PDF (public/cv.pdf) from cv.yaml + site.config.yaml + publications.bib.
+      # Built before the site so /cv/ shows the "Download PDF" button.
+      - name: Set up Typst
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.14.2
+
+      - name: Build CV PDF
+        run: npm run cv:pdf
 
       - name: Build
         run: npm run build

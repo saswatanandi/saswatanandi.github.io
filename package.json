@@ -11,7 +11,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "astro": "astro"
+    "astro": "astro",
+    "cv:data": "node --disable-warning=ExperimentalWarning scripts/build-cv-data.mjs",
+    "cv:pdf": "npm run cv:data && typst compile --font-path cv/fonts --ignore-system-fonts cv/cv.typ public/cv.pdf"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.1",

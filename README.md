@@ -51,6 +51,22 @@ rewrites `src/assets/research/climate-extremes{,.narrow}.svg` and `climate-extre
 Natural Earth (public domain, via `world-atlas`), state lines US Census (public domain, via `us-atlas`); the IVT
 and SST-anomaly fields are synthetic, drawn for illustration.
 
+## CV (web page + PDF)
+
+`src/data/cv.yaml` holds positions, education, grants, awards, talks, teaching, mentoring, service,
+skills, languages and memberships (instructions and examples are at the top of the file; empty
+sections are hidden). Publications are added automatically from `publications.bib`, grouped as
+journal articles, book chapters, proceedings and abstracts, numbered newest first (J16 … J1).
+
+- `/cv/` renders it; `/cv.pdf` is typeset with [Typst](https://typst.app) from the same data.
+- The PDF is **generated, not committed**: GitHub Actions runs `npm run cv:pdf` before every build.
+  Locally, install Typst ≥ 0.12 (e.g. `brew install typst`, or a binary from its GitHub releases)
+  and run `npm run cv:pdf` → `public/cv.pdf` (git-ignored). Without it, `/cv/` shows "PDF coming soon".
+- Paper size: `pdf.paper` in cv.yaml (`us-letter` or `a4`), or for a one-off copy:
+  `npm run cv:data && typst compile --font-path cv/fonts --input paper=a4 cv/cv.typ cv-a4.pdf`.
+- Design: `cv/cv.typ`; fonts: `cv/fonts/` (Source Serif 4 + Inter, SIL OFL); shared section logic:
+  `src/lib/cv.ts`; schema: `src/schemas/cv.ts`; data step: `scripts/build-cv-data.mjs`.
+
 ## Local development
 
 ```sh
@@ -60,6 +76,7 @@ npm run dev      # http://localhost:4321 (drafts visible)
 npm run build    # production build → dist/
 npm run preview  # serve dist/
 npm run check    # type-check .astro/.ts files
+npm run cv:pdf   # CV → public/cv.pdf (needs Typst)
 ```
 
 ## Where things live

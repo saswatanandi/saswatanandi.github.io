@@ -189,27 +189,5 @@ export const softwareSchema = z
   })
   .strict();
 
-const cvItem = z
-  .object({
-    title: z.string().min(1),
-    org: z.string().optional(),
-    location: z.string().optional(),
-    start: z.union([z.string(), z.number()]).transform(String).optional(),
-    end: z.union([z.string(), z.number()]).transform(String).optional(),
-    details: z.string().optional(),
-    url: url.optional(),
-  })
-  .strict();
-
-export const cvSchema = z
-  .object({
-    education: z.array(cvItem).default([]),
-    positions: z.array(cvItem).default([]),
-    awards: z.array(cvItem).default([]),
-    service: z.array(cvItem).default([]),
-    mentoring: z.array(cvItem).default([]),
-    teaching: z.array(cvItem).default([]),
-  })
-  .strict();
-
-export type CvItem = z.infer<typeof cvItem>;
+/** CV: see ./cv.ts (kept separate so the PDF build script can use it without Astro). */
+export { cvSchema, type Cv } from './cv';

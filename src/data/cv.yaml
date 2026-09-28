@@ -1,21 +1,134 @@
-# CV data (Phase 2 renders /cv and builds cv.pdf from this file + publications.bib).
-# Each item: title, org, location, start, end, details, url — all but `title` optional.
+# ─────────────────────────────────────────────────────────────────────────────
+#  cv.yaml — everything on /cv/ and in /cv.pdf except publications
+#  (publications come from src/data/publications.bib automatically).
+#
+#  • Every section is optional. An empty list ([]) or a missing section is hidden.
+#  • Dates: a year (2021) or year-month (2021-08). `end` can also be "present".
+#    Leave a date as "" if you don't want to show it.
+#  • `details` is one line of text, or a list of lines.
+#  • `draft: true` hides an item without deleting it.
+#  • Write items newest first; they are shown in the order you write them.
+#  • To add an item, uncomment an example below (remove the leading "# ") and edit it.
+#    A section name with nothing under it (e.g. `awards:`) is an empty section.
+#  • A typo (wrong field name, bad date) stops the build with the field name in the message.
+#
+#  STATUS: placeholder. Only the facts below are known for sure; everything marked
+#  TODO(Saswata) is waiting for the real CV.
+# ─────────────────────────────────────────────────────────────────────────────
 
-education:
-  - title: PhD, Water Resources Engineering (Civil Engineering)
-    org: Indian Institute of Technology Bombay
-    location: Mumbai, India
-    start: ""   # TODO(Saswata)
-    end: ""     # TODO(Saswata)
+# Note shown at the top of the web page (not in the PDF). Delete this line when the CV is complete.
+notice: This CV is being updated. More entries (dates, awards, service, teaching) are coming soon.
+
+# "Last updated" on the page and PDF. Empty = the date the site was built.
+updated: ""
+
+pdf:
+  paper: us-letter          # us-letter or a4
+  publications: true        # include the publication list in the PDF
 
 positions:
   - title: Postdoctoral Researcher
-    org: Sierra Nevada Research Institute, University of California, Merced
-    location: Merced, CA, USA
-    start: ""   # TODO(Saswata)
-    end: ""     # TODO(Saswata): end date, and add your current position above this one
+    org: University of California, Merced   # TODO(Saswata): lab / institute name if you want it here
+    org_url: https://ecohydrology.ucmerced.edu/
+    location: California, USA
+    start: ""                              # TODO(Saswata): e.g. 2023-01
+    end: present
+  # TODO(Saswata): earlier positions, newest first, e.g.
+  # - title: Research Associate
+  #   org: Some University
+  #   location: City, Country
+  #   start: 2021-08
+  #   end: 2022-12
+  #   details: One line on what you did (optional).
 
-awards: []
-service: []
-mentoring: []
-teaching: []
+education:
+  - degree: PhD
+    field: Water Resources Engineering
+    institution: Indian Institute of Technology Bombay
+    location: Mumbai, India
+    year: ""                               # TODO(Saswata): year awarded, e.g. 2022
+    thesis: ""                             # TODO(Saswata): thesis title
+    advisor: ""                            # TODO(Saswata): advisor name(s)
+  # TODO(Saswata): Master's and Bachelor's degrees, e.g.
+  # - degree: M.Tech.
+  #   field: …
+  #   institution: …
+  #   location: …
+  #   year: 2016
+
+# Research grants and funding, e.g.
+grants:
+  # - title: Project title
+  #   role: Co-I                 # PI, Co-PI, Co-I, Contributor…
+  #   funder: NASA
+  #   amount: USD 100,000        # optional
+  #   start: 2024
+  #   end: 2026
+
+# Awards, fellowships, honours, e.g.
+awards:
+  # - title: Some Fellowship
+  #   org: Awarding body
+  #   year: 2020
+  #   details: optional one line
+
+# Invited talks and seminars (conference abstracts/presentations live in publications.bib), e.g.
+talks:
+  # - title: Talk title
+  #   venue: Department of …, University of …
+  #   location: City, Country
+  #   date: 2025-04
+  #   url: https://…             # slides or recording (optional)
+
+teaching:
+  # - course: CE 3xx Hydrology
+  #   role: Teaching Assistant
+  #   institution: IIT Bombay
+  #   term: 2018–2020
+
+# Students you have mentored (shown newest first), e.g.
+mentoring:
+  # - name: First Last
+  #   level: MS student
+  #   institution: UC Merced
+  #   start: 2024
+  #   end: present
+  #   topic: one-line project topic
+  #   now: where they are now (optional)
+
+service:
+  # Journals you review for, one per line, e.g.
+  reviewer:
+    # - Water Resources Research
+    # - Journal of Hydrology
+  committees:
+    # - role: Member
+    #   org: Some committee
+    #   start: 2024
+    #   end: present
+  sessions:
+    # - role: Convener
+    #   meeting: "H000: Session title, AGU Fall Meeting"
+    #   location: San Francisco, CA
+    #   year: 2025
+  outreach:
+    # - title: Guest lecture / workshop / blog…
+    #   org: …
+    #   year: 2024
+
+# Skills, grouped. Known from the papers and software; TODO(Saswata): review and extend.
+skills:
+  - group: Models
+    items: [VIC, RAPID, LISFLOOD-FP]
+  - group: Programming
+    items: [Python]
+  - group: Open source
+    items: [IMDLIB (creator and maintainer)]
+
+languages:
+  # - language: English
+  #   level: fluent
+
+memberships:
+  # - org: American Geophysical Union (AGU)
+  #   since: 2019
