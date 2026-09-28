@@ -28,7 +28,7 @@
 
 #set page(
   paper: paper,
-  margin: (x: 0.8in, top: 0.85in, bottom: 0.8in),
+  margin: (x: 0.8in, top: 0.8in, bottom: 0.75in),
   header: context {
     if here().page() > 1 {
       set text(font: sans, size: 7.5pt, fill: faint)
@@ -54,7 +54,7 @@
 
 #let meta(body) = text(font: sans, size: 8pt, fill: faint, body)
 
-#let section-head(title) = block(above: 16pt, below: 8pt, sticky: true)[
+#let section-head(title) = block(above: 14pt, below: 7pt, sticky: true)[
   #set text(font: sans, size: 8.5pt, weight: "bold", fill: accent, tracking: 0.09em)
   #grid(
     columns: (auto, 1fr),
@@ -70,23 +70,34 @@
 ]
 
 // Date column + content column.
-#let entry(left, body) = block(
+#let entry(left, body, col: date-col) = block(
   breakable: false,
   above: 0pt,
-  below: 7pt,
-  grid(columns: (date-col, 1fr), column-gutter: gutter, left, body),
+  below: 6pt,
+  grid(columns: (col, 1fr), column-gutter: gutter, left, body),
 )
 
 #let maybe-link(url, body) = if url == none { body } else { link(url, body) }
 
+// Label | text rows (skills, interests) get a wider label column.
+#let label-col = 1.55in
 #let row(r, plain: false) = entry(
-  meta(r.at("when", default: "")),
+  col: if plain { label-col } else { date-col },
+  if plain {
+    text(font: sans, size: 8pt, weight: "medium", fill: muted, r.at("when", default: ""))
+  } else { meta(r.at("when", default: "")) },
   {
     text(weight: if plain { "regular" } else { "semibold" }, maybe-link(r.at("url", default: none), r.title))
     for (i, l) in r.lines.enumerate() {
       linebreak()
       let u = if i == 0 { r.at("lineUrl", default: none) } else { none }
       text(size: 9.5pt, fill: muted, maybe-link(u, l))
+    }
+    let bullets = r.at("bullets", default: ())
+    if bullets.len() > 0 {
+      set text(size: 9.5pt, fill: muted)
+      set list(marker: text(fill: accent, size: 7pt, baseline: -1pt, sym.diamond.filled), indent: 1pt, body-indent: 6pt, spacing: 0.45em)
+      block(above: 4pt, below: 0pt, list(..bullets))
     }
   },
 )
@@ -130,6 +141,10 @@
   #line(length: 100%, stroke: 1.2pt + accent)
 ]
 
+#if data.summary != none {
+  block(below: 4pt, text(size: 10pt, data.summary.map(x => if x.bold { text(weight: "semibold", x.text) } else { x.text }).join()))
+}
+
 // ── Sections ────────────────────────────────────────────────────────────────
 
 #for s in data.sections {
@@ -139,10 +154,14 @@
     if s.kind == "pubs" {
       for p in g.entries { pub(p) }
     } else {
-      for r in g.rows { row(r, plain: s.id == "skills") }
+      for r in g.rows { row(r, plain: s.id in data.plain) }
       let items = g.at("list", default: ())
       if items.len() > 0 {
-        entry([], text(size: 9.5pt, items.join("  ·  ")))
+        let note = g.at("note", default: none)
+        entry([], {
+          text(size: 9.5pt, items.join("  ·  "))
+          if note != none { text(size: 9.5pt, fill: muted, [ #note]) }
+        })
       }
     }
   }

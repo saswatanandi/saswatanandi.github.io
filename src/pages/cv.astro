@@ -12,7 +12,17 @@ import Icon, { type IconName } from '../components/Icon.astro';
 import PageLayout from '../layouts/PageLayout.astro';
 import { getPublications } from '../lib/bibtex';
 import { site } from '../lib/config';
-import { authorSep, cvSections, formatUpdated, pubGroups, type CvPubGroup, type CvSection } from '../lib/cv';
+import {
+  authorSep,
+  boldSegments,
+  cvSections,
+  formatUpdated,
+  PLAIN_SECTIONS,
+  pubGroups,
+  withPublications,
+  type CvPubGroup,
+  type CvSection,
+} from '../lib/cv';
 
 const entry = await getEntry('cv', 'cv');
 if (!entry) throw new Error('src/data/cv.yaml is missing');
@@ -21,11 +31,10 @@ const cv = entry.data;
 const rowSections = cvSections(cv);
 const pubs: CvPubGroup[] = pubGroups(getPublications());
 type Block = CvSection | { id: 'publications'; title: string; pubs: CvPubGroup[] };
-const blocks: Block[] = [...rowSections];
-if (pubs.length) {
-  const at = blocks.findIndex((s) => !['positions', 'education'].includes(s.id));
-  blocks.splice(at === -1 ? blocks.length : at, 0, { id: 'publications', title: 'Publications', pubs });
-}
+const blocks: Block[] = pubs.length
+  ? withPublications<Block>(rowSections, { id: 'publications', title: 'Publications', pubs })
+  : rowSections;
+const summary = cv.summary ? boldSegments(cv.summary) : [];
 const pubCount = pubs.reduce((n, g) => n + g.entries.length, 0);
 
 const updated = formatUpdated(cv.updated ?? new Date().toISOString().slice(0, 10));
@@ -103,6 +112,12 @@ const contacts: Contact[] = [
 
   {cv.notice && <p class="cv-notice">{cv.notice}</p>}
 
+  {
+    summary.length > 0 && (
+      <p class="cv-summary">{summary.map((x) => (x.bold ? <strong>{x.text}</strong> : x.text))}</p>
+    )
+  }
+
   <nav class="cv-nav" aria-label="CV sections">
     <ul role="list">
       {
@@ -153,7 +168,7 @@ const contacts: Contact[] = [
                 <div class="cv-group">
                   {g.heading && <h3>{g.heading}</h3>}
                   {g.rows.length > 0 && (
-                    <ol role="list" class:list={['cv-rows', { 'cv-rows--plain': b.id === 'skills' }]}>
+                    <ol role="list" class:list={['cv-rows', { 'cv-rows--plain': PLAIN_SECTIONS.includes(b.id) }]}>
                       {g.rows.map((r) => (
                         <li class="cv-row">
                           <p class="cv-row__when">{r.when}</p>
@@ -162,6 +177,13 @@ const contacts: Contact[] = [
                             {r.lines.map((l, i) => (
                               <p class="cv-row__line">{i === 0 && r.lineUrl ? <a href={r.lineUrl}>{l}</a> : l}</p>
                             ))}
+                            {r.bullets.length > 0 && (
+                              <ul class="cv-row__bullets">
+                                {r.bullets.map((x) => (
+                                  <li>{x}</li>
+                                ))}
+                              </ul>
+                            )}
                           </div>
                         </li>
                       ))}
@@ -174,6 +196,7 @@ const contacts: Contact[] = [
                       ))}
                     </ul>
                   )}
+                  {g.note && <p class="cv-inline cv-inline__note">{g.note}</p>}
                 </div>
               ))}
         </section>
@@ -386,8 +409,40 @@ const contacts: Contact[] = [
   .cv-row__line a:hover {
     color: var(--color-accent);
   }
+  .cv-rows--plain {
+    --when: 11rem;
+  }
   .cv-rows--plain .cv-row__title {
     font-weight: 400;
+  }
+  .cv-rows--plain .cv-row__when {
+    color: var(--color-text-muted);
+    font-weight: 550;
+  }
+  .cv-row__bullets {
+    margin: var(--space-2) 0 0;
+    padding-left: 1.1em;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .cv-row__bullets li + li {
+    margin-top: var(--space-1);
+  }
+  .cv-row__bullets li::marker {
+    color: var(--color-accent-2);
+  }
+  .cv-inline__note {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+  }
+
+  .cv-summary {
+    margin-bottom: var(--space-6);
+    font-size: var(--text-md);
+    line-height: var(--leading-body);
+  }
+  .cv-summary strong {
+    font-weight: 600;
   }
 
   /* Publications: label in the date column, citation as body */
@@ -428,6 +483,9 @@ const contacts: Contact[] = [
 
   /* Phones: dates above the text, rail on the left edge */
   @media (max-width: 40rem) {
+    .cv-rows--plain {
+      --when: 0rem;
+    }
     .cv-id__role {
       flex-direction: column;
     }
@@ -475,6 +533,9 @@ const contacts: Contact[] = [
 
   /* ── Print: a clean, light, paper CV ──────────────────────────────────── */
   @media print {
+    .cv-rows--plain {
+      --when: 10rem;
+    }
     :global(:root),
     :global(:root[data-theme='dark']),
     :global(:root:not([data-theme='light'])) {

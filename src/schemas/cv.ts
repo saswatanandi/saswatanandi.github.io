@@ -149,6 +149,8 @@ export const cvMentee = z
     institution: text,
     start: date,
     end: endDate,
+    /** Free-text dates shown instead of start/end, e.g. "Summer 2024" (start/end still sort). */
+    dates: text,
     topic: text,
     /** Where they are now. */
     now: text,
@@ -157,7 +159,27 @@ export const cvMentee = z
   .strict();
 
 const committee = z
-  .object({ role: req('role'), org: req('org'), start: date, end: endDate, details, draft })
+  .object({
+    role: req('role'),
+    org: req('org'),
+    start: date,
+    end: endDate,
+    /** Free-text dates shown instead of start/end, e.g. "25 Feb – 01 Mar 2019". */
+    dates: text,
+    details,
+    draft,
+  })
+  .strict();
+const editorial = z
+  .object({
+    /** e.g. Guest Editor, Associate Editor. */
+    role: req('role'),
+    journal: req('journal'),
+    start: date,
+    end: endDate,
+    details,
+    draft,
+  })
   .strict();
 const session = z
   .object({
@@ -176,9 +198,38 @@ export const cvService = z
   .object({
     /** Journals you review for (one name per line). */
     reviewer: list(z.string().trim().min(1)),
+    /** One line after the journal list, e.g. "and others — over 100 reviews across 36 journals". */
+    reviewer_note: text,
+    editorial: list(editorial),
     committees: list(committee),
     sessions: list(session),
     outreach: list(outreach),
+  })
+  .strict();
+
+const interest = z.object({ area: req('area'), description: text }).strict();
+const softwareItem = z.object({ name: req('name'), description: req('description'), url, draft }).strict();
+const pressItem = z
+  .object({
+    /** e.g. "The Hindu (Data)". */
+    outlet: req('outlet'),
+    title: req('title'),
+    url,
+    date,
+    draft,
+  })
+  .strict();
+const referee = z
+  .object({
+    name: req('name'),
+    /** e.g. Associate Professor. */
+    title: text,
+    department: text,
+    org: text,
+    email: z.preprocess(blank, z.email('email must look like name@example.org').optional()),
+    /** e.g. "Postdoctoral advisor; SNRI, UC Merced". */
+    relation: text,
+    draft,
   })
   .strict();
 
@@ -204,6 +255,10 @@ export const cvSchema = z
       })
       .strict()
       .prefault({}),
+    /** Short profile paragraph at the top of the CV. **bold** is allowed. */
+    summary: text,
+    /** Research interests: area + one-line description. */
+    interests: list(interest),
     positions: list(cvPosition),
     education: list(cvEducation),
     grants: list(cvGrant),
@@ -215,6 +270,13 @@ export const cvSchema = z
     skills: list(skillGroup),
     languages: list(language),
     memberships: list(membership),
+    /** Software and data products. */
+    software: list(softwareItem),
+    /** Press and media coverage. */
+    press: list(pressItem),
+    /** Referees. Hidden on the web page and in the PDF unless `show_references: true`. */
+    references: list(referee),
+    show_references: z.boolean().default(false),
   })
   .strict();
 

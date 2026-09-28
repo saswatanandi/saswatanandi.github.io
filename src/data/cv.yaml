@@ -12,67 +12,94 @@
 #    A section name with nothing under it (e.g. `awards:`) is an empty section.
 #  • A typo (wrong field name, bad date) stops the build with the field name in the message.
 #
-#  STATUS: placeholder. Only the facts below are known for sure; everything marked
-#  TODO(Saswata) is waiting for the real CV.
+#  Source: the owner's CV (CV_SaswataNandi.pdf, 2026). Publications and conference
+#  abstracts are NOT listed here: they come from src/data/publications.bib.
 # ─────────────────────────────────────────────────────────────────────────────
-
-# Note shown at the top of the web page (not in the PDF). Delete this line when the CV is complete.
-notice: This CV is being updated. More entries (dates, awards, service, teaching) are coming soon.
 
 # "Last updated" on the page and PDF. Empty = the date the site was built.
 updated: ""
+
+# Short profile paragraph at the top of the CV (**bold** allowed).
+# Note: the numbers here are typed by hand; update them with the metrics in site.config.yaml.
+summary: >-
+  Hydrologist working on wildfire, forest, and hydroclimate extremes — and turning those models into
+  tools agencies actually use. **22 papers** (h-index 11; 567 citations); lead developer of **IMDLIB**
+  (**251,000+ downloads**) and **ARWIN** (decision-support dashboard for El Dorado County Water Agency).
 
 pdf:
   paper: us-letter          # us-letter or a4
   publications: true        # include the publication list in the PDF
 
+interests:
+  - area: Forest & Wildfire Hydrology
+    description: Effects of wildfire, forest management, and vegetation dynamics on water yield, evapotranspiration, and sediment fluxes
+  - area: Hydroclimate Extremes & Risk
+    description: Drivers and impacts of atmospheric rivers, drought, and floods under a changing climate
+  - area: Hybrid Physics–ML Hydrology
+    description: Coupling process-based hydrology with machine learning for forecasting and process understanding
+  - area: Operational Hydrology
+    description: Hydrologic observatories, real-time decision support tools, and open-source software for water agencies and the research community (ARWIN, IMDLIB)
+
 positions:
-  - title: Postdoctoral Researcher
-    org: University of California, Merced   # TODO(Saswata): lab / institute name if you want it here
-    org_url: https://ecohydrology.ucmerced.edu/
-    location: California, USA
-    start: ""                              # TODO(Saswata): e.g. 2023-01
+  - title: Postdoctoral Research Scholar
+    org: Sierra Nevada Research Institute, UC Merced
+    location: CA, USA
+    start: 2022
     end: present
-  # TODO(Saswata): earlier positions, newest first, e.g.
-  # - title: Research Associate
-  #   org: Some University
-  #   location: City, Country
-  #   start: 2021-08
-  #   end: 2022-12
-  #   details: One line on what you did (optional).
+    details:
+      - ARWIN — real-time hydroclimate decision-support dashboard for El Dorado County Water Agency; two telemetry nodes (10 sites each); used by agency staff and basin stakeholders
+      - American River Hydrologic Observatory (ARHO) — field instrumentation for snowpack, soil-moisture, and meteorological monitoring
+      - 1 km VIC simulations across California (CWIS) with dynamic vegetation assimilation to quantify hydrologic impacts of wildfire and natural disturbance
+      - Post-fire soil-erosion and sediment-yield modelling across California burn scars
+  - title: Senior Research Fellow
+    org: Indian Institute of Engineering Science and Technology, Shibpur
+    start: 2015-01
+    end: 2015-04
+    details:
+      - Radioactive-tracer experiments and hydrodynamic modelling of dredge-material dispersion in a coastal river reach
 
 education:
-  - degree: PhD
+  - degree: Ph.D.
     field: Water Resources Engineering
     institution: Indian Institute of Technology Bombay
-    location: Mumbai, India
-    year: ""                               # TODO(Saswata): year awarded, e.g. 2022
-    thesis: ""                             # TODO(Saswata): thesis title
-    advisor: ""                            # TODO(Saswata): advisor name(s)
-  # TODO(Saswata): Master's and Bachelor's degrees, e.g.
-  # - degree: M.Tech.
-  #   field: …
-  #   institution: …
-  #   location: …
-  #   year: 2016
+    year: 2022
+    advisor: M. Janga Reddy     # from the References section ("Doctoral advisor; IIT Bombay")
+    details: Process-based integrated modelling framework for hydrological simulation and flood forecasting
+  - degree: M.E.
+    field: Water Resources Engineering
+    institution: Indian Institute of Engineering Science and Technology, Shibpur
+    year: 2015
+    details: Reservoir operation using dynamic programming and artificial neural network
+  - degree: B.Tech
+    field: Civil Engineering
+    institution: Jalpaiguri Government Engineering College
+    year: 2013
+    details: Statistical modelling and analysis of hydrological extremes
 
-# Research grants and funding, e.g.
 grants:
-  # - title: Project title
-  #   role: Co-I                 # PI, Co-PI, Co-I, Contributor…
-  #   funder: NASA
-  #   amount: USD 100,000        # optional
-  #   start: 2024
-  #   end: 2026
+  - title: A decision-support tool for mapping climate change and wildfire effect on Southern Sierra Nevada streamflow and sediment yield
+    role: Postdoctoral Researcher (proposal preparation & project lead); UC Merced (SNRI)
+    funder: California Department of Water Resources (DWR)
+    amount: USD 275,000
+    start: 2024
+  - title: SNRI Postdoctoral Grant
+    funder: Sierra Nevada Research Institute, UC Merced
+    start: 2022
 
-# Awards, fellowships, honours, e.g.
 awards:
-  # - title: Some Fellowship
-  #   org: Awarding body
-  #   year: 2020
-  #   details: optional one line
+  - title: MHRD/MoE National Doctoral Fellowship
+    details: Competitive merit fellowship supporting full PhD tenure at Indian Institute of Technology Bombay.
+  - title: AGU Travel Award
+    org: American Geophysical Union, USA
+    year: 2022
+  - title: IEEE Travel Award
+    org: IGARSS Conference, Valencia, Spain
+    year: 2018
+  - title: IIT Bombay Institute Travel Grant
+    org: EWRA Conference, Athens, Greece
+    year: 2017
 
-# Invited talks and seminars (conference abstracts/presentations live in publications.bib), e.g.
+# Invited talks and seminars (conference presentations/abstracts live in publications.bib), e.g.
 talks:
   # - title: Talk title
   #   venue: Department of …, University of …
@@ -80,32 +107,73 @@ talks:
   #   date: 2025-04
   #   url: https://…             # slides or recording (optional)
 
-teaching:
-  # - course: CE 3xx Hydrology
-  #   role: Teaching Assistant
-  #   institution: IIT Bombay
-  #   term: 2018–2020
+software:
+  - name: IMDLIB
+    url: https://imdlib.readthedocs.io
+    description: Open-source Python package for retrieval, processing, and spatiotemporal analysis of gridded India Meteorological Department (IMD) observational datasets. 251,000+ downloads; community-adopted across India-focused hydroclimate research.
+  - name: prismdata
+    url: https://prismdata.readthedocs.io
+    description: Python package for programmatic access to PRISM climate data over the continental United States.
+  - name: ARWIN
+    url: https://arwin.edwateragency.org/
+    description: Real-time hydroclimate decision-support dashboard for the Upper American River Basin, built and maintained for El Dorado County Water Agency.
 
-# Students you have mentored (shown newest first), e.g.
+teaching:
+  - course: Water Resources Engineering
+    role: Teaching Assistant
+    institution: IIT Bombay
+    term: 2016–2020
+    details:
+      - Developed lecture notes on rainfall–runoff processes, hydrograph analysis, reservoir planning and operation, and crop water requirements.
+      - Designed and graded problem sets and term examinations.
+  - course: Advanced Experimental Fluid Mechanics
+    role: Teaching Assistant
+    institution: IIT Bombay
+    term: 2017–2018
+    details:
+      - Mentored and coordinated graduate teaching assistants.
+      - Designed and evaluated student assessments.
+
+# Students you have mentored (shown newest first).
 mentoring:
-  # - name: First Last
-  #   level: MS student
-  #   institution: UC Merced
-  #   start: 2024
-  #   end: present
-  #   topic: one-line project topic
-  #   now: where they are now (optional)
+  - name: Anthony Pedraza
+    level: Undergraduate
+    institution: UC Merced
+    start: 2025
+    dates: Summer 2025
+    topic: co-mentored on soil-erosion estimation in the Upper San Joaquin Basin
+  - name: Deep Singh Mehroke
+    level: Undergraduate
+    institution: UC Merced
+    start: 2024
+    dates: Summer 2024
+    topic: co-mentored on decision-support system design for the California Water Information System (CWIS)
 
 service:
-  # Journals you review for, one per line, e.g.
   reviewer:
-    # - Water Resources Research
-    # - Journal of Hydrology
+    - Journal of Hydrology
+    - Hydrological Processes
+    - Physics and Chemistry of the Earth
+    - Science of the Total Environment
+    - Environmental Modelling & Software
+    - SoftwareX
+    - npj Climate and Atmospheric Science
+  reviewer_note: and others — totaling over 100 reviews across 36 SCI journals.
+  editorial:
+    - role: Guest Editor
+      journal: Discover Applied Sciences
+    - role: Guest Editor
+      journal: Frontiers in Environmental Science
   committees:
-    # - role: Member
-    #   org: Some committee
-    #   start: 2024
-    #   end: present
+    - role: Organizing Committee Member
+      org: CEP-QIP short-term training program on Advanced Computing Methods in Civil Engineering, Indian Institute of Technology Bombay, Mumbai
+      start: 2019-02
+      end: 2019-03
+      dates: 25 Feb – 01 Mar 2019
+    - role: Technical Committee Member
+      org: The Eleventh International Conference on Advanced Geographic Information Systems, Applications, and Services (GEOProcessing 2019), Athens, Greece
+      start: 2019-02
+      dates: 24–28 Feb 2019
   sessions:
     # - role: Convener
     #   meeting: "H000: Session title, AGU Fall Meeting"
@@ -116,19 +184,63 @@ service:
     #   org: …
     #   year: 2024
 
-# Skills, grouped. Known from the papers and software; TODO(Saswata): review and extend.
+press:
+  - outlet: The Hindu (Data)
+    title: Kolkata records hottest April; east and north-east sizzle
+    url: https://www.thehindu.com/data/data-kolkata-records-hottest-april-east-and-north-east-sizzle/article66785993.ece
+  - outlet: The Hindu (Data)
+    title: "A June with extremes: maximum temperature hits the lowest mark in Chennai, highest in Thiruvananthapuram"
+    url: https://www.thehindu.com/data/data-a-june-with-extremes-maximum-temperature-hits-the-lowest-mark-in-chennai-highest-in-thiruvananthapuram/article67020878.ece
+  - outlet: The Hindu (Data)
+    title: Little correlation between higher temperatures and lower turnout
+    url: https://www.thehindu.com/data/little-correlation-between-higher-temperatures-and-lower-turnout-data/article68125674.ece
+  - outlet: Significance Magazine
+    title: "Long read: Are heatwaves more deadly for women?"
+    url: https://significancemagazine.com/long-read-are-heatwaves-more-deadly-for-women/
+
 skills:
-  - group: Models
-    items: [VIC, RAPID, LISFLOOD-FP]
-  - group: Programming
-    items: [Python]
-  - group: Open source
-    items: [IMDLIB (creator and maintainer)]
+  - group: Hydrologic & Hydraulic Models
+    items: [VIC, SWAT, LISFLOOD-FP, HEC-Suits]
+  - group: Statistics & Machine Learning
+    items: [Copulas, evolutionary single/multi-objective optimization, deep neural networks, bias correction, time-series modelling]
+  - group: Programming Languages
+    items: [Fortran, Python, R, Matlab, JavaScript]
+  - group: Geospatial Analysis
+    items: [Google Earth Engine, QGIS, ArcGIS, GDAL, "Python libraries (xarray, rioxarray, rasterio, geopandas, geoplot)"]
+  - group: Parallel Processing / HPC
+    items: [MPI, OpenMP, POSIX threads, HPC with various job schedulers]
+  - group: Database Management
+    items: [MySQL, Postgres]
+  - group: Software Engineering
+    items: [Git, Docker, GitHub Actions, CircleCI, Travis CI]
 
 languages:
   # - language: English
   #   level: fluent
 
 memberships:
-  # - org: American Geophysical Union (AGU)
-  #   since: 2019
+  - org: American Geophysical Union (AGU)
+
+# Referees. Hidden everywhere unless show_references is true.
+# Their email addresses are in the owner's PDF CV; they are deliberately not stored here
+# (this repository is public). Add `email:` only if the referee agrees.
+show_references: false
+references:
+  - name: Dr. Safeeq Khan
+    title: Associate Professor
+    department: Dept. of Civil and Environmental Engineering
+    org: University of California, Merced
+    relation: Postdoctoral advisor; SNRI, UC Merced
+  - name: Dr. M. Janga Reddy
+    title: Professor
+    department: Dept. of Civil Engineering
+    org: Indian Institute of Technology Bombay
+    relation: Doctoral advisor; IIT Bombay
+  - name: Dr. Prakash Jha
+    title: Project Scientist
+    org: University of California Agriculture and Natural Resources (UC ANR)
+    relation: Collaborator
+  - name: Dr. Ryan R. Bart
+    title: Scientist
+    org: California Air Resources Board (CARB)
+    relation: Collaborator

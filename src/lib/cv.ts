@@ -7,15 +7,17 @@
  */
 import type { Cv } from '../schemas/cv';
 
-/** One entry: a date (left column) + a title and muted lines under it. */
+/** One entry: a date (left column) + a title, muted lines and bullet points under it. */
 export interface CvRow {
   when?: string;
   title: string;
   url?: string;
-  /** Secondary lines (organisation, details, …). */
+  /** Secondary lines (organisation, location, …). */
   lines: string[];
   /** Link for the first secondary line (e.g. the organisation's website). */
   lineUrl?: string;
+  /** Bullet points (the item's `details`). */
+  bullets: string[];
 }
 /** A block inside a section: optional sub-heading + rows and/or an inline list. */
 export interface CvGroup {
@@ -23,6 +25,8 @@ export interface CvGroup {
   rows: CvRow[];
   /** Inline list (e.g. journals reviewed for), shown as "A · B · C". */
   list?: string[];
+  /** One line after the list. */
+  note?: string;
 }
 export interface CvSection {
   id: string;
@@ -76,7 +80,14 @@ export function formatCvDate(d?: string): string | undefined {
 export function formatRange(start?: string, end?: string): string | undefined {
   const a = formatCvDate(start);
   const b = formatCvDate(end);
-  if (a && b) return a === b ? a : `${a} – ${b}`;
+  if (a && b) {
+    if (a === b) return a;
+    // "Jan – Apr 2015" rather than "Jan 2015 – Apr 2015"
+    const [ma, ya] = a.split(' ');
+    const [mb, yb] = b.split(' ');
+    if (ya && yb && ya === yb) return `${ma} – ${mb} ${yb}`;
+    return `${a} – ${b}`;
+  }
   if (a) return a;
   return b === 'present' ? undefined : b;
 }
@@ -98,53 +109,71 @@ const newestFirst = <T>(items: T[], key: (t: T) => string) =>
 
 const join = (...parts: (string | undefined)[]) => parts.filter(Boolean).join(', ');
 const visible = <T extends { draft?: boolean }>(items: T[]) => items.filter((i) => !i.draft);
+const present = (...lines: (string | undefined | false)[]) => lines.filter((l): l is string => Boolean(l));
 
 /* ── Sections ──────────────────────────────────────────────────────────── */
 
 /** Section order; "publications" is filled in by the caller (see pubGroups). */
 export const SECTION_ORDER = [
+  'interests',
   'positions',
   'education',
   'publications',
   'grants',
   'awards',
   'talks',
+  'software',
   'teaching',
   'mentoring',
   'service',
+  'press',
   'skills',
   'memberships',
+  'references',
 ] as const;
+export type SectionId = (typeof SECTION_ORDER)[number];
 
-export const SECTION_TITLES: Record<(typeof SECTION_ORDER)[number], string> = {
+export const SECTION_TITLES: Record<SectionId, string> = {
+  interests: 'Research interests',
   positions: 'Positions',
   education: 'Education',
   publications: 'Publications',
   grants: 'Grants & funding',
-  awards: 'Awards & honours',
+  awards: 'Honours & fellowships',
   talks: 'Invited talks',
+  software: 'Software & data products',
   teaching: 'Teaching',
-  mentoring: 'Mentoring',
+  mentoring: 'Student mentoring',
   service: 'Professional service',
-  skills: 'Skills',
+  press: 'Press & media',
+  skills: 'Technical skills',
   memberships: 'Professional memberships',
+  references: 'References',
 };
+
+/** Sections whose rows are "label | text" (no bold title). */
+export const PLAIN_SECTIONS: readonly string[] = ['interests', 'skills'];
 
 /**
  * All non-publication sections, in SECTION_ORDER, empty ones removed.
- * Items keep the order written in cv.yaml (write newest first), except
- * where noted.
+ * Items keep the order written in cv.yaml (write newest first), except mentoring
+ * (sorted newest first).
  */
 export function cvSections(cv: Cv): CvSection[] {
-  const s: Partial<Record<(typeof SECTION_ORDER)[number], CvGroup[]>> = {};
+  const s: Partial<Record<SectionId, CvGroup[]>> = {};
+
+  s.interests = [
+    { rows: cv.interests.map((i) => ({ when: i.area, title: i.description ?? '', lines: [], bullets: [] })) },
+  ];
 
   s.positions = [
     {
       rows: visible(cv.positions).map((p) => ({
         when: formatRange(p.start, p.end),
         title: p.title,
-        lines: [join(p.org, p.location), ...p.details],
+        lines: present(join(p.org, p.location)),
         lineUrl: p.org_url,
+        bullets: p.details,
       })),
     },
   ];
@@ -155,12 +184,12 @@ export function cvSections(cv: Cv): CvSection[] {
         when: formatCvDate(e.year) ?? formatRange(e.start, e.end),
         title: e.field ? `${e.degree}, ${e.field}` : e.degree,
         lineUrl: e.institution_url,
-        lines: [
+        lines: present(
           join(e.institution, e.location),
           e.thesis && `Thesis: “${e.thesis}”`,
           e.advisor && `Advisor: ${e.advisor}`,
-          ...e.details,
-        ].filter((l): l is string => Boolean(l)),
+        ),
+        bullets: e.details,
       })),
     },
   ];
@@ -171,10 +200,8 @@ export function cvSections(cv: Cv): CvSection[] {
         when: formatRange(g.start, g.end),
         title: g.title,
         url: g.url,
-        lines: [
-          [g.funder, g.amount].filter(Boolean).join(' · ') + (g.role ? ` (${g.role})` : ''),
-          ...g.details,
-        ],
+        lines: present([g.funder, g.amount].filter(Boolean).join(' · '), g.role),
+        bullets: g.details,
       })),
     },
   ];
@@ -185,7 +212,8 @@ export function cvSections(cv: Cv): CvSection[] {
         when: formatCvDate(a.year),
         title: a.title,
         url: a.url,
-        lines: [a.org, ...a.details].filter((l): l is string => Boolean(l)),
+        lines: [...present(a.org), ...a.details],
+        bullets: [],
       })),
     },
   ];
@@ -196,7 +224,19 @@ export function cvSections(cv: Cv): CvSection[] {
         when: formatCvDate(t.date),
         title: t.title,
         url: t.url,
-        lines: [join(t.venue, t.location), ...t.details],
+        lines: present(join(t.venue, t.location)),
+        bullets: t.details,
+      })),
+    },
+  ];
+
+  s.software = [
+    {
+      rows: visible(cv.software).map((x) => ({
+        title: x.name,
+        url: x.url,
+        lines: [x.description],
+        bullets: [],
       })),
     },
   ];
@@ -206,7 +246,8 @@ export function cvSections(cv: Cv): CvSection[] {
       rows: visible(cv.teaching).map((t) => ({
         when: t.term,
         title: t.course,
-        lines: [join(t.role, t.institution), ...t.details].filter(Boolean),
+        lines: present(join(t.role, t.institution)),
+        bullets: t.details,
       })),
     },
   ];
@@ -214,25 +255,33 @@ export function cvSections(cv: Cv): CvSection[] {
   s.mentoring = [
     {
       rows: newestFirst(visible(cv.mentoring), (m) => recency(m.start, m.end)).map((m) => ({
-        when: formatRange(m.start, m.end),
+        when: m.dates ?? formatRange(m.start, m.end),
         title: m.name,
-        lines: [
-          join(m.level, m.institution) + (m.topic ? ` — ${m.topic}` : ''),
-          m.now && `Now: ${m.now}`,
-        ].filter((l): l is string => Boolean(l)),
+        lines: present(join(m.level, m.institution) + (m.topic ? ` — ${m.topic}` : ''), m.now && `Now: ${m.now}`),
+        bullets: [],
       })),
     },
   ];
 
   const sv = cv.service;
   s.service = [
-    { heading: 'Journal reviewer', rows: [], list: sv.reviewer },
+    { heading: 'Journal reviewer', rows: [], list: sv.reviewer, note: sv.reviewer_note },
     {
-      heading: 'Committees',
+      heading: 'Editorial service',
+      rows: visible(sv.editorial).map((e) => ({
+        when: formatRange(e.start, e.end),
+        title: `${e.role}, ${e.journal}`,
+        lines: [],
+        bullets: e.details,
+      })),
+    },
+    {
+      heading: 'Committees & events organised',
       rows: visible(sv.committees).map((c) => ({
-        when: formatRange(c.start, c.end),
+        when: c.dates ?? formatRange(c.start, c.end),
         title: c.role,
-        lines: [c.org, ...c.details],
+        lines: [c.org],
+        bullets: c.details,
       })),
     },
     {
@@ -240,7 +289,8 @@ export function cvSections(cv: Cv): CvSection[] {
       rows: visible(sv.sessions).map((c) => ({
         when: formatCvDate(c.year),
         title: `${c.role}, ${c.meeting}`,
-        lines: c.location ? [c.location] : [],
+        lines: present(c.location),
+        bullets: [],
       })),
     },
     {
@@ -249,7 +299,20 @@ export function cvSections(cv: Cv): CvSection[] {
         when: formatCvDate(o.year),
         title: o.title,
         url: o.url,
-        lines: [o.org, ...o.details].filter((l): l is string => Boolean(l)),
+        lines: present(o.org),
+        bullets: o.details,
+      })),
+    },
+  ];
+
+  s.press = [
+    {
+      rows: visible(cv.press).map((x) => ({
+        when: formatCvDate(x.date),
+        title: x.title,
+        url: x.url,
+        lines: [x.outlet],
+        bullets: [],
       })),
     },
   ];
@@ -257,13 +320,14 @@ export function cvSections(cv: Cv): CvSection[] {
   s.skills = [
     {
       rows: [
-        ...cv.skills.map((g) => ({ when: g.group, title: g.items.join(' · '), lines: [] })),
+        ...cv.skills.map((g) => ({ when: g.group, title: g.items.join(' · '), lines: [], bullets: [] })),
         ...(cv.languages.length
           ? [
               {
                 when: 'Languages',
                 title: cv.languages.map((l) => (l.level ? `${l.language} (${l.level})` : l.language)).join(' · '),
                 lines: [],
+                bullets: [],
               },
             ]
           : []),
@@ -276,15 +340,45 @@ export function cvSections(cv: Cv): CvSection[] {
       rows: visible(cv.memberships).map((m) => ({
         when: m.since ? `${formatCvDate(m.since)} –` : undefined,
         title: m.org,
-        lines: m.details,
+        lines: [],
+        bullets: m.details,
       })),
     },
   ];
+
+  s.references = cv.show_references
+    ? [
+        {
+          rows: visible(cv.references).map((r) => ({
+            title: r.name,
+            lines: present(join(r.title, r.department, r.org), r.email, r.relation && `(${r.relation})`),
+            bullets: [],
+          })),
+        },
+      ]
+    : [];
 
   return SECTION_ORDER.flatMap((id) => {
     const groups = (s[id] ?? []).filter((g) => g.rows.length > 0 || (g.list?.length ?? 0) > 0);
     return groups.length ? [{ id, title: SECTION_TITLES[id], groups }] : [];
   });
+}
+
+/** "a **b** c" → [{text:"a "}, {text:"b", bold:true}, {text:" c"}] (the only markup allowed in `summary`). */
+export function boldSegments(text: string): { text: string; bold: boolean }[] {
+  return text
+    .split(/\*\*(.+?)\*\*/g)
+    .map((t, i) => ({ text: t, bold: i % 2 === 1 }))
+    .filter((x) => x.text);
+}
+
+/** Inserts `item` (the publications block) at its place in SECTION_ORDER. */
+export function withPublications<T extends { id: string }>(sections: T[], item: T): T[] {
+  const rank = (id: string) => SECTION_ORDER.indexOf(id as SectionId);
+  const at = sections.findIndex((x) => rank(x.id) > rank('publications'));
+  const out = [...sections];
+  out.splice(at === -1 ? out.length : at, 0, item);
+  return out;
 }
 
 /* ── Publications ──────────────────────────────────────────────────────── */

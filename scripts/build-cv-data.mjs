@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { parse as parseBib } from '@retorquere/bibtex-parser';
 import { z } from 'astro/zod';
 import { parse as parseYaml } from 'yaml';
-import { cvSections, formatUpdated, pubGroups } from '../src/lib/cv.ts';
+import { boldSegments, cvSections, formatUpdated, PLAIN_SECTIONS, pubGroups, withPublications } from '../src/lib/cv.ts';
 import { cvSchema } from '../src/schemas/cv.ts';
 import { siteConfigSchema } from '../src/schemas/site.ts';
 
@@ -78,7 +78,6 @@ function readPublications() {
     const title = str('title');
     const year = Number.parseInt(str('year') ?? str('date') ?? '', 10);
     if (!title || !Number.isFinite(year)) return [];
-    if (/^(true|yes)$/i.test(str('draft') ?? '')) return [];
     return [
       {
         pubtype: (str('pubtype') ?? guessPubtype(entry.type)).toLowerCase(),
@@ -99,13 +98,10 @@ function readPublications() {
 /* ── Assemble ─────────────────────────────────────────────────────────────── */
 
 const updated = cv.updated ?? new Date().toISOString().slice(0, 10);
-const sections = cvSections(cv).map((s) => ({ kind: 'rows', ...s }));
+let sections = cvSections(cv).map((s) => ({ kind: 'rows', ...s }));
 if (cv.pdf.publications) {
   const groups = pubGroups(readPublications());
-  if (groups.length) {
-    const at = sections.findIndex((s) => !['positions', 'education'].includes(s.id));
-    sections.splice(at === -1 ? sections.length : at, 0, { kind: 'pubs', id: 'publications', title: 'Publications', groups });
-  }
+  if (groups.length) sections = withPublications(sections, { kind: 'pubs', id: 'publications', title: 'Publications', groups });
 }
 
 const bare = (u) => u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
@@ -130,6 +126,8 @@ const data = {
     location: site.location ?? null,
   },
   contacts,
+  summary: cv.summary ? boldSegments(cv.summary) : null,
+  plain: PLAIN_SECTIONS,
   sections,
 };
 
