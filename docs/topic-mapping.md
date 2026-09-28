@@ -5,7 +5,7 @@ Slugs are the file names in `src/content/research/`:
 
 | Slug | Theme |
 | --- | --- |
-| `fire-and-water` | Fire and water in mountain forests |
+| `fire-and-water` | Fire and water in mountain watersheds |
 | `modelling-water-cycle` | Modelling a changing water cycle |
 | `climate-extremes` | Climate extremes and water security |
 
