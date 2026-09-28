@@ -27,10 +27,10 @@ interface Props {
 const { theme, prev, next, index } = Astro.props;
 const { image, image_alt, image_caption, image_full, collaborators, funding } = theme.data;
 
-// Split the page text after the first paragraph so the figure sits inside the reading flow.
-const paras = (theme.body ?? '').trim().split(/\n\s*\n/);
-const leadHtml = await renderMarkdown(paras[0] ?? '');
-const restHtml = paras.length > 1 ? await renderMarkdown(paras.slice(1).join('\n\n')) : '';
+// The figure goes where the text has a line `<!-- figure -->`; without the marker it goes after the text.
+const [before, ...after] = (theme.body ?? '').split(/^\s*<!--\s*figure\s*-->\s*$/m);
+const leadHtml = await renderMarkdown((before ?? '').trim());
+const restHtml = after.length ? await renderMarkdown(after.join('\n').trim()) : '';
 
 // Raster figures (screenshots, photos) open full size when clicked.
 const rasters = import.meta.glob<{ default: ImageMetadata }>('/src/assets/research/*.{png,jpg,jpeg,webp,avif,PNG,JPG,JPEG}', { eager: true });
@@ -44,7 +44,6 @@ const pubs = getPublications().filter((p) => p.topics.includes(theme.id));
   title={theme.data.title}
   eyebrow="Research"
   eyebrowHref="/research/"
-  intro={theme.data.summary}
   description={theme.data.summary}
   ridges={11 + index}
   narrow

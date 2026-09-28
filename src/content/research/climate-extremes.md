@@ -14,4 +14,6 @@ Floods and droughts pose some of the greatest threats to water security, and bot
 
 My recent work examines how atmospheric rivers and modes of climate variability, including the El Niño–Southern Oscillation and the Pacific Decadal Oscillation, jointly shape extreme precipitation across California. Because these climate modes evolve slowly and can be monitored months in advance, they offer a physical basis for anticipating seasons of heightened flood risk.
 
+<!-- figure -->
+
 Earlier, working in India, I examined how climate change may reshape floods, droughts and heatwaves in densely populated river basins. I characterised drought as a compound hazard, in which severity, duration and spatial extent combine to determine its impact. Across California and India, this work connects large-scale climate processes to the extremes that determine water security.

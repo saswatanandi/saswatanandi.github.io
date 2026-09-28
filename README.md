@@ -11,7 +11,7 @@ Personal academic website of **Saswata Nandi** — built with [Astro](https://as
 | Publications (and "selected" on home) | `src/data/publications.bib` (`selected = {true}`) |
 | Software cards / IMDLIB stats         | `src/data/software.yaml`               |
 | Reading list                          | `src/data/reading.yaml` (+ notes in `src/content/reading/notes/`) |
-| Research themes (text, picture, featured tool) | `src/content/research/<slug>.md` — see below |
+| Research themes (text, picture) | `src/content/research/<slug>.md` — see below |
 | Blog posts                            | `src/content/blog/<slug>/index.md` (copy `example-post/`) |
 | CV entries                            | `src/data/cv.yaml`                     |
 | Headshot / social card                | `public/images/headshot.jpg`, `public/og-default.png` |
@@ -25,6 +25,9 @@ One Markdown file per theme in `src/content/research/`; the file name is the the
 (used in the URL and in the BibTeX `topic` field, e.g. `topic = {fire-and-water, climate-extremes}`,
 see `docs/topic-mapping.md`). Papers tagged with a theme are listed on its page automatically.
 
+**Where the picture goes:** put a line `<!-- figure -->` in the theme text where the picture should appear.
+Without it, the picture goes after the text. The `summary` is used on cards (home and /research/), not on the theme page.
+
 **Swapping a theme picture:** put your file in `src/assets/research/` and set `image:` to its name.
 
 - `.png` / `.jpg` / `.webp` — photos, maps, plots (resized and optimised automatically).
@@ -35,7 +38,7 @@ see `docs/topic-mapping.md`). Papers tagged with a theme are listed on its page 
 
 The CWIS workflow on theme 2 is an HTML component (`image: cwis-pipeline`,
 wording in `src/components/research/CwisPipeline.astro`); replace it with an image file name the same way.
-`feature.url`, `collaborators` and `funding` are optional; empty ones are hidden.
+`collaborators` and `funding` are optional; empty ones are hidden. (`feature` is kept as data but not shown.)
 
 ## Local development
 
