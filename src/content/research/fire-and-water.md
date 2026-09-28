@@ -1,7 +1,7 @@
 ---
 title: Fire and water in mountain watersheds
 order: 1
-summary: I study how wildfire and forest management change the water cycle of mountain watersheds, from the water they use to the soil they lose after fire.
+summary: I study how wildfire and forest management change the water cycle of mountain watersheds, from forest water use to soil loss after fire.
 icon: fire
 image: flare.jpg
 thumbnail: fire-and-water.svg
