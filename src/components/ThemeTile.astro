@@ -96,14 +96,14 @@ const H = layout === 'row' ? 'h2' : 'h3';
   /* Wide rows on /research/: picture beside the text */
   .tile--row {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-columns: 17rem minmax(0, 1fr);
   }
   .tile--row .tile__pic {
-    order: 2;
     aspect-ratio: auto;
-    min-height: 15rem;
+    min-height: 12rem;
+    height: 100%;
     border-bottom: 0;
-    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
   }
   .tile--row .tile__body {
     justify-content: center;
@@ -123,10 +123,8 @@ const H = layout === 'row' ? 'h2' : 'h3';
       display: flex;
     }
     .tile--row .tile__pic {
-      order: 0;
       aspect-ratio: 2 / 1;
-      min-height: 0;
-      border-left: 0;
+      border-right: 0;
       border-bottom: 1px solid var(--color-border);
     }
     .tile--row .tile__body {

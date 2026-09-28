@@ -7,24 +7,39 @@ import BaseLayout from './BaseLayout.astro';
 interface Props extends HeadProps {
   title: string;
   eyebrow?: string;
+  /** Makes the eyebrow a link (e.g. back to the section index). */
+  eyebrowHref?: string;
+  /** Narrow, centred reading column for header and body (article pages). */
+  narrow?: boolean;
   intro?: string;
   /** Seed for the header ridgelines (a different storm pattern per page). */
   ridges?: number;
 }
-const { title, eyebrow, intro, ridges = 1, ...head } = Astro.props;
+const { title, eyebrow, eyebrowHref, intro, ridges = 1, narrow = false, ...head } = Astro.props;
 ---
 
 <BaseLayout title={title} description={head.description ?? intro} {...head}>
   <header class="page-header">
     <Ridgelines variant="page" seed={ridges} />
-    <div class="container">
-      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <div class:list={['container', { 'container--narrow': narrow }]}>
+      {
+        eyebrow &&
+          (eyebrowHref ? (
+            <p class="eyebrow">
+              <a href={eyebrowHref} class="eyebrow__link">
+                <span aria-hidden="true">←</span> {eyebrow}
+              </a>
+            </p>
+          ) : (
+            <p class="eyebrow">{eyebrow}</p>
+          ))
+      }
       <h1>{title}</h1>
       {intro && <p class="page-header__intro">{intro}</p>}
       <slot name="header" />
     </div>
   </header>
-  <div class="container page-body">
+  <div class:list={['container', 'page-body', { 'container--narrow': narrow }]}>
     <slot />
   </div>
 </BaseLayout>
@@ -45,6 +60,16 @@ const { title, eyebrow, intro, ridges = 1, ...head } = Astro.props;
     max-width: 60ch;
     color: var(--color-text-muted);
     font-size: var(--text-md);
+  }
+  .container--narrow {
+    max-width: calc(46rem + 2 * var(--gutter));
+  }
+  .eyebrow__link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .eyebrow__link:hover {
+    text-decoration: underline;
   }
   .page-body {
     padding-top: var(--space-7);

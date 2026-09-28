@@ -39,7 +39,7 @@ if (src.startsWith('/')) {
   Component = components[src as keyof typeof components];
 } else if (key in svgs) {
   const attrs = thumb
-    ? 'aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice"'
+    ? 'aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet"'
     : `role="img" aria-label="${esc(alt)}"`;
   svg = svgs[key]!.replace(/<\?xml[^>]*>\s*/, '').replace('<svg ', `<svg ${attrs} `);
 } else if (key in rasters) {
