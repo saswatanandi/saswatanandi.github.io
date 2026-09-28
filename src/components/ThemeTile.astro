@@ -54,9 +54,13 @@ const H = layout === 'row' ? 'h2' : 'h3';
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
   }
+  /* Fixed-height picture band: the drawing is scaled to fit (never cropped or blown up). */
   .tile__pic {
     display: block;
-    aspect-ratio: 2 / 1;
+    width: 100%;
+    min-width: 0;
+    height: clamp(8.5rem, 20vw, 11.5rem);
+    overflow: hidden;
     background: var(--color-surface-2);
     border-bottom: 1px solid var(--color-border);
   }
@@ -99,9 +103,8 @@ const H = layout === 'row' ? 'h2' : 'h3';
     grid-template-columns: 17rem minmax(0, 1fr);
   }
   .tile--row .tile__pic {
-    aspect-ratio: auto;
+    height: auto;
     min-height: 12rem;
-    height: 100%;
     border-bottom: 0;
     border-right: 1px solid var(--color-border);
   }
@@ -123,7 +126,8 @@ const H = layout === 'row' ? 'h2' : 'h3';
       display: flex;
     }
     .tile--row .tile__pic {
-      aspect-ratio: 2 / 1;
+      height: 11.5rem;
+      min-height: 0;
       border-right: 0;
       border-bottom: 1px solid var(--color-border);
     }
