@@ -75,11 +75,19 @@ h4 {
   line-height: var(--leading-tight);
   letter-spacing: -0.012em;
   color: var(--color-text);
-  text-wrap: balance;
+  /*
+   * Heading wrap rule (site-wide): fill each line naturally (greedy wrap).
+   * Never "balance": it splits short titles into two even halves and leaves a large gap on
+   * the first line (e.g. "Modelling a / changing water cycle" inside a card).
+   * Only the big page title (h1) and long publication titles use "pretty", which keeps lines
+   * full and just avoids a single stranded last word.
+   */
+  text-wrap: wrap;
 }
 h1 {
   font-size: var(--text-3xl);
   letter-spacing: -0.02em;
+  text-wrap: pretty;
 }
 h2 {
   font-size: var(--text-xl);

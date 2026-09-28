@@ -67,6 +67,9 @@
 
   /* Layout */
   --width-prose: 72ch;
+  /* Longest line for big page titles (h1). Wide enough that short titles never break
+     early; long titles still wrap to a comfortable measure. */
+  --width-heading: 30ch;
   --width-layout: 1100px;
   --gutter: clamp(1rem, 0.5rem + 2.5vw, 2rem);
   --header-height: 4rem;

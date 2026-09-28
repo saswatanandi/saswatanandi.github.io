@@ -60,7 +60,7 @@ if (src.startsWith('/')) {
         src={raster}
         alt={thumb ? '' : alt}
         widths={thumb ? [480, 800] : [800, 1200, 1800]}
-        sizes={thumb ? '(max-width: 48rem) 100vw, 360px' : '(max-width: 72rem) 100vw, 1040px'}
+        sizes={thumb ? '(max-width: 36rem) 100vw, 400px' : '(max-width: 72rem) 100vw, 1040px'}
       />
     )
   }
@@ -81,7 +81,7 @@ if (src.startsWith('/')) {
   .tfig--thumb > :global(svg),
   .tfig--thumb > :global(img) {
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
   }
   .tfig--thumb > :global(svg text) {
     display: none;

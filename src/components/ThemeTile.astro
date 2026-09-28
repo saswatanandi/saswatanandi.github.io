@@ -15,27 +15,36 @@ const pic = thumbnail ?? ((FIGURE_COMPONENTS as readonly string[]).includes(imag
 const H = layout === 'row' ? 'h2' : 'h3';
 ---
 
-<a class:list={['tile', `tile--${layout}`]} href={`/research/${theme.id}/`}>
-  {
-    pic && (
-      <span class="tile__pic">
-        <ThemeFigure src={pic} alt="" variant="thumb" />
-      </span>
-    )
-  }
-  <span class="tile__body">
-    <span class="tile__num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-    <H class="tile__title">{title}</H>
-    <span class="tile__summary">{summary}</span>
-    <span class="tile__more" aria-hidden="true">Read more →</span>
+<a class:list={['tile', `tile--${layout}`, { 'tile--nopic': !pic }]} href={`/research/${theme.id}/`}>
+  <span class="tile__inner">
+    {
+      pic && (
+        <span class="tile__pic">
+          <ThemeFigure src={pic} alt="" variant="thumb" />
+        </span>
+      )
+    }
+    <span class="tile__body">
+      <span class="tile__num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+      <H class="tile__title">{title}</H>
+      <span class="tile__summary">{summary}</span>
+      <span class="tile__more" aria-hidden="true">Read more →</span>
+    </span>
   </span>
 </a>
 
 <style>
+  /*
+   * One responsive scheme for both uses (home grid and /research/ rows), driven by the
+   * card's OWN width (container query), not the viewport:
+   *   • card narrower than 34rem  → picture band on top (fixed height), text below;
+   *   • card 34rem or wider       → picture panel on the left, stretched to the card's height.
+   * The drawing is always scaled to fit (never cropped or enlarged beyond its panel).
+   */
   .tile {
-    display: flex;
-    flex-direction: column;
+    display: block;
     height: 100%;
+    container: tile / inline-size;
     overflow: hidden;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -54,12 +63,18 @@ const H = layout === 'row' ? 'h2' : 'h3';
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
   }
-  /* Fixed-height picture band: the drawing is scaled to fit (never cropped or blown up). */
+  .tile__inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  /* Stacked: fixed-height picture band */
   .tile__pic {
     display: block;
+    flex: none;
     width: 100%;
     min-width: 0;
-    height: clamp(8.5rem, 20vw, 11.5rem);
+    height: 10.5rem;
     overflow: hidden;
     background: var(--color-surface-2);
     border-bottom: 1px solid var(--color-border);
@@ -69,6 +84,7 @@ const H = layout === 'row' ? 'h2' : 'h3';
     flex: 1;
     flex-direction: column;
     gap: var(--space-2);
+    min-width: 0;
     padding: var(--space-4) var(--space-5) var(--space-5);
   }
   .tile__num {
@@ -88,6 +104,7 @@ const H = layout === 'row' ? 'h2' : 'h3';
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     line-height: 1.55;
+    text-wrap: pretty;
   }
   .tile__more {
     margin-top: auto;
@@ -97,42 +114,42 @@ const H = layout === 'row' ? 'h2' : 'h3';
     font-weight: 600;
   }
 
-  /* Wide rows on /research/: picture beside the text */
-  .tile--row {
-    display: grid;
-    grid-template-columns: 17rem minmax(0, 1fr);
-  }
-  .tile--row .tile__pic {
-    height: auto;
-    min-height: 12rem;
-    border-bottom: 0;
-    border-right: 1px solid var(--color-border);
-  }
-  .tile--row .tile__body {
-    justify-content: center;
-    padding: var(--space-6);
-  }
-  .tile--row .tile__title {
-    font-size: var(--text-xl);
-  }
-  .tile--row .tile__summary {
-    font-size: var(--text-base);
-  }
-  .tile--row .tile__more {
-    margin-top: var(--space-2);
-  }
-  @media (max-width: 48rem) {
-    .tile--row {
-      display: flex;
+  /* Side by side: picture panel on the left, stretched to the card's height */
+  @container tile (min-width: 34rem) {
+    .tile:not(.tile--nopic) .tile__inner {
+      display: grid;
+      grid-template-columns: clamp(9rem, 33%, 17rem) minmax(0, 1fr);
     }
-    .tile--row .tile__pic {
-      height: 11.5rem;
-      min-height: 0;
-      border-right: 0;
-      border-bottom: 1px solid var(--color-border);
+    .tile__pic {
+      width: auto;
+      height: auto;
+      min-height: 10rem;
+      border-bottom: 0;
+      border-right: 1px solid var(--color-border);
     }
-    .tile--row .tile__body {
-      padding: var(--space-4) var(--space-5) var(--space-5);
+    .tile__body {
+      justify-content: center;
+      padding: var(--space-5) var(--space-6);
+    }
+    .tile__more {
+      margin-top: var(--space-1);
+    }
+  }
+  /* Row cards (/research/): slightly larger type, full size only once the card is wide */
+  @container tile (min-width: 34rem) {
+    .tile--row .tile__title {
+      font-size: var(--text-lg);
+    }
+  }
+  @container tile (min-width: 50rem) {
+    .tile__body {
+      padding: var(--space-6);
+    }
+    .tile--row .tile__title {
+      font-size: var(--text-xl);
+    }
+    .tile--row .tile__summary {
+      font-size: var(--text-base);
     }
   }
 </style>

@@ -350,13 +350,14 @@ const metrics = [
   .section {
     margin-top: var(--space-8);
   }
-  /* Research cards: three across, stacked on small screens. */
+  /* Research cards: three across on wide screens; below 60rem one per row
+     (each card then lays its picture beside the text, see ThemeTile). */
   .tiles {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-5);
   }
-  @media (max-width: 48rem) {
+  @media (max-width: 60rem) {
     .tiles {
       grid-template-columns: 1fr;
     }
