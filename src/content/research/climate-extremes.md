@@ -4,8 +4,9 @@ order: 3
 summary: I study how large-scale climate variability and climate change shape floods, droughts and extreme precipitation.
 icon: forecast
 image: climate-extremes.svg
-image_alt: Schematic map of the Pacific Ocean and the California coast. A long band of moisture, an atmospheric river, stretches from the tropical Pacific to the California coast, where it brings extreme precipitation and floods. Two slow climate modes in the Pacific, ENSO and the PDO, are shown modulating the atmospheric river. Drought is shown as the flip side when these storms are few.
-image_caption: Schematic of an atmospheric river carrying moisture from the tropical Pacific to California, with ENSO and the PDO as slow climate modes.
+thumbnail: climate-extremes-card.svg
+image_alt: Map of the North Pacific and western North America. A narrow plume of high integrated water vapour transport, an atmospheric river, extends from the subtropical Pacific near Hawaiʻi northeastward to landfall on the central California coast, where it brings extreme precipitation; arrows show the transport direction. Warm sea-surface temperature anomalies mark El Niño in the Niño 3.4 region of the equatorial Pacific, and the positive phase of the Pacific Decadal Oscillation appears as a cool anomaly in the central North Pacific and warm water along the North American coast.
+image_caption: "Schematic composite of an atmospheric river making landfall in California, shown as integrated vapour transport (IVT), with the Niño 3.4 region (ENSO) and the positive-phase PDO sea-surface temperature pattern. The fields are synthetic and illustrative, not observed data. Coastlines: Natural Earth; state boundaries: US Census Bureau."
 collaborators: []
 funding: []
 ---

@@ -46,6 +46,11 @@ wording in `src/components/research/CwisPipeline.astro`); replace it with an ima
 The theme-2 model-chain drawing is generated: `node scripts/figures/make-india-svg.mjs` rewrites
 `src/assets/research/model-chain-india{,.narrow}.svg`.
 
+The theme-3 map (atmospheric river, ENSO, PDO) is generated too: `node scripts/figures/make-ar-map.mjs`
+rewrites `src/assets/research/climate-extremes{,.narrow}.svg` and `climate-extremes-card.svg`. Coastlines are
+Natural Earth (public domain, via `world-atlas`), state lines US Census (public domain, via `us-atlas`); the IVT
+and SST-anomaly fields are synthetic, drawn for illustration.
+
 ## Local development
 
 ```sh
