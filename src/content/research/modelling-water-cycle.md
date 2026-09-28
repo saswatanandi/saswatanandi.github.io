@@ -27,6 +27,6 @@ With colleagues, I developed the California Water Information System (CWIS) to a
 
 <!-- figure -->
 
-CWIS extends my earlier work in Indian river basins, where I focused on what happens once water leaves the land surface. I developed one of the first frameworks to couple a land-surface model with river-routing and hydrodynamic models, simulating streamflow and floodplain inundation within a single system. I later added reservoir operations to the routing model, bringing human regulation of rivers into the simulation. The broader aim is an integrated representation of the terrestrial water cycle under the joint influence of climate, land cover and human management.
+CWIS extends my earlier work in Indian river basins. There, I developed one of the first frameworks to couple a land-surface model with river-routing and hydrodynamic models, simulating streamflow and floodplain inundation within a single system. I later added reservoir operations to the routing model, bringing human regulation of rivers into the simulation. The broader aim is an integrated representation of the terrestrial water cycle under the joint influence of climate, land cover and human management.
 
 <!-- figure 2 -->
