@@ -6,6 +6,8 @@
  *   • "/images/…"           → a file in public/, used as-is
  *   • "cwis-pipeline"       → a built-in figure component (src/components/research/)
  * variant "full" = the figure on the theme page; "thumb" = decorative crop on cards (labels hidden).
+ * An SVG may have a phone version next to it, "name.narrow.svg": on the theme page it replaces
+ * the wide one whenever the figure is narrower than 30rem (e.g. numbered dots + a legend).
  */
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
@@ -30,6 +32,7 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').repl
 const key = `/src/assets/research/${src}`;
 
 let svg: string | undefined;
+let svgNarrow: string | undefined;
 let raster: ImageMetadata | undefined;
 let Component: (typeof components)[keyof typeof components] | undefined;
 
@@ -41,7 +44,12 @@ if (src.startsWith('/')) {
   const attrs = thumb
     ? 'aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet"'
     : `role="img" aria-label="${esc(alt)}"`;
-  svg = svgs[key]!.replace(/<\?xml[^>]*>\s*/, '').replace('<svg ', `<svg ${attrs} `);
+  const prep = (raw: string, cls: string) =>
+    raw.replace(/<\?xml[^>]*>\s*/, '').replace('<svg ', `<svg ${attrs}${cls ? ` data-variant="${cls}"` : ''} `);
+  const narrowKey = key.replace(/\.svg$/, '.narrow.svg');
+  const hasNarrow = !thumb && narrowKey !== key && narrowKey in svgs;
+  svg = prep(svgs[key]!, hasNarrow ? 'wide' : '');
+  if (hasNarrow) svgNarrow = prep(svgs[narrowKey]!, 'narrow');
 } else if (key in rasters) {
   raster = rasters[key]!.default;
 } else {
@@ -52,8 +60,9 @@ if (src.startsWith('/')) {
 }
 ---
 
-<div class:list={['tfig', `tfig--${variant}`, className]}>
+<div class:list={['tfig', `tfig--${variant}`, svgNarrow && 'tfig--dual', className]}>
   {svg && <Fragment set:html={svg} />}
+  {svgNarrow && <Fragment set:html={svgNarrow} />}
   {
     raster && (
       <Image
@@ -74,6 +83,21 @@ if (src.startsWith('/')) {
     display: block;
     width: 100%;
     height: auto;
+  }
+  /* wide + phone versions of one SVG: pick by the figure's own width */
+  .tfig--dual {
+    container-type: inline-size;
+  }
+  .tfig--dual > :global(svg[data-variant='narrow']) {
+    display: none;
+  }
+  @container (max-width: 30rem) {
+    .tfig--dual > :global(svg[data-variant='wide']) {
+      display: none;
+    }
+    .tfig--dual > :global(svg[data-variant='narrow']) {
+      display: block;
+    }
   }
   .tfig--thumb {
     height: 100%;

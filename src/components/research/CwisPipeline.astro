@@ -1,8 +1,9 @@
 ---
 /**
- * The CWIS workflow (redrawn from the original flowchart, public/images/research/cwis-flowchart.png).
- * HTML/CSS rather than one big image so it stays legible: six columns on wide screens,
- * a vertical stack on phones. Edit the `stages` list to change the wording.
+ * The CWIS workflow as a vertical timeline (redrawn from the original flowchart,
+ * public/images/research/cwis-flowchart.png): one row per stage on a rail, with the
+ * re-calibration loop drawn beside the rail from stage 04 back to stage 02.
+ * Pure HTML/CSS, identical at every width. Edit the `stages` list to change the wording.
  */
 interface Props {
   /** Accessible description of the whole diagram. */
@@ -19,270 +20,222 @@ const icons = {
   app: '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 13l3-3 3 2 4-4"/>',
 } as const;
 
+/** `term` is shown in bold before its text; items are joined with a middle dot. */
 type Item = { term?: string; text: string };
-const stages: { title: string; icon: keyof typeof icons; tone: 'slate' | 'teal' | 'warm'; items: Item[]; loop?: string }[] = [
+const stages: { title: string; icon: keyof typeof icons; tone?: 'slate' | 'warm'; items: Item[] }[] = [
   {
-    title: 'Data acquisition & assimilation',
+    title: 'Data acquisition',
     icon: 'data',
     tone: 'slate',
     items: [
-      { term: 'MAPT', text: 'meteorological forcing, historical and forecast' },
+      { term: 'MAPT', text: 'weather forcing, historical and forecast' },
       { term: 'VAPT', text: 'satellite LAI, albedo, NDVI, canopy cover' },
-      { term: 'VFT', text: 'AI-based vegetation forecasts' },
+      { term: 'VFT', text: 'AI vegetation forecasts' },
     ],
   },
   {
     title: 'Hydrologic simulation',
     icon: 'model',
-    tone: 'teal',
-    items: [
-      { term: 'VIC', text: '1 km, daily' },
-      { text: 'Historical run: VAPT + MAPT' },
-      { text: 'ET, soil moisture, SWE, streamflow' },
-    ],
+    items: [{ term: 'VIC', text: '1 km, daily' }, { text: 'historical run: VAPT + MAPT' }, { text: 'ET, soil moisture, snow, streamflow' }],
   },
-  {
-    title: 'Forecast',
-    icon: 'forecast',
-    tone: 'teal',
-    items: [{ text: 'Forecast run: VFT + MAPT' }],
-  },
+  { title: 'Forecast', icon: 'forecast', items: [{ text: 'forecast run: VFT + MAPT' }] },
   {
     title: 'Verification',
     icon: 'verify',
-    tone: 'teal',
-    items: [
-      { term: 'MVT', text: 'multi-point verification toolbox' },
-      { text: 'CDEC and SNOTEL stations: discharge, ET, SWE' },
-    ],
-    loop: 'Unsatisfactory → re-calibration',
+    items: [{ term: 'MVT', text: 'multi-point verification' }, { text: 'CDEC and SNOTEL: discharge, ET, snow' }],
   },
   {
     title: 'Hydrologic data bank',
     icon: 'bank',
-    tone: 'teal',
-    items: [
-      { text: 'Database: geospatial and time series' },
-      { text: 'Cataloguing, post-processing, QA/QC' },
-      { term: 'API', text: 'for the web app' },
-    ],
+    items: [{ text: 'geospatial and time-series database' }, { text: 'cataloguing, QA/QC' }, { term: 'API', text: 'for the web app' }],
   },
-  {
-    title: 'User interface',
-    icon: 'app',
-    tone: 'warm',
-    items: [{ term: 'Web app', text: 'visualization, dashboard, statistics, data download' }],
-  },
+  { title: 'Web app', icon: 'app', tone: 'warm', items: [{ text: 'maps, dashboard, statistics, downloads' }] },
 ];
+/** The loop runs from this stage (index) back to `LOOP_TO`. */
+const LOOP_FROM = 3;
+const LOOP_TO = 1;
+const loopPart = (i: number) =>
+  i === LOOP_TO ? 'loop-start' : i === LOOP_FROM ? 'loop-end' : i > LOOP_TO && i < LOOP_FROM ? 'loop-mid' : undefined;
 ---
 
 <div class="cwis" role="img" aria-label={label}>
-  <ol class="cwis__stages" aria-hidden="true">
+  <ol class="cwis__rail" aria-hidden="true">
     {
       stages.map((s, i) => (
-        <li class={`stage stage--${s.tone}`}>
-          <div class="stage__head">
-            <svg class="stage__icon" viewBox="0 0 24 24" width="22" height="22" set:html={icons[s.icon]} />
-            <span class="stage__num">{String(i + 1).padStart(2, '0')}</span>
+        <li class:list={['st', s.tone && `st--${s.tone}`, loopPart(i)]}>
+          <span class="st__node">
+            <svg viewBox="0 0 24 24" width="18" height="18" set:html={icons[s.icon]} />
+          </span>
+          <div class="st__body">
+            <p class="st__title">
+              <span class="st__num">{String(i + 1).padStart(2, '0')}</span>
+              {s.title}
+            </p>
+            <p class="st__detail">
+              {s.items.map((it, k) => (
+                <>
+                  {k > 0 && <span class="st__sep">&nbsp;· </span>}
+                  {it.term && <b>{it.term} </b>}
+                  {it.text}
+                </>
+              ))}
+            </p>
+            {i === LOOP_FROM && (
+              <p class="st__loop">
+                ↺ re-calibrate and re-run {String(LOOP_TO + 1).padStart(2, '0')} if unsatisfactory
+              </p>
+            )}
           </div>
-          <p class="stage__title">{s.title}</p>
-          <ul class="stage__items">
-            {s.items.map((it) => (
-              <li>
-                {it.term && <b>{it.term}</b>}
-                {it.term && ' '}
-                {it.text}
-              </li>
-            ))}
-          </ul>
-          {s.loop && <p class="stage__loop">↺ {s.loop}</p>}
         </li>
       ))
     }
   </ol>
-  <div class="cwis__loop" aria-hidden="true">
-    <span class="cwis__loop-line"></span>
-    <span class="cwis__loop-label">Unsatisfactory → re-calibration</span>
-  </div>
 </div>
 
 <style>
   .cwis {
-    --gap: 1.6rem;
-    --down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 16' preserveAspectRatio='none'%3E%3Cpath d='M4.25 0h1.5v9h3.75L5 16 .5 9h3.75z'/%3E%3C/svg%3E");
-    display: grid;
+    --node: 2.5rem;
+    --loop-x: -1.5rem; /* where the loop bracket runs, left of the rail */
+    --loop: var(--color-accent-2);
+    padding: var(--space-5) var(--space-5) var(--space-5) var(--space-4);
     font-family: var(--font-body);
   }
-  .cwis__stages {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: var(--gap);
+  .cwis__rail {
     margin: 0;
-    padding: 0;
+    padding: 0 0 0 1.75rem;
     list-style: none;
   }
-  .stage {
+  .st {
     --tone: var(--color-accent);
     position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    padding: var(--space-4) var(--space-3) var(--space-4);
-    border: 1px solid var(--color-border-strong);
-    border-top: 3px solid var(--tone);
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
+    display: grid;
+    grid-template-columns: var(--node) minmax(0, 1fr);
+    column-gap: var(--space-3);
+    padding-bottom: var(--space-4);
   }
-  .stage--slate {
+  .st:last-child {
+    padding-bottom: 0;
+  }
+  .st--slate {
     --tone: var(--color-text-muted);
   }
-  .stage--warm {
+  .st--warm {
     --tone: var(--color-warm);
   }
-  /* connector arrow into the next stage */
-  .stage:not(:last-child)::after {
+  /* the rail: from below this node to the next one */
+  .st:not(:last-child)::before {
     content: '';
     position: absolute;
-    top: 1.55rem;
-    right: calc(-1 * var(--gap) + 0.3rem);
-    width: calc(var(--gap) - 0.6rem);
-    height: 10px;
-    background:
-      linear-gradient(var(--color-text-faint), var(--color-text-faint)) left center / calc(100% - 7px) 1.5px no-repeat,
-      conic-gradient(from -120deg at 100% 50%, var(--color-text-faint) 60deg, transparent 0) right center / 8px 10px no-repeat;
+    left: calc(var(--node) / 2 - 0.75px);
+    top: var(--node);
+    bottom: 0;
+    border-left: 1.5px solid var(--color-border-strong);
   }
-  .stage__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  .st__node {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: var(--node);
+    height: var(--node);
+    border: 1.5px solid var(--tone);
+    border-radius: 50%;
+    background: var(--color-surface);
   }
-  .stage__icon {
+  .st__node svg {
     fill: none;
     stroke: var(--tone);
     stroke-width: 1.7;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .stage__num {
+  .st__body {
+    min-width: 0;
+    padding-top: 0.4rem;
+  }
+  .st__title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
     font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text);
+  }
+  .st__num {
     font-size: var(--text-sm);
+    font-weight: 400;
     color: var(--color-text-faint);
     font-variant-numeric: oldstyle-nums;
   }
-  .stage__title {
-    font-family: var(--font-display);
-    font-size: 1.02rem;
-    font-weight: 600;
-    line-height: 1.25;
-    color: var(--color-text);
-  }
-  .stage__items {
-    display: grid;
-    gap: 0.4rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 0.8125rem;
-    line-height: 1.4;
+  .st__detail {
+    margin-top: 0.2rem;
+    font-size: var(--text-sm);
+    line-height: 1.5;
     color: var(--color-text-muted);
   }
-  .stage__items b {
+  .st__detail b {
     font-weight: 650;
     color: var(--color-text);
   }
-  .stage__loop {
-    display: none;
-    margin-top: auto;
-    padding-top: var(--space-2);
+  .st__sep {
+    color: var(--color-text-faint);
+  }
+  .st__loop {
+    margin-top: 0.3rem;
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--color-accent);
   }
 
-  /* re-calibration loop: from Verification (col 4) back to Hydrologic simulation (col 2) */
-  .cwis__loop {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    column-gap: var(--gap);
-    margin-top: 0.35rem;
-  }
-  .cwis__loop-line {
-    position: relative;
-    grid-column: 2 / 5;
-    grid-row: 1;
-    height: 1.4rem;
-    margin-inline: calc(50% / 3 - var(--gap) / 3);
-    border: 1.5px dashed var(--color-accent-2);
-    border-top: 0;
-    border-radius: 0 0 10px 10px;
-  }
-  .cwis__loop-line::before {
+  /* Re-calibration loop, drawn in pieces so it needs no measuring:
+     start (stage 02) = hook from its node down, mid = straight, end (stage 04) = hook up to its node. */
+  .loop-start::after,
+  .loop-mid::after,
+  .loop-end::after {
     content: '';
     position: absolute;
-    top: -0.35rem;
-    left: -6.5px;
-    border: 5.5px solid transparent;
-    border-bottom: 8px solid var(--color-accent-2);
-    border-top: 0;
+    left: var(--loop-x);
+    width: calc(-1 * var(--loop-x) - 0.35rem);
+    border-left: 1.5px dashed var(--loop);
   }
-  .cwis__loop-label {
-    grid-column: 2 / 5;
-    grid-row: 2;
-    justify-self: center;
-    margin-top: 0.35rem;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--color-accent);
+  .loop-start::after {
+    top: calc(var(--node) / 2);
+    bottom: 0;
+    border-top: 1.5px dashed var(--loop);
+    border-top-left-radius: 10px;
+  }
+  .loop-mid::after {
+    top: 0;
+    bottom: 0;
+  }
+  .loop-end::after {
+    top: 0;
+    height: calc(var(--node) / 2);
+    border-bottom: 1.5px dashed var(--loop);
+    border-bottom-left-radius: 10px;
+  }
+  /* arrowhead into stage 02's node */
+  .loop-start .st__node::before {
+    content: '';
+    position: absolute;
+    left: -0.6rem;
+    top: calc(50% - 5.5px);
+    border: 5.5px solid transparent;
+    border-left: 8px solid var(--loop);
+    border-right: 0;
   }
 
-  /* Phones and narrow tablets: vertical stack, arrows pointing down */
-  @media (max-width: 58rem) {
+  @media (max-width: 30rem) {
     .cwis {
-      --gap: 1.25rem;
+      padding: var(--space-4) var(--space-3) var(--space-4) var(--space-2);
     }
-    .cwis__stages {
-      grid-template-columns: 1fr;
+    .cwis__rail {
+      padding-left: 1.6rem;
     }
-    .stage {
-      display: grid;
-      grid-template-columns: 2.25rem 1fr;
-      column-gap: var(--space-3);
-      row-gap: var(--space-1);
-      padding: var(--space-3) var(--space-4);
-      border-top-width: 1px;
-      border-left: 3px solid var(--tone);
-    }
-    .stage__head {
-      grid-row: span 3;
-      flex-direction: column;
-      align-items: center;
-      justify-content: start;
-      gap: var(--space-1);
-    }
-    .stage__title {
-      font-size: 1.0625rem;
-    }
-    .stage__items {
-      font-size: var(--text-sm);
-    }
-    .stage__loop {
-      display: block;
-      grid-column: 2;
-      padding-top: 0;
-    }
-    .stage:not(:last-child)::after {
-      top: auto;
-      right: auto;
-      bottom: calc(-1 * var(--gap) + 0.2rem);
-      left: calc(var(--space-4) + 1.125rem - 5px);
-      width: 10px;
-      height: calc(var(--gap) - 0.4rem);
-      background: var(--color-text-faint);
-      -webkit-mask: var(--down) center / 100% 100% no-repeat;
-      mask: var(--down) center / 100% 100% no-repeat;
-    }
-    .cwis__loop {
-      display: none;
+    .st__title {
+      font-size: 1.02rem;
     }
   }
 </style>

@@ -25,13 +25,16 @@ One Markdown file per theme in `src/content/research/`; the file name is the the
 (used in the URL and in the BibTeX `topic` field, e.g. `topic = {fire-and-water, climate-extremes}`,
 see `docs/topic-mapping.md`). Papers tagged with a theme are listed on its page automatically.
 
-**Where the picture goes:** put a line `<!-- figure -->` in the theme text where the picture should appear.
-Without it, the picture goes after the text. The `summary` is used on cards (home and /research/), not on the theme page.
+**Where the pictures go:** put a line `<!-- figure -->` in the theme text where the main picture (`image:`)
+should appear. A theme can have more pictures in a `figures:` list (each with `image`, `alt`, optional
+`caption` and `full`); place them with `<!-- figure 2 -->`, `<!-- figure 3 -->`, … Any picture without
+a marker goes after the text; a marker with no matching picture stops the build with a clear message. The `summary` is used on cards (home and /research/), not on the theme page.
 
 **Swapping a theme picture:** put your file in `src/assets/research/` and set `image:` to its name.
 
 - `.png` / `.jpg` / `.webp` — photos, maps, plots (resized and optimised automatically).
 - `.svg` — drawn inline; use `currentColor` or the site colours (`var(--color-accent)`, …) so it follows dark mode.
+  An optional phone version `name.narrow.svg` next to it replaces it when the figure is narrower than 30rem.
 - Update `image_alt` (what the picture shows, for screen readers) and optionally `image_caption`.
 - The home-page card uses `thumbnail:` if set, otherwise `image` (text labels in inline SVGs are hidden on cards).
 - `image_full:` adds a "View full diagram" link (e.g. `/images/research/cwis-flowchart.png` in `public/`).

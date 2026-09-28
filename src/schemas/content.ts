@@ -95,6 +95,23 @@ export const researchSchema = z
     image_caption: z.string().optional(),
     /** Optional link under the figure, e.g. to a full-size original. */
     image_full: optionalUrl,
+    /**
+     * Extra figures for the theme page. In the text, `<!-- figure 2 -->` places the first
+     * of these, `<!-- figure 3 -->` the second, … (`<!-- figure -->` = the main `image`).
+     */
+    figures: z
+      .array(
+        z
+          .object({
+            image: figure,
+            alt: z.string().min(10, 'figures[].alt: describe the picture in a sentence'),
+            caption: z.string().optional(),
+            /** Optional "View full diagram" link. */
+            full: optionalUrl,
+          })
+          .strict(),
+      )
+      .default([]),
     /** Optional smaller picture for the home-page card (defaults to `image`). */
     thumbnail: figure.optional(),
     /** Optional highlighted tool, dataset or project. Leave `url` empty for no link. */

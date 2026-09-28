@@ -5,6 +5,10 @@ summary: I develop large-scale hydrological models that represent the water cycl
 icon: layers
 image: cwis-pipeline
 thumbnail: modelling-water-cycle-card.svg
+figures:
+  - image: model-chain-india.svg
+    alt: Schematic landscape of the coupled modelling chain. On a forested hillslope divided into grid cells with soil layers, rain falls and water evaporates; runoff and baseflow from the land-surface model VIC drain to a river. The river routing model RAPID carries the flow through a reservoir behind a dam, and the hydrodynamic model LISFLOOD-FP spreads the water beyond the river banks across a floodplain with houses.
+    caption: Coupling a land-surface model (VIC) with river routing (RAPID) and floodplain hydraulics (LISFLOOD-FP).
 image_alt: The CWIS workflow in six stages. Data acquisition and assimilation (meteorological, satellite vegetation and AI vegetation-forecast toolboxes) feeds hydrologic simulation with the VIC model at 1 km, daily, and a forecast run. Results are verified against CDEC and SNOTEL stations, with re-calibration when unsatisfactory, stored in a hydrologic data bank with an API, and delivered through a web application.
 image_caption: The California Water Information System (CWIS), from data acquisition to the web application.
 image_full: /images/research/cwis-flowchart.png
@@ -24,3 +28,5 @@ With colleagues, I developed the California Water Information System (CWIS) to a
 <!-- figure -->
 
 CWIS extends my earlier work in Indian river basins, where I focused on what happens once water leaves the land surface. I developed one of the first frameworks to couple a land-surface model with river-routing and hydrodynamic models, simulating streamflow and floodplain inundation within a single system. I later added reservoir operations to the routing model, bringing human regulation of rivers into the simulation. The broader aim is an integrated representation of the terrestrial water cycle under the joint influence of climate, land cover and human management.
+
+<!-- figure 2 -->
