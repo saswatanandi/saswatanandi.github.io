@@ -11,7 +11,7 @@ collaborators: []
 funding: []
 ---
 
-Floods and droughts pose some of the greatest threats to water security, and both are expected to intensify as the climate warms. In California, a few atmospheric rivers each year deliver a large share of the annual precipitation and cause many of the largest floods.
+Floods, droughts and heatwaves cause large damage to water resources and often occur together or in quick succession. Their frequency and severity are controlled by large-scale climate processes, including storm tracks, moisture transport and ocean–atmosphere modes such as the El Niño–Southern Oscillation. A warmer atmosphere holds about 7% more water vapour per degree Celsius and has higher evaporative demand, so warming tends to intensify both wet and dry extremes. Because these controls are changing, risk estimates based only on historical observations can underestimate future extremes. My research examines how large-scale climate processes control extreme precipitation, floods and droughts, and how these extremes change with warming.
 
 My recent work examines how atmospheric rivers and modes of climate variability, including the El Niño–Southern Oscillation and the Pacific Decadal Oscillation, jointly shape extreme precipitation across California. Because these climate modes evolve slowly and can be monitored months in advance, they offer a physical basis for anticipating seasons of heightened flood risk.
 
