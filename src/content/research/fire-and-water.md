@@ -3,9 +3,10 @@ title: Fire and water in mountain forests
 order: 1
 summary: I study how wildfire and forest management change the water cycle of mountain forests, from the water they use to the soil they lose after fire.
 icon: fire
-image: fire-and-water.svg
-image_alt: Schematic cross-section of a mountain ridge. On the forested slope, rain falls and large evapotranspiration arrows rise from the trees. On the burned or thinned slope, evapotranspiration is smaller, runoff runs down the bare surface, and eroded sediment is carried into the stream, which flows into a reservoir downstream where sediment settles.
-image_caption: Schematic of a forested and a burned or thinned slope draining to a stream and a reservoir downstream.
+image: flare.jpg
+thumbnail: fire-and-water.svg
+image_alt: Screenshot of the FLARE dashboard showing a map of annual erosion severity for 2005 across the Upper San Joaquin River Basin, ranging from low in the southwest to severe and extreme in the upper basin, with a control panel for time period, erodibility method and year.
+image_caption: FLARE dashboard, historical erosion severity in the Upper San Joaquin River Basin (2005).
 feature:
   title: FLARE
   description: An interactive dashboard of post-fire erosion risk in the Upper San Joaquin River Basin
