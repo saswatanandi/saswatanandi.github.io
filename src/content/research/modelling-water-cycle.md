@@ -21,9 +21,9 @@ collaborators: []
 funding: []
 ---
 
-Decisions about water supply, drought and wildfire all depend on knowing how much water is on the land today. Large-scale hydrological models provide this picture, but they usually represent vegetation as static or prescribe it from a fixed seasonal climatology. In a landscape shaped by frequent disturbance, that simplification breaks down, because vegetation governs how much water returns to the atmosphere and how much remains for soils and rivers.
+Large-scale hydrological models usually treat vegetation as fixed, either static or prescribed from a seasonal climatology. Yet vegetation changes after wildfire and drought mortality, under forest treatments such as thinning and prescribed burning, and with changes in cropping and irrigation. It also keeps changing as landscapes recover. Because vegetation governs how much water returns to the atmosphere and how much remains for soils and rivers, a model that holds it fixed misses both the loss and the recovery.
 
-With colleagues, I developed the California Water Information System (CWIS) to address this gap. CWIS is a real-time modelling framework built on the VIC land-surface model and run at 1 km resolution, the finest configuration of its kind at the scale of California. It incorporates satellite observations of vegetation as they become available, allowing the model to capture the hydrological response to natural disturbance. CWIS provides current estimates of soil moisture, evapotranspiration and runoff across the state, supporting drought monitoring and post-fire assessment.
+With colleagues, I developed the California Water Information System (CWIS) to address this gap. CWIS is a real-time modelling framework built on the VIC land-surface model and run at 1 km resolution, the finest configuration of its kind at the scale of California. It incorporates satellite observations of vegetation as they become available, allowing the model to capture the hydrological response to natural disturbance. CWIS provides current estimates of soil moisture, evapotranspiration, snow water equivalent and runoff across the state, supporting drought monitoring and post-fire assessment.
 
 <!-- figure -->
 
