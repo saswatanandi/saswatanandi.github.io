@@ -42,7 +42,7 @@ every field. Your name is bolded automatically (last name "Nandi", first initial
 "Copy BibTeX" gives visitors the entry without the site-only fields (`pubtype`, `topic`, `abstract`, …).
 Each paper page carries Google Scholar `citation_*` tags and schema.org data.
 
-**Badges:** papers with a DOI show an Altmetric donut and a Dimensions citation badge. They load from
+**Badges:** each paper's own page shows an Altmetric donut and a Dimensions citation badge (papers with a DOI). They load from
 those services only when scrolled into view, and empty ones hide themselves. Switch them off in
 `site.config.yaml`:
 
@@ -51,6 +51,7 @@ publications:
   badges:
     altmetric: true    # false = off
     dimensions: true
+    in_list: false     # true = also show them in the /publications/ list
 ```
 
 The citations / h-index / i10 numbers at the top of `/publications/` (and on the home page) are the

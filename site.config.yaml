@@ -56,11 +56,13 @@ metrics:
 
 # Publications page (/publications/ and each paper's page).
 # Badges load from Altmetric / Dimensions only for papers with a DOI; empty ones hide themselves.
-# Set to false to switch a badge off everywhere.
+# Set altmetric/dimensions to false to switch a badge off everywhere.
+# in_list: true also shows them in the /publications/ list (off = only on each paper's own page).
 publications:
   badges:
     altmetric: true
     dimensions: true
+    in_list: false
 
 # Source repository (footer link + "edit" links later).
 repo: https://github.com/saswatanandi/saswatanandi.github.io

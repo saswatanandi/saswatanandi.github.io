@@ -114,7 +114,12 @@ export const siteConfigSchema = z
       .object({
         /** Altmetric donut / Dimensions citation badge next to papers with a DOI (loaded lazily from their servers). */
         badges: z
-          .object({ altmetric: z.boolean().default(true), dimensions: z.boolean().default(true) })
+          .object({
+            altmetric: z.boolean().default(true),
+            dimensions: z.boolean().default(true),
+            /** Also show badges in the /publications/ list (default: only on each paper's page). */
+            in_list: z.boolean().default(false),
+          })
           .strict()
           .prefault({}),
       })

@@ -123,7 +123,7 @@ const profiles = [
               </h3>
               <div class="year__items">
                 {items.map((p) => (
-                  <PublicationItem pub={p} variant="list" headingLevel="h4" badges />
+                  <PublicationItem pub={p} variant="list" headingLevel="h4" badges={site.publications.badges.in_list} />
                 ))}
               </div>
             </section>
