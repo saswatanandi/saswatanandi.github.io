@@ -1,51 +1,174 @@
 % ─────────────────────────────────────────────────────────────────────────────
 %  publications.bib — single source of truth for publications, talks and the CV.
+%  Newest first (the site sorts by year/month anyway, so order is only for you).
 %
-%  PHASE 1 STUB: only the four "selected" papers shown on the home page.
-%  Phase 2 converts the full list (publication.txt) into this file.
+%  ADD A PAPER: paste the BibTeX from Google Scholar / Zotero / doi.org, then add
+%  the custom fields below. A template is in templates/new-paper.bib.
+%  The entry key (e.g. nandi2024imdlib) becomes the page URL /publications/nandi2024imdlib/
+%  — keep it once published.
 %
-%  Custom fields (all optional, ignored by LaTeX):
+%  Custom fields (all optional; LaTeX ignores them):
 %    pubtype  = {journal | chapter | proceedings | abstract | talk}
-%    selected = {true}                 → shown under "Selected publications" on home
+%               which tab it goes in: journal → "Journal articles", chapter → "Book chapters",
+%               proceedings → "Conference papers", abstract/talk → "Talks & abstracts".
+%               If missing it is guessed from the entry type (@article → journal, …).
+%    selected = {true}   → also shown under "Selected papers" on the home page
 %    topic    = {one or more research theme slugs, comma-separated}
 %               fire-and-water, modelling-water-cycle, climate-extremes
 %               (= file names in src/content/research/; see docs/topic-mapping.md)
-%    pdf, code, data, slides = {https://…}
-%    summary  = {one plain-language sentence}
+%    pdf, code, data, slides = {https://…}  (or a site path like /papers/x.pdf in public/)
+%    summary  = {one or two plain-language sentences}  → shown on the paper's page
+%    image    = {/images/papers/x.png}  → a figure for the paper's page (file in public/)
+%    image_alt = {what the figure shows}
+%    abstract = {…}  → shown on the paper's page; separate paragraphs with a blank line
+%  Special characters: write \& for &, \% for %, and wrap acronyms/place names in
+%  braces in titles ({VIC}, {India}) so citation styles keep their capitals.
 % ─────────────────────────────────────────────────────────────────────────────
 
 @article{kandhway2026crop,
-  author   = {Kandhway, A. and Nandi, S. and Conklin, M. H. and Safeeq, M.},
+  author   = {Kandhway, Anshika and Nandi, Saswata and Conklin, Martha H. and Safeeq, Mohammad},
   title    = {Comparing crop evapotranspiration estimation methods to evaluate water-saving potential of alternative land uses in the {San Joaquin Valley}, {California}},
   journal  = {Frontiers in Water},
   year     = {2026},
+  month    = aug,
   volume   = {8},
   pages    = {1879797},
   doi      = {10.3389/frwa.2026.1879797},
   pubtype  = {journal},
   selected = {true},
-  topic    = {modelling-water-cycle}
+  topic    = {modelling-water-cycle},
+  abstract = {This study explores strategies for water conservation by repurposing agricultural land in California’s San Joaquin Valley (SJV) for alternative uses like habitat restoration, groundwater recharge, and solar energy development. Water availability in the region has become increasingly constrained due to climate variability and regulatory restrictions under the Sustainable Groundwater Management Act (SGMA), which mandates groundwater sustainability through reduced extraction and enhanced recharge. Climate change and expansion of water intensive high-value crops are further increasing agricultural water demand and exacerbating water scarcity. One proposed water demand management strategy is land fallowing, but leaving land idle can have significant financial and environmental trade-offs. Repurposing fallowed land for alternative uses can address these trade-offs and deliver benefits beyond water savings. Using the VIC-CropSyst, an agrohydrology model, this study assesses water savings across various land-use and climate change scenarios. Results show annual water savings between 370 and 3,740 million m³, requiring the fallowing of 838 to 4,360 km² of farmland, with estimated revenue losses ranging from \$0.87 billion to \$4.4 billion. Habitat restoration and groundwater recharge are identified as the most effective strategies for reducing water demand, while solar development offers moderate savings. Perennial crops, particularly almonds, demonstrate the highest water demand reductions, while corn shows the least. The findings underscore the importance of crop-specific and farm-centric strategies to optimize water use. These insights will aid policymakers in developing multi-benefit land repurposing policies to support sustainable water management in the SJV amidst climate challenges.}
+}
+
+@misc{chakraborty2025drought,
+  author       = {Chakraborty, A. and Nandi, S. and Abatzoglou, J. T. and Safeeq, M.},
+  title        = {Deciphering the Multiscale Influences of Drought Characteristics on the Water Use Efficiency Across {CONUS} Ecosystems},
+  howpublished = {AGU Fall Meeting 2025},
+  address      = {New Orleans, LA, USA},
+  year         = {2025},
+  month        = dec,
+  note         = {Abstract B41I-1968},
+  pubtype      = {abstract},
+  topic        = {climate-extremes, fire-and-water}
+}
+
+@article{datta2025climate,
+  author   = {Datta, Rajarshi and {Janga Reddy}, Manne and Nandi, Saswata},
+  title    = {Assessment of climate change impacts on runoff and hydrological drought risk using the {VIC-3L} model and four-variate D-vine copulas in the {Upper Bhima} basin, {India}},
+  journal  = {Journal of Water and Climate Change},
+  year     = {2025},
+  month    = nov,
+  volume   = {16},
+  number   = {11},
+  pages    = {3447--3482},
+  doi      = {10.2166/wcc.2025.135},
+  pubtype  = {journal},
+  topic    = {climate-extremes, modelling-water-cycle},
+  abstract = {This study proposed a D-vine copula-based methodology to compute the four-variate joint return period of drought events, incorporating severity, duration, peak, and interarrival time. The VIC-3L hydrological model, calibrated using differential evolution, was employed to simulate gridded runoff in the Upper Bhima basin using climate projections from five CMIP6 GCMs under the SSP2-4.5 and SSP5-8.5 scenarios. Future runoff projections reveal substantial seasonal shifts relative to a historical period. In the future, early monsoon runoff (June–August) is expected to decline, while post-monsoon runoff (September–December) might increase. INM-CM5-0 and MIROC6 models have projected higher runoff in post-monsoon months, whereas IPSL-CM6A-LR consistently simulates lower runoff. To characterize the hydrological droughts, the study employed a 3-month Standardized Runoff Index (SRI) and run theory. Spatiotemporal analysis of extreme hydrological droughts over the Upper Bhima basin indicates a decline in drought duration and severity but an increase in peak and reduced interarrival time under future scenarios. Under the SSP2-4.5 scenario for extreme droughts, the basin was projected to experience critically decreasing return periods, about 17.7\% (19\%) of the study area in the mid-(late-) century.}
+}
+
+@article{jha2025climate,
+  author  = {Jha, Prakash Kumar and Jha, Prakash Kumar and Mehan, Sushant and Nandi, Saswata},
+  title   = {Editorial: Addressing climate change in agriculture and natural resources with a focus on adaptation and extreme events},
+  journal = {Frontiers in Environmental Science},
+  year    = {2025},
+  month   = nov,
+  volume  = {13},
+  pages   = {1722615},
+  doi     = {10.3389/fenvs.2025.1722615},
+  pubtype = {journal},
+  topic   = {climate-extremes}
 }
 
 @article{casirati2025forest,
-  author   = {Casirati, S. and Conklin, M. H. and Nandi, S. and Safeeq, M.},
-  title    = {Effect of forest management practices on water balance across a water--energy gradient in the upper {Kings River Basin}, {USA}},
+  author   = {Casirati, Stefano and Conklin, Martha H. and Nandi, Saswata and Safeeq, Mohammad},
+  title    = {Effect of Forest Management Practices on Water Balance Across a Water--Energy Gradient in the {Upper Kings River Basin}, {USA}},
   journal  = {Ecohydrology},
   year     = {2025},
+  month    = jan,
   volume   = {18},
   number   = {1},
   pages    = {e2753},
   doi      = {10.1002/eco.2753},
   pubtype  = {journal},
   selected = {true},
-  topic    = {fire-and-water}
+  topic    = {fire-and-water},
+  abstract = {Headwater watersheds and forests play a crucial role in ensuring water security for the western United States. Reducing forest biomass from the current overgrown forests can mitigate the severity and impact of wildfires and offer additional competing ecohydrological benefits. A reduction in canopy interception and transpiration following forest treatments can lead to an increase in available water for the remaining trees and runoff. However, the impact of forest management on water balance can be highly variable due to differences in climate, topography, location and vegetation. In this study, we used the Soil Water Assessment Tool Plus model to investigate how decisions regarding location, intensity and scale of forest treatments can affect both evapotranspiration and streamflow in a large watershed such as the upper Kings River Basin (3998 km²). The model was parameterized using a multiobjective calibration of streamflow, snow water equivalent and evapotranspiration. Various forest treatment scenarios were simulated across different years and regions in the landscape. Modelling results show that during dry years, streamflow gains from biomass reduction are primarily originated from energy‐limited regions (i.e., 82\% of total streamflow increase in the first year). In water‐limited regions, the water is prioritized for sustaining remaining trees, improving forest health and recharging subsurface storage, rather than increasing streamflow. During wet years, the contribution to streamflow from biomass reduction comes from both energy‐ and water‐limited areas. These findings emphasize the importance of evaluating forest treatments on a larger scale. The competing benefits for forests and downstream users are driven by the energy and water limitations of the vegetation targeted by forest treatments, as well as the climate variability that modulates the water availability and forest recovery time.}
+}
+
+@article{nandi2024groundwater,
+  author  = {Nandi, Saswata and Swain, Sabyasachi},
+  title   = {Role of groundwater systems in fulfilling sustainable development goals: A focus on {SDG6} and {SDG13}},
+  journal = {Current Opinion in Environmental Science \& Health},
+  year    = {2024},
+  month   = dec,
+  volume  = {42},
+  pages   = {100576},
+  doi     = {10.1016/j.coesh.2024.100576},
+  pubtype = {journal},
+  topic   = {climate-extremes}
+}
+
+@misc{nandi2024wildfires,
+  author       = {Nandi, S. and Safeeq, M.},
+  title        = {How Wildfires Alter Evapotranspiration Patterns in {California}: A High Resolution Hydrological Modelling Approach},
+  howpublished = {AGU Fall Meeting 2024},
+  address      = {Washington, DC, USA},
+  year         = {2024},
+  month        = dec,
+  note         = {Abstract GC51CC-0045},
+  pubtype      = {abstract},
+  topic        = {fire-and-water}
+}
+
+@misc{khan2024forest,
+  author       = {Khan, S. and Casirati, S. and Nandi, S. and Conklin, M. H.},
+  title        = {Modeling the effects of forest thinning on the long-term water balance in a {Mediterranean} mixed-conifer basin},
+  howpublished = {AGU Fall Meeting 2024},
+  address      = {Washington, DC, USA},
+  year         = {2024},
+  month        = dec,
+  note         = {Abstract H23S-05},
+  pubtype      = {abstract},
+  topic        = {fire-and-water}
+}
+
+@article{nandi2024projected,
+  author   = {Nandi, Saswata and Reddy, Manne Janga},
+  title    = {Investigating the projected changes in water balance components under climate change considering the effect of storage structures},
+  journal  = {Journal of Water and Climate Change},
+  year     = {2024},
+  month    = may,
+  volume   = {15},
+  number   = {5},
+  pages    = {1981--2000},
+  doi      = {10.2166/wcc.2024.371},
+  pubtype  = {journal},
+  topic    = {modelling-water-cycle, climate-extremes},
+  abstract = {The objective of this study was the critical challenge of accurately predicting water balance components in the Upper Bhima River basin, which is also facing significant challenges due to climate change. A major challenge faced in water balance studies is inadequacy of existing hydrological models to account for the effects of storage structures. The study utilized the variable infiltration capacity–routing application for parallel computation of discharge hydrological model with a newly developed storage structure scheme to simulate water balance components for historical (1999–2010) and future (2019–2040) periods, with future climate forcing from 19 Coupled Model Intercomparison Project Phase 5 GCMs under Representative Concentration Pathway (RCP)4.5 and RCP8.5 scenarios. The performance of the model was evaluated against observed streamflow data and around 30\% improvement is noticed for the Nash–Sutcliffe efficiency score. The results signify the adverse impacts of climate change in the region, particularly a significant decrease in monsoon precipitation which may intensify drought scenarios and affect monsoon-driven agriculture. Furthermore, the study emphasizes the high sensitivity of baseflow in the Upper Bhima River to climate alterations, indicating potential threats to biodiversity and river ecosystem health. This research offers indispensable findings crucial for future strategies concerning hydropower, flood management, and water resource management in the region.}
+}
+
+@article{swain2024meteorological,
+  author   = {Swain, Sabyasachi and Mishra, Prabhash Kumar and Nandi, Saswata and Pradhan, Biswajeet and Sahoo, Sashikanta and Al-Ansari, Nadhir},
+  title    = {A simplistic approach for monitoring meteorological drought over arid regions: a case study of {Rajasthan}, {India}},
+  journal  = {Applied Water Science},
+  year     = {2024},
+  month    = feb,
+  volume   = {14},
+  number   = {2},
+  pages    = {36},
+  doi      = {10.1007/s13201-023-02085-z},
+  pubtype  = {journal},
+  topic    = {climate-extremes},
+  abstract = {The commonly used precipitation-based drought indices typically rely on probability distribution functions that can be suitable when the data exhibit minimal discrepancies. However, in arid and semi-arid regions, the precipitation data often display significant discrepancies due to highly irregular rainfall patterns. Consequently, imposing any probability distributions on the data for drought analysis in such regions may not be effective. To address this issue, this study employs a novel drought index called the Discrepancy Precipitation Index (DPI), specifically designed for arid regions. Unlike traditional methods, the DPI does not impose a probability distribution on the precipitation data; instead, it relies on the discrepancy between the data and the mean value. Drought severity classifications (i.e., Drought-I, Drought-II, and Drought-III) are proposed based on the DPI values. The DPI is used to characterize and assess the meteorological drought years based on annual and monsoonal precipitation over nineteen districts in Western Rajasthan, India, during 1901–2019. Additionally, a novel statistic called Discrepancy Measure (DM) is employed to assess the degree of discrepancy in the precipitation climatology of the districts for annual and monsoon precipitation time series. Based on annual precipitation, Jaisalmer district exhibited the highest number of historical drought years (35), whereas three districts, i.e., Jhunjhunu, Dausa, and Bhilwara exhibited the lowest number of drought years (11). Similarly, based on monsoon precipitation, Jaisalmer and Bhilwara encountered the highest (34) and the lowest (11) number of drought years, respectively. The return period of Drought-II is lower for monsoon precipitation-based DPI as compared to that of the annual precipitation-based DPI for all the districts. The DM and DPI-based total number of droughts are found to be strongly correlated for both annual and monsoon precipitation. The DM value is highest for Jaisalmer and lowest for Bhilwara district. The findings reveal DPI as an efficient tool for assessing drought years, particularly in arid climatic conditions. Moreover, as the DM value increases for a precipitation series, the DPI becomes more effective in capturing drought events.}
 }
 
 @article{nandi2024imdlib,
-  author   = {Nandi, S. and Patel, P. and Swain, S.},
+  author   = {Nandi, Saswata and Patel, Pratiman and Swain, Sabyasachi},
   title    = {{IMDLIB}: An open-source library for retrieval, processing and spatiotemporal exploratory assessments of gridded meteorological observation datasets over {India}},
   journal  = {Environmental Modelling \& Software},
   year     = {2024},
+  month    = jan,
   volume   = {171},
   pages    = {105869},
   doi      = {10.1016/j.envsoft.2023.105869},
@@ -55,15 +178,251 @@
   code     = {https://github.com/iamsaswata/imdlib}
 }
 
+@article{swain2024hydrological,
+  author  = {Swain, Sabyasachi and Mishra, Surendra Kumar and Pandey, Ashish and Srivastava, Prashant Kumar and Nandi, Saswata},
+  title   = {Characterization and assessment of hydrological droughts using {GloFAS} streamflow data for the {Narmada} River Basin, {India}},
+  journal = {Environmental Science and Pollution Research},
+  year    = {2024},
+  volume  = {31},
+  number  = {41},
+  pages   = {54281--54294},
+  doi     = {10.1007/s11356-023-27036-8},
+  pubtype = {journal},
+  topic   = {climate-extremes}
+}
+
+@article{nandi2023multimodel,
+  author  = {Nandi, Saswata and {Janga Reddy}, Manne},
+  title   = {Improving the accuracy of multimodel short-to-medium-range precipitation and streamflow forecasts over the {Upper Bhima} river basin, {India}},
+  journal = {Hydrological Sciences Journal},
+  year    = {2023},
+  month   = oct,
+  volume  = {68},
+  number  = {13},
+  pages   = {1864--1880},
+  doi     = {10.1080/02626667.2023.2243257},
+  pubtype = {journal},
+  topic   = {modelling-water-cycle}
+}
+
+@misc{nandi2023tigge,
+  author       = {Nandi, Saswata and Swain, Sabyasachi},
+  title        = {Towards a reliable streamflow forecasting system: An evaluation of {TIGGE} multimodel ensemble forecasts in the {Upper Bhima} River Basin, {India}},
+  howpublished = {XXVIII General Assembly of the International Union of Geodesy and Geophysics (IUGG)},
+  publisher    = {GFZ German Research Centre for Geosciences},
+  address      = {Berlin, Germany},
+  year         = {2023},
+  month        = jul,
+  note         = {Oral presentation, IUGG23-0380},
+  doi          = {10.57757/IUGG23-0380},
+  pubtype      = {abstract},
+  topic        = {modelling-water-cycle},
+  abstract     = {Accurate precipitation forecasting is a critical component of developing a robust flood warning system (FWS), especially in developing countries where resources can be limited. In this study, we evaluate the utility of the TIGGE multimodel ensemble meteorological forecasts over the Upper Bhima River Basin in India, and investigate their hydrological usefulness through a calibrated hydrological model and postprocessed streamflow simulations. Our approach includes the innovative use of the Bayesian model average (BMA) approach to further improve the accuracy of the simulations. The results of our study highlight the challenges faced in achieving reliable precipitation forecasts with increasing lead time. However, our findings also demonstrate that a suitable bias-correction technique can help to mitigate this issue, leading to more accurate forecasts. The BMA-based postprocessing further improves the streamflow simulations, especially during extreme events, showcasing its efficacy in flood forecasting. From the results of this study, we recommend an integrated approach to FWS development that combines improved precipitation prediction, a calibrated hydrological model and postprocessed streamflow simulations. This compound system will lead to a more reliable and operationally effective FWS, especially in areas prone to extreme events. With the increasing need for effective flood warning systems, this study holds significant implications for communities at risk of flooding.}
+}
+
+@article{nandi2023heatwave,
+  author  = {Nandi, Saswata and Swain, Sabyasachi},
+  title   = {Analysis of heatwave characteristics under climate change over three highly populated cities of {South India}: a {CMIP6}-based assessment},
+  journal = {Environmental Science and Pollution Research},
+  year    = {2023},
+  volume  = {30},
+  number  = {44},
+  pages   = {99013--99025},
+  doi     = {10.1007/s11356-022-22398-x},
+  pubtype = {journal},
+  topic   = {climate-extremes}
+}
+
+@article{nandi2022imerg,
+  author  = {Nandi, Saswata and {Janga Reddy}, Manne},
+  title   = {Evaluating the performance of bias-corrected {IMERG} satellite rainfall estimates for hydrological simulation over the {Upper Bhima} River basin, {India}},
+  journal = {Geocarto International},
+  year    = {2022},
+  month   = dec,
+  volume  = {37},
+  number  = {27},
+  pages   = {15505--15529},
+  doi     = {10.1080/10106049.2022.2101695},
+  pubtype = {journal},
+  topic   = {modelling-water-cycle}
+}
+
+@misc{nandi2022flood,
+  author       = {Nandi, S. and Swain, S.},
+  title        = {Flood risk assessment and identification of hotspots under {CMIP6} scenarios using a coupled physical modeling approach: A case study over the {Mahanadi} River Basin, {India}},
+  howpublished = {AGU Fall Meeting 2022},
+  address      = {Chicago, IL, USA},
+  year         = {2022},
+  month        = dec,
+  note         = {Abstract H42B-1253},
+  pubtype      = {abstract},
+  topic        = {climate-extremes}
+}
+
+@misc{datta2022severity,
+  author       = {Datta, R. and Reddy, M. J. and Nandi, S.},
+  title        = {Development of Regional Severity-Duration-Frequency and Severity-Areal extent-Frequency Curves for an {Indian} Basin Under Warming Climate},
+  howpublished = {AGU Fall Meeting 2022},
+  address      = {Chicago, IL, USA},
+  year         = {2022},
+  month        = dec,
+  note         = {Abstract H41A-02},
+  pubtype      = {abstract},
+  topic        = {climate-extremes}
+}
+
 @article{nandi2022integrated,
-  author   = {Nandi, S. and Reddy, M. J.},
+  author   = {Nandi, Saswata and Reddy, Manne Janga},
   title    = {An integrated approach to streamflow estimation and flood inundation mapping using {VIC}, {RAPID} and {LISFLOOD-FP}},
   journal  = {Journal of Hydrology},
   year     = {2022},
+  month    = jul,
   volume   = {610},
   pages    = {127842},
   doi      = {10.1016/j.jhydrol.2022.127842},
   pubtype  = {journal},
   selected = {true},
   topic    = {modelling-water-cycle}
+}
+
+@inproceedings{nandi2021vic,
+  author    = {Nandi, Saswata and Reddy, Manne Janga},
+  title     = {Parameter Estimation of {VIC-RAPID} Hydrological Model Using Self-adaptive Differential Evolution Algorithm},
+  booktitle = {Proceedings of International Conference on Scientific and Natural Computing},
+  series    = {Algorithms for Intelligent Systems},
+  publisher = {Springer Singapore},
+  address   = {Singapore},
+  year      = {2021},
+  pages     = {137--146},
+  isbn      = {9789811615283},
+  doi       = {10.1007/978-981-16-1528-3_12},
+  pubtype   = {proceedings},
+  topic     = {modelling-water-cycle}
+}
+
+@incollection{nandi2021multiobjective,
+  author    = {Nandi, Saswata and Reddy, M. Janga},
+  title     = {Multiobjective Automatic Calibration of a Physically Based Hydrologic Model Using Multiobjective Self-Adaptive Differential Evolution Algorithm},
+  booktitle = {Climate Change Impacts on Water Resources},
+  series    = {Water Science and Technology Library},
+  publisher = {Springer International Publishing},
+  address   = {Cham},
+  year      = {2021},
+  pages     = {435--448},
+  isbn      = {9783030642020},
+  doi       = {10.1007/978-3-030-64202-0_37},
+  pubtype   = {chapter},
+  topic     = {modelling-water-cycle}
+}
+
+@incollection{nandi2020macroscale,
+  author    = {Nandi, Saswata and {Janga Reddy}, Manne},
+  title     = {Parameter Estimation of a Macroscale Hydrological Model Using an Adaptive Differential Evolution},
+  booktitle = {Water Management and Water Governance},
+  series    = {Water Science and Technology Library},
+  publisher = {Springer International Publishing},
+  address   = {Cham},
+  year      = {2020},
+  month     = nov,
+  pages     = {243--255},
+  isbn      = {9783030580513},
+  doi       = {10.1007/978-3-030-58051-3_17},
+  pubtype   = {chapter},
+  topic     = {modelling-water-cycle}
+}
+
+@article{nandi2020spatiotemporal,
+  author  = {Nandi, Saswata and Manne, Janga Reddy},
+  title   = {Spatiotemporal Analysis of Water Balance Components and Their Projected Changes in Near-future Under Climate Change Over {Sina} Basin, {India}},
+  journal = {Water Resources Management},
+  year    = {2020},
+  month   = jul,
+  volume  = {34},
+  number  = {9},
+  pages   = {2657--2675},
+  doi     = {10.1007/s11269-020-02551-2},
+  pubtype = {journal},
+  topic   = {modelling-water-cycle, climate-extremes}
+}
+
+@article{nandi2020comparative,
+  author   = {Nandi, Saswata and {Janga Reddy}, M.},
+  title    = {Comparative performance evaluation of self-adaptive differential evolution with {GA}, {SCE} and {DE} algorithms for the automatic calibration of a computationally intensive distributed hydrological model},
+  journal  = {H2Open Journal},
+  year     = {2020},
+  month    = jan,
+  volume   = {3},
+  number   = {1},
+  pages    = {306--327},
+  doi      = {10.2166/h2oj.2020.030},
+  pubtype  = {journal},
+  topic    = {modelling-water-cycle},
+  abstract = {Recently, physically-based hydrological models have been gaining much popularity in various activities of water resources planning and management, such as assessment of basin water availability, floods, droughts, and reservoir operation. Every hydrological model contains some parameters that must be tuned to the catchment being studied to obtain reliable estimates from the model. This study evaluated the performance of different evolutionary algorithms, namely genetic algorithm (GA), shuffled complex evolution (SCE), differential evolution (DE), and self-adaptive differential evolution (SaDE) algorithm for the parameter calibration of a computationally intensive distributed hydrological model, variable infiltration capacity (VIC) model. The methodology applied and tested for a case study of the upper Tungabhadra River basin in India and the performance of the algorithms is evaluated in terms of reliability, variability, efficacy measures in a limited number of function evaluations, their ability for achieving global convergence, and also by their capability to produce a skilful simulation of streamflows. The results of the study indicated that SaDE facilitates an effective calibration of the VIC model with higher reliability and faster convergence to optimal solutions as compared to the other methods. Moreover, due to the simplicity of the SaDE, it provides easy implementation and flexibility for the automatic calibration of complex hydrological models.}
+}
+
+@inproceedings{nandi2018satellite,
+  author    = {Nandi, Saswata and Reddy, M Janga},
+  title     = {Assessing Suitability of Satellite Rainfall Data for Estimation of Daily Streamflows of a Small Tropical Catchment in {India}},
+  booktitle = {IGARSS 2018 - 2018 IEEE International Geoscience and Remote Sensing Symposium},
+  publisher = {IEEE},
+  year      = {2018},
+  month     = jul,
+  pages     = {5278--5281},
+  doi       = {10.1109/IGARSS.2018.8517335},
+  pubtype   = {proceedings},
+  topic     = {modelling-water-cycle}
+}
+
+@incollection{swain2018arima,
+  author    = {Swain, S. and Nandi, S. and Patel, P.},
+  title     = {Development of an {ARIMA} Model for Monthly Rainfall Forecasting over {Khordha} District, {Odisha}, {India}},
+  booktitle = {Recent Findings in Intelligent Computing Techniques},
+  series    = {Advances in Intelligent Systems and Computing},
+  publisher = {Springer Singapore},
+  address   = {Singapore},
+  year      = {2018},
+  pages     = {325--331},
+  isbn      = {9789811086366},
+  doi       = {10.1007/978-981-10-8636-6_34},
+  pubtype   = {chapter},
+  topic     = {modelling-water-cycle}
+}
+
+@inproceedings{swain2017spi,
+  author    = {Swain, S. and Patel, P. and Nandi, S.},
+  title     = {Application of {SPI}, {EDI} and {PNPI} using {MSWEP} precipitation data over {Marathwada}, {India}},
+  booktitle = {2017 IEEE International Geoscience and Remote Sensing Symposium (IGARSS)},
+  publisher = {IEEE},
+  year      = {2017},
+  month     = jul,
+  pages     = {5505--5507},
+  doi       = {10.1109/IGARSS.2017.8128250},
+  pubtype   = {proceedings},
+  topic     = {climate-extremes}
+}
+
+@inproceedings{swain2017regression,
+  author    = {Swain, S. and Patel, P. and Nandi, S.},
+  title     = {A multiple linear regression model for precipitation forecasting over {Cuttack} district, {Odisha}, {India}},
+  booktitle = {2017 2nd International Conference for Convergence in Technology (I2CT)},
+  publisher = {IEEE},
+  year      = {2017},
+  month     = apr,
+  pages     = {355--357},
+  doi       = {10.1109/I2CT.2017.8226150},
+  pubtype   = {proceedings},
+  topic     = {modelling-water-cycle}
+}
+
+@article{nandi2017distributed,
+  author  = {Nandi, S. and Reddy, M. J.},
+  title   = {Distributed rainfall runoff modeling over {Krishna} river basin},
+  journal = {European Water},
+  year    = {2017},
+  volume  = {57},
+  pages   = {71--76},
+  url     = {https://www.ewra.net/ew/pdf/EW_2017_57_10.pdf},
+  pubtype = {journal},
+  topic   = {modelling-water-cycle},
+  pdf     = {https://www.ewra.net/ew/pdf/EW_2017_57_10.pdf}
 }

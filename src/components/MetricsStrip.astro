@@ -1,0 +1,74 @@
+---
+/**
+ * Citation metrics entered by hand in site.config.yaml → metrics (no live API calls).
+ * Metrics that are null are hidden; the whole strip is hidden when all are null.
+ */
+import { site } from '../lib/config';
+import { formatMonth } from '../lib/format';
+
+interface Props {
+  class?: string;
+  /** Adds a link to the metrics source profile (Google Scholar). */
+  link?: boolean;
+}
+const { class: className, link = true } = Astro.props;
+const m = site.metrics;
+const metrics = [
+  { label: 'Citations', value: m.citations },
+  { label: 'h-index', value: m.h_index },
+  { label: 'i10-index', value: m.i10 },
+].filter((x): x is { label: string; value: number } => typeof x.value === 'number');
+const sourceHref = link && m.source?.toLowerCase().includes('scholar') ? site.links.scholar : undefined;
+---
+
+{
+  metrics.length > 0 && (
+    <dl class:list={['metrics', className]} aria-label={`Citation metrics${m.source ? ` (${m.source})` : ''}`}>
+      {metrics.map((x) => (
+        <div>
+          <dt>{x.label}</dt>
+          <dd>{x.value.toLocaleString('en')}</dd>
+        </div>
+      ))}
+      {(m.source || m.updated) && (
+        <p class="metrics__src">
+          {sourceHref ? <a href={sourceHref}>{m.source}</a> : m.source}
+          {m.updated && <> · {formatMonth(m.updated)}</>}
+        </p>
+      )}
+    </dl>
+  )
+}
+
+<style>
+  .metrics {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-2) var(--space-6);
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    max-width: 36rem;
+  }
+  .metrics dt {
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .metrics dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .metrics__src {
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+  }
+  .metrics__src a {
+    color: inherit;
+  }
+</style>

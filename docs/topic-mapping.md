@@ -1,4 +1,4 @@
-# Paper → research theme mapping (plan for Phase 2)
+# Paper → research theme mapping
 
 Each BibTeX entry gets `topic = {…}` with one or more theme slugs, comma-separated.
 Slugs are the file names in `src/content/research/`:
@@ -12,7 +12,7 @@ Slugs are the file names in `src/content/research/`:
 A paper appears on every theme page it is tagged with (newest first). An unknown slug stops the build
 with a message listing the valid ones.
 
-Status: ✅ = already in `publications.bib`; the rest are added in Phase 2 with this tagging.
+Status: all entries below are in `publications.bib` (Phase 2) with this tagging; ✅ = the four selected papers.
 
 | Year | Paper (short) | Venue | `topic` |
 | --- | --- | --- | --- |

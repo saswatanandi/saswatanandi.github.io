@@ -1,0 +1,408 @@
+---
+/**
+ * /publications/<citekey>/ — one page per BibTeX entry: abstract, plain-language summary,
+ * figure, links, citation (APA-like + BibTeX, both copyable) and related papers.
+ * Carries Google Scholar citation_* meta tags and schema.org JSON-LD.
+ */
+import type { GetStaticPaths } from 'astro';
+import CopyButton from '../../components/CopyButton.astro';
+import Icon from '../../components/Icon.astro';
+import PubBadges from '../../components/PubBadges.astro';
+import PublicationItem from '../../components/PublicationItem.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { formatCitation, getPublications, PUBTYPE_LABEL, venueDetails, type Publication } from '../../lib/bibtex';
+import { getThemes } from '../../lib/collections';
+import { site } from '../../lib/config';
+
+export const getStaticPaths = (() =>
+  getPublications().map((pub) => ({ params: { key: pub.key }, props: { pub } }))) satisfies GetStaticPaths;
+
+interface Props {
+  pub: Publication;
+}
+const { pub } = Astro.props;
+
+const themes = await getThemes();
+const themeTitle = new Map(themes.map((t) => [t.id, t.data.title]));
+const pubThemes = pub.topics.map((id) => ({ id, title: themeTitle.get(id) ?? id }));
+
+// Related: other papers sharing a theme — most shared themes first, then newest. Max 4.
+const related = getPublications()
+  .filter((p) => p.key !== pub.key)
+  .map((p) => ({ p, score: p.topics.filter((t) => pub.topics.includes(t)).length }))
+  .filter((x) => x.score > 0)
+  .sort((a, b) => b.score - a.score || b.p.year - a.p.year || (b.p.month ?? 0) - (a.p.month ?? 0))
+  .slice(0, 4)
+  .map((x) => x.p);
+
+const citation = formatCitation(pub);
+const details = venueDetails(pub);
+const fullName = (a: Publication['authors'][number]) => (a.firstName ? `${a.firstName} ${a.lastName}` : a.lastName);
+const doiUrl = pub.doi ? `https://doi.org/${pub.doi}` : undefined;
+const abs = (u: string) => new URL(u, Astro.site).toString();
+
+const links = [
+  doiUrl && { href: doiUrl, label: 'DOI', icon: 'doi' as const, primary: true },
+  !doiUrl && pub.url && pub.url !== pub.pdf && { href: pub.url, label: 'Link', icon: 'external' as const, primary: true },
+  pub.pdf && { href: pub.pdf, label: 'PDF', icon: 'file' as const, primary: !doiUrl },
+  pub.code && { href: pub.code, label: 'Code', icon: 'github' as const },
+  pub.data && { href: pub.data, label: 'Data', icon: 'data' as const },
+  pub.slides && { href: pub.slides, label: 'Slides', icon: 'slides' as const },
+].filter(Boolean) as { href: string; label: string; icon: 'doi' | 'external' | 'file' | 'github' | 'data' | 'slides'; primary?: boolean }[];
+
+/* ── Google Scholar (Highwire Press) tags ── */
+const [firstPage, lastPage] = (pub.pages ?? '').split('–');
+const containerTag =
+  pub.pubtype === 'journal'
+    ? 'citation_journal_title'
+    : pub.pubtype === 'chapter'
+      ? 'citation_inbook_title'
+      : 'citation_conference_title';
+const meta = [
+  { name: 'citation_title', content: pub.title },
+  ...pub.authors.map((a) => ({ name: 'citation_author', content: a.firstName ? `${a.lastName}, ${a.firstName}` : a.lastName })),
+  { name: 'citation_publication_date', content: pub.date.replace('-', '/') },
+  pub.venue && { name: containerTag, content: pub.venue },
+  pub.volume && { name: 'citation_volume', content: pub.volume },
+  pub.issue && { name: 'citation_issue', content: pub.issue },
+  firstPage && { name: 'citation_firstpage', content: firstPage },
+  lastPage && { name: 'citation_lastpage', content: lastPage },
+  pub.publisher && { name: 'citation_publisher', content: pub.publisher },
+  pub.isbn && { name: 'citation_isbn', content: pub.isbn },
+  pub.doi && { name: 'citation_doi', content: pub.doi },
+  pub.pdf && { name: 'citation_pdf_url', content: abs(pub.pdf) },
+  { name: 'citation_abstract_html_url', content: abs(pub.href) },
+].filter(Boolean) as { name: string; content: string }[];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ScholarlyArticle',
+  headline: pub.title.length > 110 ? `${pub.title.slice(0, 107)}…` : pub.title,
+  name: pub.title,
+  author: pub.authors.map((a) => ({
+    '@type': 'Person',
+    name: fullName(a),
+    ...(a.isSelf ? { url: Astro.site?.toString() } : {}),
+  })),
+  datePublished: pub.date,
+  genre: PUBTYPE_LABEL[pub.pubtype],
+  ...(pub.venue
+    ? {
+        isPartOf:
+          pub.pubtype === 'journal'
+            ? {
+                '@type': pub.volume ? 'PublicationVolume' : 'Periodical',
+                ...(pub.volume ? { volumeNumber: pub.volume, isPartOf: { '@type': 'Periodical', name: pub.venue } } : { name: pub.venue }),
+              }
+            : { '@type': pub.pubtype === 'chapter' ? 'Book' : 'CreativeWork', name: pub.venue },
+      }
+    : {}),
+  ...(pub.pages ? { pagination: pub.pages } : {}),
+  ...(pub.publisher ? { publisher: { '@type': 'Organization', name: pub.publisher } } : {}),
+  ...(pub.doi
+    ? { identifier: { '@type': 'PropertyValue', propertyID: 'DOI', value: pub.doi }, sameAs: doiUrl }
+    : {}),
+  ...(pub.abstract ? { abstract: pub.abstract } : {}),
+  ...(pubThemes.length ? { about: pubThemes.map((t) => t.title) } : {}),
+  url: abs(pub.href),
+};
+
+const description = pub.summary ?? (pub.abstract ? `${pub.abstract.slice(0, 180).replace(/\s+\S*$/, '')}…` : `${PUBTYPE_LABEL[pub.pubtype]} (${pub.year})${pub.venue ? ` in ${pub.venue}` : ''}.`);
+---
+
+<PageLayout
+  title={pub.title}
+  eyebrow="Publications"
+  eyebrowHref="/publications/"
+  description={description}
+  type="article"
+  meta={meta}
+  jsonLd={[jsonLd]}
+  ridges={30 + (pub.year % 7)}
+  narrow
+>
+  <Fragment slot="header">
+    <p class="authors">
+      {
+        pub.authors.map((a, i) => (
+          <>
+            {a.isSelf ? <strong>{fullName(a)}</strong> : fullName(a)}
+            {i < pub.authors.length - 2 ? ', ' : i === pub.authors.length - 2 ? ' & ' : ''}
+          </>
+        ))
+      }
+    </p>
+    <p class="venue">
+      {pub.venue && <em>{pub.venue}</em>}{details && <span>, {details}</span>}
+      {pub.address && pub.pubtype !== 'journal' && <span> · {pub.address}</span>}
+    </p>
+    <p class="kind">
+      <span class="kind__type">{PUBTYPE_LABEL[pub.pubtype]}</span>
+      <span aria-hidden="true">·</span>
+      <span>{pub.year}</span>
+      {
+        pubThemes.map((t) => (
+          <a class="theme-chip" href={`/research/${t.id}/`}>
+            {t.title}
+          </a>
+        ))
+      }
+    </p>
+  </Fragment>
+
+  <article class="paper">
+    <div class="actions">
+      <div class="actions__links">
+        {
+          links.map((l) => (
+            <a class:list={['btn', { 'btn--primary': l.primary }]} href={l.href}>
+              <Icon name={l.icon} /> {l.label}
+            </a>
+          ))
+        }
+        <a class="btn" href="#cite"><Icon name="quote" /> Cite</a>
+      </div>
+      <PubBadges doi={pub.doi} />
+    </div>
+
+    {
+      pub.summary && (
+        <aside class="summary" aria-label="In brief">
+          <p class="eyebrow">In brief</p>
+          {pub.summary.split('\n\n').map((para) => (
+            <p>{para}</p>
+          ))}
+        </aside>
+      )
+    }
+
+    {
+      pub.image && (
+        <figure class="figure">
+          <img src={pub.image} alt={pub.imageAlt ?? ''} loading="lazy" decoding="async" />
+          {pub.imageAlt && <figcaption>{pub.imageAlt}</figcaption>}
+        </figure>
+      )
+    }
+
+    {
+      pub.abstractHtml.length > 0 && (
+        <section class="abstract" aria-labelledby="abstract">
+          <h2 id="abstract">Abstract</h2>
+          <div class="prose">
+            {pub.abstractHtml.map((para) => (
+              <p set:html={para} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <section class="cite" aria-labelledby="cite">
+      <h2 id="cite">Cite</h2>
+      <div class="cite__block">
+        <div class="cite__head">
+          <span class="cite__label">Reference</span>
+          <CopyButton from="cite-text" label="Copy" srLabel="Copy reference" />
+        </div>
+        <p class="cite__text" set:html={citation.html} />
+        <template id="cite-text" set:text={citation.text} />
+      </div>
+      <div class="cite__block">
+        <div class="cite__head">
+          <span class="cite__label">BibTeX</span>
+          <CopyButton from="cite-bibtex" label="Copy" srLabel="Copy BibTeX" />
+        </div>
+        <pre class="cite__bib" id="cite-bibtex" tabindex="0">{pub.bibtexClean}</pre>
+      </div>
+    </section>
+
+    {
+      related.length > 0 && (
+        <section class="related" aria-labelledby="related">
+          <h2 id="related">Related papers</h2>
+          <div>
+            {related.map((p) => (
+              <PublicationItem pub={p} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <p class="back">
+      <a class="more-link" href="/publications/"><span aria-hidden="true">←</span> All publications</a>
+      {
+        site.links.scholar && (
+          <a class="more-link" href={site.links.scholar}>
+            Google Scholar <span aria-hidden="true">→</span>
+          </a>
+        )
+      }
+    </p>
+  </article>
+</PageLayout>
+
+<style>
+  /* Paper titles are long: a calmer title size than section pages. */
+  :global(.page-header h1) {
+    font-size: var(--text-xl);
+    max-width: none;
+    text-wrap: balance;
+  }
+  .authors {
+    margin-top: var(--space-4);
+    font-size: var(--text-md);
+    color: var(--color-text-muted);
+  }
+  .authors strong {
+    color: var(--color-text);
+    font-weight: 650;
+  }
+  .venue {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+  }
+  .kind {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
+  }
+  .kind__type {
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+  .theme-chip {
+    display: inline-flex;
+    padding: 0.15em 0.7em;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 550;
+    text-decoration: none;
+  }
+  .theme-chip:first-of-type {
+    margin-left: var(--space-2);
+  }
+  .theme-chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .paper > * + * {
+    margin-top: var(--space-7);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .actions__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .summary {
+    padding: var(--space-5);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    background: var(--color-accent-soft);
+  }
+  .summary p + p {
+    margin-top: var(--space-2);
+  }
+  .summary .eyebrow {
+    margin-bottom: var(--space-2);
+  }
+  .figure img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+  .figure figcaption {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .abstract h2,
+  .cite h2,
+  .related h2 {
+    margin-bottom: var(--space-4);
+  }
+  .abstract .prose {
+    font-size: var(--text-md);
+  }
+  .abstract .prose p {
+    hyphens: auto;
+  }
+
+  .cite {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+  .cite h2 {
+    margin-bottom: 0;
+    scroll-margin-top: calc(var(--header-height) + var(--space-4));
+  }
+  .cite__block {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .cite__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+  }
+  .cite__label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .cite__text {
+    padding: var(--space-4);
+    font-size: var(--text-sm);
+    overflow-wrap: anywhere;
+  }
+  .cite__bib {
+    margin: 0;
+    padding: var(--space-4);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  .back {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+</style>

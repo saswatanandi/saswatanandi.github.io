@@ -1,0 +1,37 @@
+% Copy this into src/data/publications.bib (anywhere; the site sorts by date).
+% Easiest: paste the BibTeX from Google Scholar ("Cite" → BibTeX), Zotero, or
+% https://doi.org/<your-doi> (ask for BibTeX), then add the lines marked ★.
+% The key (yourname2026word) becomes the page URL /publications/yourname2026word/.
+
+@article{nandi2026example,
+  author   = {Nandi, Saswata and Coauthor, Firstname},
+  title    = {Title with {Acronyms} and {Place} names in braces},
+  journal  = {Water Resources Research},
+  year     = {2026},
+  month    = mar,
+  volume   = {62},
+  number   = {3},
+  pages    = {e2026WR000000},
+  doi      = {10.1029/2026WR000000},
+  pubtype  = {journal},                       % ★ journal | chapter | proceedings | abstract | talk
+  topic    = {fire-and-water},                % ★ theme slug(s), comma-separated
+  selected = {true},                          %   optional: also show on the home page
+  pdf      = {https://…},                     %   optional links: pdf, code, data, slides
+  code     = {https://github.com/…},
+  summary  = {One plain-language sentence.},  %   optional, shown on the paper's page
+  abstract = {Paste the abstract. Blank line between paragraphs; write \% and \&.}
+}
+
+% A conference abstract or talk (no DOI needed):
+@misc{nandi2026agu,
+  author       = {Nandi, S. and Coauthor, F.},
+  title        = {Talk title},
+  howpublished = {AGU Fall Meeting 2026},
+  address      = {San Francisco, CA, USA},
+  year         = {2026},
+  month        = dec,
+  note         = {Abstract H12A-01},
+  pubtype      = {abstract},
+  topic        = {climate-extremes},
+  slides       = {/slides/agu2026.pdf}
+}

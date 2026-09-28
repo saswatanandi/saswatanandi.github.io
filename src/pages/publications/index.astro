@@ -1,0 +1,534 @@
+---
+/**
+ * /publications/ — everything in src/data/publications.bib.
+ * Four tabs (journal · chapters · conference · talks), year + research-theme filters.
+ * Works without JavaScript: all four sections render one after another with headings;
+ * the tabs and filters are added on top when JS runs.
+ */
+import Icon from '../../components/Icon.astro';
+import MetricsStrip from '../../components/MetricsStrip.astro';
+import PublicationItem from '../../components/PublicationItem.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPublications, groupOf, PUB_GROUPS, type Publication } from '../../lib/bibtex';
+import { getThemes } from '../../lib/collections';
+import { site } from '../../lib/config';
+
+const pubs = getPublications();
+const themes = (await getThemes()).filter((t) => pubs.some((p) => p.topics.includes(t.id)));
+const years = [...new Set(pubs.map((p) => p.year))].sort((a, b) => b - a);
+
+const groups = PUB_GROUPS.map((g) => {
+  const items = pubs.filter((p) => groupOf(p) === g.id);
+  const byYear = new Map<number, Publication[]>();
+  for (const p of items) byYear.set(p.year, [...(byYear.get(p.year) ?? []), p]);
+  return { ...g, items, byYear: [...byYear.entries()] };
+}).filter((g) => g.items.length > 0);
+
+const profiles = [
+  site.links.scholar && { href: site.links.scholar, label: 'Google Scholar', icon: 'scholar' as const },
+  site.links.orcid && { href: site.links.orcid, label: 'ORCID', icon: 'orcid' as const },
+].filter((l): l is { href: string; label: string; icon: 'scholar' | 'orcid' } => Boolean(l));
+---
+
+<PageLayout
+  title="Publications"
+  eyebrow="Publications"
+  intro="Journal articles, book chapters, conference papers and talks, newest first. Each title opens a page with the abstract and a ready-to-copy citation."
+  description="Publications of Saswata Nandi: journal articles, book chapters, conference papers and talks in hydrology, land-surface modelling, forecasting and climate extremes."
+  ridges={2}
+>
+  <Fragment slot="header">
+    <MetricsStrip link={false} />
+    {
+      profiles.length > 0 && (
+        <p class="profiles">
+          {profiles.map((l) => (
+            <a href={l.href} rel="me">
+              <Icon name={l.icon} size={14} /> {l.label}
+            </a>
+          ))}
+        </p>
+      )
+    }
+  </Fragment>
+
+  <div class="pubs" data-pubs>
+    <div class="controls" data-controls>
+      <div class="tabs" role="tablist" aria-label="Publication type">
+        {
+          groups.map((g, i) => (
+            <button
+              type="button"
+              role="tab"
+              class="tab"
+              id={`tab-${g.id}`}
+              aria-controls={`panel-${g.id}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              data-tab={g.id}
+              data-label={g.label}
+            >
+              {g.label}
+              <span class="tab__count">
+                <span class="visually-hidden">(</span>
+                <span data-count={g.id}>{g.items.length}</span>
+                <span class="visually-hidden">)</span>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="filters" role="group" aria-label="Filter publications">
+        <label class="filters__year">
+          <span class="filters__label">Year</span>
+          <select data-filter-year>
+            <option value="">All years</option>
+            {years.map((y) => <option value={y}>{y}</option>)}
+          </select>
+        </label>
+        {
+          themes.length > 0 && (
+            <div class="filters__themes">
+              <span class="filters__label" id="theme-filter-label">
+                Theme
+              </span>
+              <div class="chips" role="group" aria-labelledby="theme-filter-label">
+                {themes.map((t) => (
+                  <button type="button" class="fchip" aria-pressed="false" data-filter-topic={t.id}>
+                    {t.data.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </div>
+      <p class="status" aria-live="polite">
+        <span data-status></span>
+        <button type="button" class="linkbtn" data-clear hidden>Clear filters</button>
+      </p>
+    </div>
+
+    {
+      groups.map((g) => (
+        <section class="panel" id={`panel-${g.id}`} data-panel={g.id} aria-labelledby={`h-${g.id}`}>
+          <h2 class="panel__title" id={`h-${g.id}`}>
+            {g.label} <span class="panel__count">{g.items.length}</span>
+          </h2>
+          {g.byYear.map(([year, items]) => (
+            <section class="year" data-year-group={year} aria-labelledby={`y-${g.id}-${year}`}>
+              <h3 class="year__title" id={`y-${g.id}-${year}`}>
+                {year}
+              </h3>
+              <div class="year__items">
+                {items.map((p) => (
+                  <PublicationItem pub={p} variant="list" headingLevel="h4" badges />
+                ))}
+              </div>
+            </section>
+          ))}
+          <div class="empty" data-empty hidden>
+            <p>No {g.label.toLowerCase()} match these filters.</p>
+            <button type="button" class="linkbtn" data-clear-inline>
+              Clear filters
+            </button>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</PageLayout>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-pubs]');
+  if (root) {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+    const yearSel = root.querySelector<HTMLSelectElement>('[data-filter-year]')!;
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-filter-topic]')];
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const clear = root.querySelector<HTMLButtonElement>('[data-clear]')!;
+    const ids = tabs.map((t) => t.dataset.tab!);
+    const labels = Object.fromEntries(tabs.map((t) => [t.dataset.tab!, t.dataset.label!]));
+    let active = ids[0]!;
+
+    root.classList.add('is-enhanced');
+    panels.forEach((p) => {
+      p.setAttribute('role', 'tabpanel');
+      p.setAttribute('aria-labelledby', `tab-${p.dataset.panel}`);
+      p.tabIndex = 0;
+    });
+
+    function select(id: string, opts: { focus?: boolean; hash?: boolean } = {}) {
+      if (!ids.includes(id)) return;
+      active = id;
+      tabs.forEach((t) => {
+        const on = t.dataset.tab === id;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        if (on && opts.focus) t.focus();
+        if (on) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      });
+      panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
+      if (opts.hash) history.replaceState(null, '', `#${id}`);
+      apply();
+    }
+
+    function apply() {
+      const year = yearSel.value;
+      const topics = chips.filter((c) => c.getAttribute('aria-pressed') === 'true').map((c) => c.dataset.filterTopic!);
+      const filtered = Boolean(year) || topics.length > 0;
+      const counts: Record<string, number> = {};
+      for (const panel of panels) {
+        let shown = 0;
+        for (const group of panel.querySelectorAll<HTMLElement>('[data-year-group]')) {
+          let inYear = 0;
+          for (const item of group.querySelectorAll<HTMLElement>('[data-pub]')) {
+            const itemTopics = (item.dataset.topics ?? '').split(' ');
+            const ok = (!year || item.dataset.year === year) && (!topics.length || topics.some((t) => itemTopics.includes(t)));
+            item.hidden = !ok;
+            if (ok) inYear++;
+          }
+          group.hidden = inYear === 0;
+          shown += inYear;
+        }
+        counts[panel.dataset.panel!] = shown;
+        panel.querySelector<HTMLElement>('[data-empty]')!.hidden = shown > 0;
+      }
+      for (const [id, n] of Object.entries(counts)) {
+        const el = root!.querySelector<HTMLElement>(`[data-count="${id}"]`);
+        if (el) el.textContent = String(n);
+      }
+      const total = root!.querySelectorAll(`[data-panel="${active}"] [data-pub]`).length;
+      const what = labels[active]!.toLowerCase();
+      status.textContent = filtered ? `Showing ${counts[active]} of ${total} ${what}` : `${total} ${what}`;
+      clear.hidden = !filtered;
+    }
+
+    function reset() {
+      yearSel.value = '';
+      chips.forEach((c) => c.setAttribute('aria-pressed', 'false'));
+      apply();
+    }
+
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t.dataset.tab!, { hash: true }));
+      t.addEventListener('keydown', (e) => {
+        const n = tabs.length;
+        const to =
+          e.key === 'ArrowRight' ? (i + 1) % n : e.key === 'ArrowLeft' ? (i - 1 + n) % n : e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : -1;
+        if (to < 0) return;
+        e.preventDefault();
+        select(tabs[to]!.dataset.tab!, { focus: true, hash: true });
+      });
+    });
+    yearSel.addEventListener('change', apply);
+    chips.forEach((c) =>
+      c.addEventListener('click', () => {
+        c.setAttribute('aria-pressed', String(c.getAttribute('aria-pressed') !== 'true'));
+        apply();
+      }),
+    );
+    clear.addEventListener('click', reset);
+    root.querySelectorAll('[data-clear-inline]').forEach((b) => b.addEventListener('click', reset));
+
+    const fromHash = () => location.hash.slice(1);
+    window.addEventListener('hashchange', () => select(fromHash()));
+    select(ids.includes(fromHash()) ? fromHash() : active);
+  }
+</script>
+
+<style>
+  .profiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+  }
+  .profiles a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-weight: 550;
+    text-decoration: none;
+  }
+  .profiles a:hover {
+    text-decoration: underline;
+  }
+
+  .pubs {
+    max-width: 58rem;
+  }
+
+  /* ── Controls (only with JS) ── */
+  :global(html:not(.js)) .controls {
+    display: none;
+  }
+  .controls {
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+  .tabs {
+    display: flex;
+    gap: var(--space-1);
+    border-bottom: 1px solid var(--color-border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* let the focus ring and the selected underline breathe */
+    padding-top: 3px;
+    margin-inline: -3px;
+    padding-inline: 3px;
+  }
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .tab {
+    position: relative; /* keeps the visually-hidden count brackets inside the scroll box */
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: -1px;
+    padding: 0.65rem 0.9rem 0.7rem;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      color var(--duration) var(--ease),
+      border-color var(--duration) var(--ease);
+  }
+  .tab:first-child {
+    padding-left: 0.25rem;
+  }
+  .tab:hover {
+    color: var(--color-text);
+  }
+  .tab[aria-selected='true'] {
+    color: var(--color-text);
+    border-bottom-color: var(--color-accent);
+  }
+  .tab__count {
+    min-width: 1.6em;
+    padding: 0.05em 0.45em;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-2);
+    color: var(--color-text-faint);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+  .tab[aria-selected='true'] .tab__count {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+  }
+  .filters__label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .filters__year {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .filters__year select {
+    appearance: none;
+    min-height: 2.1rem;
+    padding: 0.3rem 2rem 0.3rem 0.8rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    background: var(--color-surface)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393a3ab' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E")
+      no-repeat right 0.6rem center / 1rem;
+    color: var(--color-text);
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+  .filters__themes {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    min-width: 0;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .fchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: 2.1rem;
+    padding: 0.3rem 0.85rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background var(--duration) var(--ease),
+      border-color var(--duration) var(--ease),
+      color var(--duration) var(--ease);
+  }
+  .fchip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+  .fchip[aria-pressed='true'] {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  .fchip[aria-pressed='true']::before {
+    content: '';
+    width: 0.8em;
+    height: 0.8em;
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
+  }
+  .linkbtn {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-accent);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+  .linkbtn[hidden] {
+    display: none;
+  }
+
+  /* ── Panels ── */
+  .panel + .panel {
+    margin-top: var(--space-8);
+  }
+  .is-enhanced .panel + .panel {
+    margin-top: 0;
+  }
+  .panel:focus-visible {
+    outline-offset: 6px;
+  }
+  .panel__title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+  .panel__count {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-faint);
+  }
+  /* With tabs the panel heading is redundant visually (kept for screen readers). */
+  .is-enhanced .panel__title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .year {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+  .year[hidden] {
+    display: none;
+  }
+  .year__title {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-3));
+    align-self: start;
+    padding-top: var(--space-5);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--color-accent);
+  }
+  .year__items :global(.pub:first-child) {
+    padding-top: var(--space-5);
+  }
+  .year__items :global(.pub:last-child) {
+    border-bottom: 0;
+  }
+  .year__items :global(.pub[hidden]) {
+    display: none;
+  }
+  .empty {
+    padding: var(--space-7) var(--space-4);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-md);
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+  .empty[hidden] {
+    display: none;
+  }
+  .empty p {
+    margin-bottom: var(--space-2);
+  }
+
+  @media (max-width: 40rem) {
+    .filters {
+      display: grid;
+      gap: var(--space-3);
+    }
+    .filters__themes {
+      display: grid;
+      gap: var(--space-2);
+    }
+    .year {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    .year__title {
+      position: static;
+      padding-top: var(--space-4);
+      font-size: var(--text-md);
+    }
+    .year__items :global(.pub:first-child) {
+      padding-top: var(--space-3);
+    }
+  }
+</style>

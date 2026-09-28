@@ -1,0 +1,119 @@
+---
+/**
+ * A button that copies text to the clipboard: the text content of the element with id `from`
+ * (typically a <template> or <pre>). Shows "Copied" for a moment; announces it to screen readers.
+ * Hidden when JavaScript is off (it can't work without it).
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  /** id of the element whose text is copied (a <template> works). */
+  from: string;
+  label?: string;
+  /** What is being copied, for screen readers: "BibTeX for <title>". */
+  srLabel?: string;
+  class?: string;
+}
+const { from, label = 'Copy', srLabel, class: className } = Astro.props;
+---
+
+<button type="button" class:list={['copy-btn', className]} data-copy-from={from} aria-label={srLabel}>
+  <span class="copy-btn__idle"><Icon name="copy" size={13} /> {label}</span>
+  <span class="copy-btn__done" aria-hidden="true"><Icon name="check" size={13} /> Copied</span>
+</button>
+
+<script>
+  async function copyText(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Fallback for older browsers / non-secure contexts.
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      ta.remove();
+      return ok;
+    }
+  }
+
+  let live: HTMLElement | undefined;
+  function announce(msg: string) {
+    if (!live) {
+      live = document.createElement('div');
+      live.className = 'visually-hidden';
+      live.setAttribute('aria-live', 'polite');
+      document.body.appendChild(live);
+    }
+    live.textContent = '';
+    requestAnimationFrame(() => (live!.textContent = msg));
+  }
+
+  document.addEventListener('click', async (e) => {
+    const btn = (e.target as Element | null)?.closest<HTMLButtonElement>('[data-copy-from]');
+    if (!btn) return;
+    const src = document.getElementById(btn.dataset.copyFrom!);
+    if (!src) return;
+    const text = (src instanceof HTMLTemplateElement ? src.content.textContent : src.textContent) ?? '';
+    const ok = await copyText(text.trim());
+    btn.dataset.state = ok ? 'done' : 'error';
+    announce(ok ? 'Copied to clipboard' : 'Copy failed. Select the text and copy it manually.');
+    window.setTimeout(() => delete btn.dataset.state, 1800);
+  });
+</script>
+
+<style>
+  .copy-btn {
+    display: inline-grid;
+    align-items: center;
+    padding: 0.2rem 0.65rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: inherit;
+    cursor: pointer;
+  }
+  :global(html:not(.js)) .copy-btn {
+    display: none;
+  }
+  .copy-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  /* Both labels share one grid cell so the width never jumps. */
+  .copy-btn > span {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    justify-content: center;
+    transition: opacity var(--duration) var(--ease);
+  }
+  .copy-btn__done {
+    opacity: 0;
+    color: var(--color-accent);
+  }
+  .copy-btn[data-state='done'] {
+    border-color: var(--color-accent);
+  }
+  .copy-btn[data-state='done'] .copy-btn__idle {
+    opacity: 0;
+  }
+  .copy-btn[data-state='done'] .copy-btn__done {
+    opacity: 1;
+  }
+</style>

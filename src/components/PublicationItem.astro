@@ -1,22 +1,47 @@
 ---
+/**
+ * One publication in a list: title (→ its page on this site), authors (me in bold), venue,
+ * link buttons (DOI, PDF, Code, Data, Slides, Copy BibTeX) and optional citation badges.
+ *
+ * variant="default": year in a left column (home page, research theme pages).
+ * variant="list":    no year column (the /publications/ list has year headings); carries
+ *                    data-* attributes used by the tab/filter script.
+ */
 import type { Publication } from '../lib/bibtex';
+import { groupOf, venueDetails } from '../lib/bibtex';
+import CopyButton from './CopyButton.astro';
 import Icon from './Icon.astro';
+import PubBadges from './PubBadges.astro';
 
 interface Props {
   pub: Publication;
   headingLevel?: 'h3' | 'h4';
+  variant?: 'default' | 'list';
+  /** Show Altmetric / Dimensions badges (if enabled in site.config.yaml and the paper has a DOI). */
+  badges?: boolean;
 }
-const { pub, headingLevel: H = 'h3' } = Astro.props;
-const doiUrl = pub.doi ? `https://doi.org/${pub.doi}` : pub.url;
-const details = [pub.volume && (pub.issue ? `${pub.volume}(${pub.issue})` : pub.volume), pub.pages].filter(Boolean).join(', ');
+const { pub, headingLevel: H = 'h3', variant = 'default', badges = false } = Astro.props;
+const details = venueDetails(pub);
+const bibId = `bib-${pub.key}`;
+const hasBadges = badges && Boolean(pub.doi);
+const links = [
+  pub.pdf && { href: pub.pdf, label: 'PDF', icon: 'file' as const },
+  pub.code && { href: pub.code, label: 'Code', icon: 'github' as const },
+  pub.data && { href: pub.data, label: 'Data', icon: 'data' as const },
+  pub.slides && { href: pub.slides, label: 'Slides', icon: 'slides' as const },
+].filter((l): l is { href: string; label: string; icon: 'file' | 'github' | 'data' | 'slides' } => Boolean(l));
 ---
 
-<article class="pub">
-  <div class="pub__year" aria-hidden="true">{pub.year}</div>
+<article
+  class:list={['pub', `pub--${variant}`, { 'pub--badges': hasBadges }]}
+  data-pub={variant === 'list' ? pub.key : undefined}
+  data-year={variant === 'list' ? pub.year : undefined}
+  data-topics={variant === 'list' ? pub.topics.join(' ') : undefined}
+  data-group={variant === 'list' ? groupOf(pub) : undefined}
+>
+  {variant === 'default' && <div class="pub__year" aria-hidden="true">{pub.year}</div>}
   <div class="pub__body">
-    <H class="pub__title">
-      {doiUrl ? <a href={doiUrl}>{pub.title}</a> : pub.title}
-    </H>
+    <H class="pub__title"><a href={pub.href} set:html={pub.titleHtml} /></H>
     <p class="pub__authors">
       {
         pub.authors.map((a, i) => (
@@ -29,9 +54,9 @@ const details = [pub.volume && (pub.issue ? `${pub.volume}(${pub.issue})` : pub.
     </p>
     <p class="pub__venue">
       {pub.venue && <em>{pub.venue}</em>}{details && <span>, {details}</span>}
-      <span class="visually-hidden"> ({pub.year})</span>
+      {variant === 'default' ? <span class="visually-hidden"> ({pub.year})</span> : <span>, {pub.year}</span>}
     </p>
-    <p class="pub__actions">
+    <div class="pub__actions">
       {
         pub.doi && (
           <a class="pub__btn" href={`https://doi.org/${pub.doi}`}>
@@ -39,26 +64,41 @@ const details = [pub.volume && (pub.issue ? `${pub.volume}(${pub.issue})` : pub.
           </a>
         )
       }
-      {pub.pdf && <a class="pub__btn" href={pub.pdf}>PDF</a>}
       {
-        pub.code && (
-          <a class="pub__btn" href={pub.code}>
-            <Icon name="github" size={13} /> Code
+        !pub.doi && pub.url && pub.url !== pub.pdf && (
+          <a class="pub__btn" href={pub.url}>
+            <Icon name="external" size={13} /> Link
           </a>
         )
       }
-      {pub.data && <a class="pub__btn" href={pub.data}>Data</a>}
-    </p>
+      {
+        links.map((l) => (
+          <a class="pub__btn" href={l.href}>
+            <Icon name={l.icon} size={13} /> {l.label}
+          </a>
+        ))
+      }
+      <CopyButton from={bibId} label="BibTeX" srLabel={`Copy BibTeX for “${pub.title}”`} />
+      <template id={bibId} set:text={pub.bibtexClean} />
+    </div>
   </div>
+  {hasBadges && <PubBadges doi={pub.doi} class="pub__badges" />}
 </article>
 
 <style>
   .pub {
     display: grid;
-    grid-template-columns: 4.5rem 1fr;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
     gap: var(--space-4);
     padding-block: var(--space-5);
     border-bottom: 1px solid var(--color-border);
+  }
+  .pub--list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pub--list.pub--badges {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-5);
   }
   .pub:first-child {
     padding-top: var(--space-2);
@@ -78,6 +118,7 @@ const details = [pub.volume && (pub.issue ? `${pub.volume}(${pub.issue})` : pub.
     line-height: var(--leading-snug);
     letter-spacing: 0;
     text-wrap: pretty;
+    overflow-wrap: anywhere;
   }
   .pub__title a {
     color: var(--color-text);
@@ -106,15 +147,14 @@ const details = [pub.volume && (pub.issue ? `${pub.volume}(${pub.issue})` : pub.
   .pub__venue {
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+    overflow-wrap: anywhere;
   }
   .pub__actions {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: var(--space-2);
     margin-top: var(--space-3);
-  }
-  .pub__actions:empty {
-    display: none;
   }
   .pub__btn {
     display: inline-flex;
@@ -133,10 +173,20 @@ const details = [pub.volume && (pub.issue ? `${pub.volume}(${pub.issue})` : pub.
     border-color: var(--color-accent);
     color: var(--color-accent);
   }
+  .pub :global(.pub__badges) {
+    padding-top: 0.2rem;
+  }
   @media (max-width: 40rem) {
     .pub {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       gap: var(--space-1);
+    }
+    .pub--list.pub--badges {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pub :global(.pub__badges) {
+      margin-top: var(--space-3);
+      padding-top: 0;
     }
     .pub__year {
       font-size: var(--text-sm);

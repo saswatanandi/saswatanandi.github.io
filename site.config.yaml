@@ -54,6 +54,14 @@ metrics:
   source: Google Scholar
   updated: null          # TODO(Saswata): date you copied the numbers, e.g. 2026-09-01
 
+# Publications page (/publications/ and each paper's page).
+# Badges load from Altmetric / Dimensions only for papers with a DOI; empty ones hide themselves.
+# Set to false to switch a badge off everywhere.
+publications:
+  badges:
+    altmetric: true
+    dimensions: true
+
 # Source repository (footer link + "edit" links later).
 repo: https://github.com/saswatanandi/saswatanandi.github.io
 

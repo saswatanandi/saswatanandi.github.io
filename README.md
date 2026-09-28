@@ -8,7 +8,7 @@ Personal academic website of **Saswata Nandi** — built with [Astro](https://as
 | ------------------------------------- | -------------------------------------- |
 | Name, title, affiliation, bio, links, nav, citation metrics, analytics | `site.config.yaml` |
 | News on the home page                 | `src/data/news.yaml`                   |
-| Publications (and "selected" on home) | `src/data/publications.bib` (`selected = {true}`) |
+| Publications (list, paper pages, home "Selected") | `src/data/publications.bib` — see below |
 | Software cards / IMDLIB stats         | `src/data/software.yaml`               |
 | Reading list                          | `src/data/reading.yaml` (+ notes in `src/content/reading/notes/`) |
 | Research themes (text, picture) | `src/content/research/<slug>.md` — see below |
@@ -18,6 +18,44 @@ Personal academic website of **Saswata Nandi** — built with [Astro](https://as
 
 Every file is validated at build time: a typo produces an error naming the file and field
 (see the "Build" step log in the Actions tab). Set `draft: true` to hide an item on the live site.
+
+## Publications
+
+Everything comes from **one file, `src/data/publications.bib`**. `/publications/` (tabs by type, year and
+theme filters), each paper's page `/publications/<key>/`, "Selected papers" on the home page, the theme
+pages and the CV all read from it.
+
+**Add a paper:**
+
+1. Get its BibTeX from Google Scholar (Cite → BibTeX), Zotero, or `https://doi.org/<doi>`
+   (for example `curl -LH "Accept: application/x-bibtex" https://doi.org/10.1029/…`).
+2. Paste it into `publications.bib` and add:
+   - `pubtype = {journal}`: sets the tab. `journal` (Journal articles), `chapter` (Book chapters),
+     `proceedings` (Conference papers), `abstract` or `talk` (Talks & abstracts).
+   - `topic = {fire-and-water, climate-extremes}`: research themes (file names in `src/content/research/`).
+   - optional: `selected = {true}` (home page), `pdf`, `code`, `data`, `slides` (links become buttons),
+     `summary` (plain-language sentence), `abstract`, `image` + `image_alt` (a figure in `public/`).
+3. Commit. The key (e.g. `nandi2024imdlib`) becomes the page URL, so keep it once published.
+
+A ready-to-copy example is in `templates/new-paper.bib`, and the header of `publications.bib` explains
+every field. Your name is bolded automatically (last name "Nandi", first initial "S", set in `src/lib/bibtex.ts`).
+"Copy BibTeX" gives visitors the entry without the site-only fields (`pubtype`, `topic`, `abstract`, …).
+Each paper page carries Google Scholar `citation_*` tags and schema.org data.
+
+**Badges:** papers with a DOI show an Altmetric donut and a Dimensions citation badge. They load from
+those services only when scrolled into view, and empty ones hide themselves. Switch them off in
+`site.config.yaml`:
+
+```yaml
+publications:
+  badges:
+    altmetric: true    # false = off
+    dimensions: true
+```
+
+The citations / h-index / i10 numbers at the top of `/publications/` (and on the home page) are the
+`metrics:` block in `site.config.yaml`, entered by hand. `docs/publications-notes.md` lists what to check
+after the conversion from `publication.txt`.
 
 ## Research themes
 

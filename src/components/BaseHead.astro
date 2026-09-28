@@ -23,10 +23,19 @@ export interface Props {
   noindex?: boolean;
   /** Extra JSON-LD objects for this page. */
   jsonLd?: Record<string, unknown>[];
+  /** Extra <meta name=… content=…> tags (e.g. Google Scholar citation_* tags); repeated names allowed. */
+  meta?: { name: string; content: string }[];
 }
 
-const { title, description = site.description, image = '/og-default.png', type = 'website', noindex = false, jsonLd = [] } =
-  Astro.props;
+const {
+  title,
+  description = site.description,
+  image = '/og-default.png',
+  type = 'website',
+  noindex = false,
+  jsonLd = [],
+  meta = [],
+} = Astro.props;
 
 const fullTitle = title ? `${title} · ${site.name}` : `${site.name} | ${site.role.split('·')[0]!.trim()}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -116,6 +125,8 @@ const themeScript = `(function(){var d=document.documentElement;d.classList.add(
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={imageUrl} />
+
+{meta.map((m) => <meta name={m.name} content={m.content} />)}
 
 {[person, ...jsonLd].map((obj) => <script type="application/ld+json" is:inline set:html={JSON.stringify(obj)} />)}
 

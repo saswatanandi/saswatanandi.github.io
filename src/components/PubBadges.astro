@@ -1,0 +1,114 @@
+---
+/**
+ * Altmetric donut + Dimensions citation badge for a DOI.
+ * Switched on/off in site.config.yaml → publications.badges.
+ * The third-party scripts load only when a badge scrolls near the viewport (once per page),
+ * and each badge sits in a fixed-size box so nothing jumps when they appear.
+ * Badges with no mentions / no citations hide themselves.
+ */
+import { site } from '../lib/config';
+
+interface Props {
+  doi?: string;
+  class?: string;
+}
+const { doi, class: className } = Astro.props;
+const { altmetric, dimensions } = site.publications.badges;
+const show = Boolean(doi) && (altmetric || dimensions);
+---
+
+{
+  show && (
+    <div class:list={['pub-badges', className]} data-pub-badges>
+      {altmetric && (
+        <div class="pub-badges__slot">
+          <div
+            class="altmetric-embed"
+            data-badge-type="donut"
+            data-badge-popover="left"
+            data-doi={doi}
+            data-hide-no-mentions="true"
+            data-link-target="_blank"
+          />
+        </div>
+      )}
+      {dimensions && (
+        <div class="pub-badges__slot">
+          <span
+            class="__dimensions_badge_embed__"
+            data-doi={doi}
+            data-style="small_circle"
+            data-legend="hover-right"
+            data-hide-zero-citations="true"
+          />
+        </div>
+      )}
+    </div>
+  )
+}
+
+<script>
+  const SCRIPTS: Record<string, string> = {
+    altmetric: 'https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js',
+    dimensions: 'https://badge.dimensions.ai/badge.js',
+  };
+  let loaded = false;
+  function load() {
+    if (loaded) return;
+    loaded = true;
+    if (document.querySelector('.altmetric-embed')) inject(SCRIPTS.altmetric!);
+    if (document.querySelector('.__dimensions_badge_embed__')) inject(SCRIPTS.dimensions!);
+  }
+  function inject(src: string) {
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    document.body.appendChild(s);
+  }
+  const boxes = document.querySelectorAll('[data-pub-badges]');
+  if (boxes.length) {
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io.disconnect();
+            load();
+          }
+        },
+        { rootMargin: '300px 0px' },
+      );
+      boxes.forEach((b) => io.observe(b));
+    } else {
+      load();
+    }
+  }
+</script>
+
+<style>
+  .pub-badges {
+    display: flex;
+    gap: var(--space-2);
+    align-items: flex-start;
+  }
+  /* Fixed boxes: reserve the space the badges will take (64px donut, 56px circle). */
+  .pub-badges__slot {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    overflow: visible;
+  }
+  .pub-badges__slot :global(.altmetric-embed),
+  .pub-badges__slot :global(.__dimensions_badge_embed__) {
+    line-height: 0;
+  }
+  /* A badge with no mentions/citations hides itself (inline display:none): drop its slot too. */
+  .pub-badges__slot:has(> .altmetric-hidden),
+  .pub-badges__slot:has(> [style*='none']),
+  .pub-badges__slot:has(> .__dimensions_badge_embed__[data-dimensions-badge-installed]:empty) {
+    display: none;
+  }
+  :global(html:not(.js)) .pub-badges {
+    display: none;
+  }
+</style>

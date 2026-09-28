@@ -109,6 +109,17 @@ export const siteConfigSchema = z
       })
       .strict()
       .prefault({}),
+    /** /publications/ settings. */
+    publications: z
+      .object({
+        /** Altmetric donut / Dimensions citation badge next to papers with a DOI (loaded lazily from their servers). */
+        badges: z
+          .object({ altmetric: z.boolean().default(true), dimensions: z.boolean().default(true) })
+          .strict()
+          .prefault({}),
+      })
+      .strict()
+      .prefault({}),
     repo: optionalUrl,
     analytics: z
       .object({
