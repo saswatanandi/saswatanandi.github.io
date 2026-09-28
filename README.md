@@ -43,6 +43,9 @@ The CWIS workflow on theme 2 is an HTML component (`image: cwis-pipeline`,
 wording in `src/components/research/CwisPipeline.astro`); replace it with an image file name the same way.
 `collaborators` and `funding` are optional; empty ones are hidden. (`feature` is kept as data but not shown.)
 
+The theme-2 model-chain drawing is generated: `node scripts/figures/make-india-svg.mjs` rewrites
+`src/assets/research/model-chain-india{,.narrow}.svg`.
+
 ## Local development
 
 ```sh
