@@ -44,12 +44,16 @@ export const blogSchema = z
   })
   .strict();
 
+/**
+ * A longer note on a paper in reading.yaml: src/content/reading/notes/<slug>.md,
+ * linked from the entry with `note: <slug>`. The paper reference comes from the entry.
+ */
 export const readingNoteSchema = z
   .object({
-    title: z.string().min(1),
-    date: z.coerce.date(),
-    /** Id of the matching entry in reading.yaml (optional). */
-    entry: z.string().optional(),
+    /** Optional heading; defaults to the paper title. */
+    title: z.string().min(1).optional(),
+    /** When you wrote the note (optional). */
+    date: z.coerce.date().optional(),
     tags,
     draft: z.boolean().default(false),
   })
@@ -148,13 +152,17 @@ export const newsSchema = z
 export const readingSchema = z
   .object({
     title: z.string().min(1),
+    /** As you want them shown, e.g. "Beven, K." or "Smith, J., Lee, K. and Rao, P." */
     authors: z.string().min(1),
-    journal: z.string().optional(),
-    year: z.number().int().min(1800).max(2100),
+    /** Journal (or book, preprint server, report series). */
+    venue: z.string().min(1).optional(),
+    year: z.number({ error: 'year must be a number like 2024 (no quotes)' }).int().min(1800).max(2100),
     doi: z
       .string()
+      .trim()
       .regex(/^10\.\d{4,9}\/\S+$/, 'doi should look like 10.1029/2024WR012345 (no https://doi.org/ prefix)')
       .optional(),
+    /** Link used when there is no DOI (preprint, report). */
     url: url.optional(),
     /** When you read it: YYYY-MM. */
     read: yearMonth,
@@ -162,29 +170,94 @@ export const readingSchema = z
     topics: z.array(topic).default([]),
     /** One line: why it is worth reading. */
     why: z.string().min(1),
-    /** Slug of a longer note in src/content/reading/notes/ (optional). */
-    note: z.string().optional(),
+    /** Slug of a longer note: src/content/reading/notes/<slug>.md (optional). */
+    note: z
+      .string()
+      .trim()
+      .regex(/^[a-z0-9-]+$/, 'note is the note file name without .md, e.g. beven-2006 (lowercase, digits, hyphens)')
+      .optional(),
     draft: z.boolean().default(false),
   })
   .strict();
 
+/** Text of a software detail page (src/content/software/<slug>.md). Facts live in software.yaml. */
+export const softwarePageSchema = z
+  .object({
+    /** Last time you checked the page against the current release (shown at the bottom). */
+    updated: z.coerce.date().optional(),
+    /** Longer text for search engines (defaults to the tagline). */
+    description: z.string().max(300).optional(),
+  })
+  .strict();
+
+const doi = z
+  .string()
+  .trim()
+  .regex(/^10\.\d{4,9}\/\S+$/, 'doi should look like 10.1016/j.envsoft.2023.105869 (no https://doi.org/ prefix)');
+
 export const softwareSchema = z
   .object({
     name: z.string().min(1),
-    repo: url,
+    /** URL part for the detail page (/software/<slug>/). Defaults to the name in lowercase. */
+    slug: z
+      .string()
+      .regex(/^[a-z0-9-]+$/, 'slug: lowercase letters, digits and hyphens only')
+      .optional(),
+    /** One short line under the name. */
+    tagline: z.string().min(1).optional(),
     description: z.string().min(1),
-    language: z.string().optional(),
-    pypi: z.string().optional(),
-    conda: z.string().optional(),
+    repo: url.optional(),
     docs: url.optional(),
-    paper_doi: z.string().optional(),
-    /** Short usage example shown on the featured card (plain text; lines starting with # are comments). */
-    snippet: z.string().optional(),
-    /** Manual stats (no API calls at build time). null = unknown. */
-    stars: z.number().int().nonnegative().nullable().default(null),
-    downloads: z.number().int().nonnegative().nullable().default(null),
-    stats_updated: z.coerce.date().nullable().optional(),
+    /** PyPI package name, e.g. imdlib. */
+    pypi: z.string().optional(),
+    /** conda channel and package, e.g. conda-forge/imdlib. */
+    conda: z
+      .string()
+      .regex(/^[\w.-]+\/[\w.-]+$/, 'conda should look like conda-forge/imdlib (channel/package)')
+      .optional(),
+    /** A project website that is not the repository or the docs (a dashboard, a lab page). */
+    website: url.optional(),
+    language: z.string().optional(),
+    license: z.string().optional(),
+    /** Latest released version, shown as a badge (entered by hand). */
+    version: z.string().optional(),
+    /** Short status word shown as a badge, e.g. "Active" (optional). */
+    status: z.string().optional(),
+    /** Position on /software/ (1 = first). */
+    order: z.number().int().default(99),
     featured: z.boolean().default(false),
+    /** true = a detail page /software/<slug>/ from src/content/software/<slug>.md */
+    page: z.boolean().default(false),
+    /** Install commands shown on cards, one per line, e.g. "pip install imdlib". */
+    install: z.array(z.string().min(1)).default([]),
+    /** Short usage example on the featured card (lines starting with # are comments). */
+    snippet: z.string().optional(),
+    /** Manual stats (no API calls at build time). null = hidden. */
+    stats: z
+      .object({
+        stars: z.number().int().nonnegative().nullable().default(null),
+        downloads: z.number().int().nonnegative().nullable().default(null),
+        /** What the downloads number counts, e.g. "PyPI downloads". */
+        downloads_label: z.string().default('downloads'),
+        /** When you copied the numbers: YYYY-MM-DD. */
+        as_of: z.coerce.date({ error: 'as_of must look like 2026-09-28' }).nullable().default(null),
+      })
+      .strict()
+      .default({ stars: null, downloads: null, downloads_label: 'downloads', as_of: null }),
+    /** How to cite: text (Markdown allowed) and the DOI of the paper. */
+    citation: z
+      .object({
+        text: z.string().min(1),
+        doi: doi.optional(),
+        /** Key in publications.bib, links to /publications/<key>/. */
+        bib: z.string().optional(),
+        /** DOI of the archived software (e.g. Zenodo), optional. */
+        software_doi: doi.optional(),
+      })
+      .strict()
+      .optional(),
+    /** Extra links for the detail page, e.g. a video tutorial. */
+    links: z.array(z.object({ label: z.string().min(1), url }).strict()).default([]),
     tags,
   })
   .strict();

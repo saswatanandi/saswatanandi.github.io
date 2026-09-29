@@ -1,9 +1,9 @@
 ---
-title: Example reading note (copy me)
-date: 2026-09-27
-entry: a-manifesto-for-the-equifinality-thesis
+# A longer note on a paper in src/data/reading.yaml.
+# The file name (here example-note) goes in the entry's `note:` field.
+# The paper's title, authors and link come from that entry.
 tags: [example]
 draft: true
 ---
 
-Longer notes on a paper from `src/data/reading.yaml` go here. Link the entry with `note: example-note`.
+Write the note here in Markdown. Headings (`##`), lists, links, code and quotes all work.

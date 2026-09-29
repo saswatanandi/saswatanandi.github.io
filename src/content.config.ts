@@ -7,6 +7,7 @@ import {
   readingNoteSchema,
   readingSchema,
   researchSchema,
+  softwarePageSchema,
   softwareSchema,
 } from './schemas/content';
 
@@ -22,6 +23,12 @@ const blog = defineCollection({
 const readingNotes = defineCollection({
   loader: glob({ base: './src/content/reading/notes', pattern: '**/*.md' }),
   schema: readingNoteSchema,
+});
+
+/** Detail pages for software.yaml items with `page: true`: src/content/software/<slug>.md */
+const softwarePages = defineCollection({
+  loader: glob({ base: './src/content/software', pattern: '*.md' }),
+  schema: softwarePageSchema,
 });
 
 /** Research themes: src/content/research/<slug>.md */
@@ -50,4 +57,4 @@ const software = defineCollection({
   schema: softwareSchema,
 });
 
-export const collections = { blog, readingNotes, research, news, reading, software };
+export const collections = { blog, readingNotes, research, news, reading, software, softwarePages };

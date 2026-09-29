@@ -1,0 +1,144 @@
+---
+/** A longer note on a paper: /reading/<note>/, text from src/content/reading/notes/<note>.md. */
+import type { GetStaticPaths } from 'astro';
+import { render, type CollectionEntry } from 'astro:content';
+import Icon from '../../components/Icon.astro';
+import CodeCopy from '../../components/blog/CodeCopy.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getReadingNotes, readingHref } from '../../lib/collections';
+import { formatDate, formatYearMonth, isoDate } from '../../lib/format';
+
+export const getStaticPaths = (async () => {
+  const pairs = await getReadingNotes();
+  return pairs.map(({ entry, note }) => ({ params: { slug: note.id }, props: { entry, note } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  entry: CollectionEntry<'reading'>;
+  note: CollectionEntry<'readingNotes'>;
+}
+const { entry, note } = Astro.props;
+const r = entry.data;
+const { Content } = await render(note);
+const href = readingHref(entry);
+const tags = [...new Set([...r.tags, ...note.data.tags])];
+---
+
+<PageLayout
+  title={note.data.title ?? r.title}
+  eyebrow="Reading"
+  eyebrowHref="/reading/"
+  description={r.why}
+  ridges={9}
+  narrow
+>
+  <Fragment slot="header">
+    <div class="ref">
+      {note.data.title && <p class="ref__title">{r.title}</p>}
+      <p class="ref__src">
+        {r.authors}
+        {r.venue && (
+          <>
+            {' · '}
+            <em>{r.venue}</em>
+          </>
+        )}
+        {' · '}
+        {r.year}
+      </p>
+      <p class="ref__meta">
+        {
+          href && (
+            <a class="btn" href={href}>
+              <Icon name={r.doi ? 'doi' : 'external'} /> {r.doi ? `doi:${r.doi}` : 'Read the paper'}
+            </a>
+          )
+        }
+        <span>Read {formatYearMonth(r.read)}</span>
+        {note.data.date && <time datetime={isoDate(note.data.date)}>· note written {formatDate(note.data.date)}</time>}
+      </p>
+    </div>
+  </Fragment>
+
+  <article class="article">
+    <p class="why"><span>Why read it:</span> {r.why}</p>
+    <div class="prose">
+      <Content />
+    </div>
+    {
+      tags.length > 0 && (
+        <ul role="list" class="tags" aria-label="Tags">
+          {tags.map((t) => (
+            <li>
+              <a class="chip" href={`/reading/?tag=${encodeURIComponent(t)}`}>
+                {t}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <p class="back">
+      <a class="more-link" href="/reading/"><span aria-hidden="true">←</span> All reading</a>
+    </p>
+  </article>
+  <CodeCopy />
+</PageLayout>
+
+<style>
+  .ref {
+    margin-top: var(--space-4);
+  }
+  .ref__title {
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: 600;
+  }
+  .ref__src {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+  }
+  .ref__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
+  }
+  .ref__meta .btn {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .article {
+    padding-bottom: var(--space-8);
+  }
+  .why {
+    margin-bottom: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    border-left: 3px solid var(--color-accent);
+    background: var(--color-accent-soft);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .why span {
+    font-weight: 600;
+  }
+  .prose {
+    font-size: var(--text-md);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-7);
+  }
+  .tags .chip {
+    text-decoration: none;
+  }
+  .back {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+</style>

@@ -223,14 +223,14 @@ const metrics = [
             </a>
           )}
           {latestReading && (
-            <a class="note-card" href="/reading/">
+            <a class="note-card" href={latestReading.data.note ? `/reading/${latestReading.data.note}/` : '/reading/'}>
               <span class="note-card__kind">
                 <Icon name="book" size={16} /> Recently read
               </span>
               <span class="note-card__title">{latestReading.data.title}</span>
               <span class="note-card__desc">{latestReading.data.why}</span>
               <span class="note-card__date">
-                {latestReading.data.authors} · {latestReading.data.journal ?? ''} {latestReading.data.year} · read{' '}
+                {[latestReading.data.authors, latestReading.data.venue, latestReading.data.year].filter(Boolean).join(' · ')} · read{' '}
                 {formatYearMonth(latestReading.data.read)}
               </span>
             </a>

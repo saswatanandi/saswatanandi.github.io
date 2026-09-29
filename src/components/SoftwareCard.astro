@@ -1,16 +1,30 @@
 ---
+/**
+ * A software card from src/data/software.yaml.
+ * `feature` = the large IMDLIB-style card with a code panel (home page and top of /software/).
+ */
 import type { CollectionEntry } from 'astro:content';
-import { compactNumber, formatMonth } from '../lib/format';
+import { compactNumber, formatDate } from '../lib/format';
+import CopyButton from './CopyButton.astro';
 import Icon from './Icon.astro';
 
 interface Props {
   item: CollectionEntry<'software'>;
-  /** Large showcase variant (home page feature). */
   feature?: boolean;
+  /** Heading level of the name: 2 on /software/, 3 under a section heading. */
+  level?: 2 | 3;
 }
-const { item, feature = false } = Astro.props;
+const { item, feature = false, level = 3 } = Astro.props;
 const s = item.data;
-// Tiny highlighter for the snippet: comments, prompts, strings, numbers, keywords.
+const Heading = level === 2 ? 'h2' : 'h3';
+const detail = s.page ? `/software/${item.id}/` : undefined;
+const badges = [s.language, s.license && `${s.license} license`, s.version && `v${s.version}`, s.status].filter(
+  (b): b is string => Boolean(b),
+);
+const stats = s.stats;
+const hasStats = stats.stars !== null || stats.downloads !== null;
+
+// Tiny highlighter for the code panel: comments, prompts, strings, numbers, keywords.
 const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const highlight = (line: string) => {
   if (/^\s*#/.test(line)) return `<span class="c">${esc(line)}</span>`;
@@ -22,39 +36,72 @@ const highlight = (line: string) => {
     .replace(/\b(\d+)\b/g, '<span class="n">$1</span>');
   return prompt + code;
 };
-const snippetHtml = s.snippet?.trimEnd().split('\n').map(highlight).join('\n');
+const firstInstall = s.install[0];
+const panel = [firstInstall && `$ ${firstInstall}`, firstInstall && s.snippet && '', s.snippet?.trimEnd()]
+  .filter((l): l is string => typeof l === 'string')
+  .join('\n');
+const panelHtml = panel ? panel.split('\n').map(highlight).join('\n') : '';
+const installId = `install-${item.id}`;
 ---
 
 <article class:list={['sw', { 'sw--feature': feature }]} aria-labelledby={`sw-${item.id}`}>
   <div class="sw__main">
-    <p class="sw__meta">
-      {s.featured && <span class="sw__badge">Featured</span>}
-      {s.language && <span>{s.language}</span>}
-      <span>Open source</span>
-    </p>
-    <h3 id={`sw-${item.id}`} class="sw__name">{s.name}</h3>
-    <p class="sw__desc">{s.description}</p>
     {
-      (s.stars !== null || s.downloads !== null) && (
+      badges.length > 0 && (
+        <ul role="list" class="sw__badges" aria-label="Details">
+          {badges.map((b) => (
+            <li>{b}</li>
+          ))}
+        </ul>
+      )
+    }
+    <Heading id={`sw-${item.id}`} class="sw__name">
+      {detail ? <a href={detail}>{s.name}</a> : s.name}
+    </Heading>
+    <p class="sw__desc">{s.description}</p>
+
+    {
+      !feature && firstInstall && (
+        <div class="sw__install">
+          <code id={installId}>{firstInstall}</code>
+          <CopyButton from={installId} srLabel={`Copy install command for ${s.name}`} />
+        </div>
+      )
+    }
+
+    {
+      hasStats && (
         <p class="sw__stats">
-          {s.stars !== null && (
+          {stats.stars !== null && (
             <span>
-              <Icon name="star" size={15} /> {compactNumber(s.stars)} stars
+              <Icon name="star" size={15} /> {compactNumber(stats.stars)} stars
             </span>
           )}
-          {s.downloads !== null && (
+          {stats.downloads !== null && (
             <span>
-              <Icon name="download" size={15} /> {compactNumber(s.downloads)} downloads
+              <Icon name="download" size={15} /> {stats.downloads.toLocaleString('en')} {stats.downloads_label}
             </span>
           )}
-          {s.stats_updated && <span class="sw__updated">as of {formatMonth(s.stats_updated)}</span>}
+          {stats.as_of && <span class="sw__asof">as of {formatDate(stats.as_of)}</span>}
         </p>
       )
     }
+
     <p class="sw__links">
-      <a class="btn btn--primary" href={s.repo}>
-        <Icon name="github" /> Repository
-      </a>
+      {
+        s.website && (
+          <a class:list={['btn', { 'btn--primary': !s.repo }]} href={s.website}>
+            <Icon name="external" /> Website
+          </a>
+        )
+      }
+      {
+        s.repo && (
+          <a class="btn btn--primary" href={s.repo}>
+            <Icon name="github" /> Repository
+          </a>
+        )
+      }
       {
         s.docs && (
           <a class="btn" href={s.docs}>
@@ -70,23 +117,40 @@ const snippetHtml = s.snippet?.trimEnd().split('\n').map(highlight).join('\n');
         )
       }
       {
-        s.paper_doi && (
-          <a class="btn" href={`https://doi.org/${s.paper_doi}`}>
+        s.citation?.doi && (
+          <a class="btn" href={`https://doi.org/${s.citation.doi}`}>
             <Icon name="quote" /> Paper
           </a>
         )
       }
     </p>
+    {
+      detail && (
+        <p class="sw__more">
+          <a class="more-link" href={detail}>
+            More about {s.name} <span aria-hidden="true">→</span>
+          </a>
+        </p>
+      )
+    }
   </div>
   {
-    feature && snippetHtml && (
+    feature && panelHtml && (
       <div class="sw__code">
-        <div class="sw__code-bar" aria-hidden="true">
-          <span />
-          <span />
-          <span />
+        <div class="sw__code-bar">
+          <span aria-hidden="true" class="sw__dots">
+            <span />
+            <span />
+            <span />
+          </span>
+          {firstInstall && (
+            <>
+              <template id={installId}>{firstInstall}</template>
+              <CopyButton from={installId} label="Copy install" srLabel={`Copy install command for ${s.name}`} class="sw__copy" />
+            </>
+          )}
         </div>
-        <pre tabindex="0" aria-label={`${s.name} usage example`}><code set:html={snippetHtml} /></pre>
+        <pre tabindex="0" aria-label={`${s.name} usage example`}><code set:html={panelHtml} /></pre>
       </div>
     )
   }
@@ -94,52 +158,90 @@ const snippetHtml = s.snippet?.trimEnd().split('\n').map(highlight).join('\n');
 
 <style>
   .sw {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: var(--space-5);
     padding: var(--space-5);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-sm);
+    min-width: 0;
+  }
+  .sw__main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
   }
   .sw--feature {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
     align-items: center;
     padding: var(--space-6);
     gap: var(--space-6);
   }
-  .sw__meta {
+  .sw__badges {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
-    align-items: center;
-    color: var(--color-text-faint);
-    font-size: var(--text-xs);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    gap: var(--space-2);
   }
-  .sw__badge {
-    padding: 0.15rem 0.55rem;
+  .sw__badges li {
+    padding: 0.1rem 0.55rem;
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-full);
-    background: var(--color-warm-soft);
-    color: var(--color-warm-text);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 550;
+    line-height: 1.6;
   }
   .sw__name {
-    margin-top: var(--space-2);
+    margin-top: var(--space-3);
+    font-size: var(--text-xl);
+    letter-spacing: -0.015em;
+  }
+  .sw--feature .sw__name {
     font-size: var(--text-2xl);
     letter-spacing: -0.02em;
   }
+  .sw__name a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .sw__name a:hover {
+    color: var(--color-accent);
+  }
   .sw__desc {
-    margin-top: var(--space-3);
+    margin-top: var(--space-2);
     color: var(--color-text-muted);
-    max-width: 52ch;
+    max-width: 58ch;
+  }
+  .sw__install {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    margin-top: var(--space-4);
+  }
+  .sw__install code {
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-2);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+  }
+  .sw__install code::before {
+    content: '$ ';
+    color: var(--color-text-faint);
+    user-select: none;
   }
   .sw__stats {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
-    margin-top: var(--space-3);
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-4);
     font-size: var(--text-sm);
     color: var(--color-text-muted);
   }
@@ -148,8 +250,9 @@ const snippetHtml = s.snippet?.trimEnd().split('\n').map(highlight).join('\n');
     align-items: center;
     gap: 0.35em;
   }
-  .sw__updated {
+  .sw__asof {
     color: var(--color-text-faint);
+    font-size: var(--text-xs);
   }
   .sw__links {
     display: flex;
@@ -157,7 +260,13 @@ const snippetHtml = s.snippet?.trimEnd().split('\n').map(highlight).join('\n');
     gap: var(--space-2);
     margin-top: var(--space-5);
   }
+  .sw__more {
+    margin-top: var(--space-4);
+  }
+
+  /* Code panel ------------------------------------------------------------- */
   .sw__code {
+    min-width: 0;
     overflow: hidden;
     border-radius: var(--radius-md);
     background: #13232b;
@@ -176,20 +285,36 @@ const snippetHtml = s.snippet?.trimEnd().split('\n').map(highlight).join('\n');
   }
   .sw__code-bar {
     display: flex;
-    gap: 6px;
-    padding: 0.7rem 0.9rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 0.5rem 0.6rem 0.5rem 0.9rem;
     border-bottom: 1px solid rgb(255 255 255 / 0.07);
   }
-  .sw__code-bar span {
+  .sw__dots {
+    display: flex;
+    gap: 6px;
+  }
+  .sw__dots span {
     width: 9px;
     height: 9px;
     border-radius: 50%;
     background: rgb(255 255 255 / 0.16);
   }
+  .sw__code :global(.sw__copy) {
+    border-color: rgb(255 255 255 / 0.18);
+    color: #b9c9cf;
+  }
+  .sw__code :global(.sw__copy:hover),
+  .sw__code :global(.sw__copy .copy-btn__done) {
+    border-color: #5dcaa5;
+    color: #5dcaa5;
+  }
   .sw__code pre {
     margin: 0;
     padding: var(--space-4) var(--space-5) var(--space-5);
     overflow-x: auto;
+    font-family: var(--font-mono);
     font-size: 0.84rem;
     line-height: 1.7;
   }

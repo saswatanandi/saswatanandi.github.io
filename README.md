@@ -90,6 +90,30 @@ rewrites `src/assets/research/climate-extremes{,.narrow}.svg` and `climate-extre
 Natural Earth (public domain, via `world-atlas`), state lines US Census (public domain, via `us-atlas`); the IVT
 and SST-anomaly fields are synthetic, drawn for illustration.
 
+## Reading
+
+`/reading/` lists papers from **`src/data/reading.yaml`**, grouped by the month you read them, with a tag filter.
+Until the file has a published entry, the page says "Nothing here yet".
+
+**Adding a paper to Reading:**
+
+1. Copy the block in `templates/reading-entry.yaml` to the top of `src/data/reading.yaml`.
+2. Fill in `title`, `authors`, `year`, `read` (e.g. `2026-10`), `why` (one line) and `tags`.
+   Add `venue` and `doi` (or `url`) if there are any. All fields are typed by hand; nothing is fetched.
+3. For a longer note, add `note: surname-2025` and write `src/content/reading/notes/surname-2025.md`
+   (front matter: optional `tags`, `date`, `title`; then Markdown). It appears at `/reading/surname-2025/`
+   and the entry gets a "Read note →" link.
+
+A `note:` with no matching file, or a note file that no entry links to, stops the build with a message.
+The newest entry also shows on the home page under "Blog and reading".
+
+## Software
+
+Cards on `/software/` and the IMDLIB block on the home page come from **`src/data/software.yaml`**
+(fields explained at the top of the file). `page: true` adds a page `/software/<slug>/` whose text is
+`src/content/software/<slug>.md`; the badges, buttons, citation, license and links on it come from the YAML.
+Stars and downloads are typed by hand with an `as_of` date. `docs/software-notes.md` records what was checked.
+
 ## CV (PDF only)
 
 The CV is a PDF at `/cv.pdf` (the nav "CV" link and the home-page button point there; the old

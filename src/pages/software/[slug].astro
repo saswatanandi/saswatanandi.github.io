@@ -1,0 +1,357 @@
+---
+/** Detail page for a software.yaml item with `page: true`; text from src/content/software/<slug>.md. */
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import CopyButton from '../../components/CopyButton.astro';
+import CodeCopy from '../../components/blog/CodeCopy.astro';
+import Icon from '../../components/Icon.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getSoftware } from '../../lib/collections';
+import { formatDate, formatMonth } from '../../lib/format';
+import { renderInline } from '../../lib/markdown';
+
+export const getStaticPaths = (async () => {
+  const items = (await getSoftware()).filter((s) => s.data.page);
+  const pages = await getCollection('softwarePages');
+  return items.map((item) => ({
+    params: { slug: item.id },
+    props: { item, page: pages.find((p) => p.id === item.id)! },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  item: CollectionEntry<'software'>;
+  page: CollectionEntry<'softwarePages'>;
+}
+const { item, page } = Astro.props;
+const s = item.data;
+const { Content, headings } = await render(page);
+const toc = headings.filter((h) => h.depth === 2);
+const citeHtml = s.citation ? await renderInline(s.citation.text) : '';
+const badges = [s.language, s.license && `${s.license} license`, s.version && `v${s.version}`, s.status].filter(
+  (b): b is string => Boolean(b),
+);
+const links = [
+  s.repo && { label: 'Source code on GitHub', url: s.repo },
+  s.docs && { label: 'Documentation', url: s.docs },
+  s.pypi && { label: 'PyPI', url: `https://pypi.org/project/${s.pypi}/` },
+  s.website && { label: 'Website', url: s.website },
+  ...s.links,
+].filter((l): l is { label: string; url: string } => Boolean(l));
+const stats = s.stats;
+---
+
+<PageLayout
+  title={s.name}
+  eyebrow="Software"
+  eyebrowHref="/software/"
+  intro={s.tagline ?? s.description}
+  description={page.data.description ?? s.tagline ?? s.description}
+  ridges={5}
+  narrow
+>
+  <Fragment slot="header">
+    {
+      badges.length > 0 && (
+        <ul role="list" class="badges" aria-label="Details">
+          {badges.map((b) => (
+            <li>{b}</li>
+          ))}
+        </ul>
+      )
+    }
+    <p class="actions">
+      {
+        s.repo && (
+          <a class="btn btn--primary" href={s.repo}>
+            <Icon name="github" /> Repository
+          </a>
+        )
+      }
+      {
+        s.docs && (
+          <a class="btn" href={s.docs}>
+            <Icon name="docs" /> Documentation
+          </a>
+        )
+      }
+      {
+        s.pypi && (
+          <a class="btn" href={`https://pypi.org/project/${s.pypi}/`}>
+            <Icon name="package" /> PyPI
+          </a>
+        )
+      }
+      {
+        s.citation?.doi && (
+          <a class="btn" href={`https://doi.org/${s.citation.doi}`}>
+            <Icon name="quote" /> Paper
+          </a>
+        )
+      }
+    </p>
+    {
+      (stats.stars !== null || stats.downloads !== null) && (
+        <p class="stats">
+          {stats.stars !== null && (
+            <span>
+              <Icon name="star" size={15} /> {stats.stars.toLocaleString('en')} stars
+            </span>
+          )}
+          {stats.downloads !== null && (
+            <span>
+              <Icon name="download" size={15} /> {stats.downloads.toLocaleString('en')} {stats.downloads_label}
+            </span>
+          )}
+          {stats.as_of && <span class="stats__asof">as of {formatDate(stats.as_of)}</span>}
+        </p>
+      )
+    }
+  </Fragment>
+
+  <article class="article">
+    {
+      toc.length > 2 && (
+        <nav class="toc" aria-labelledby="toc-title">
+          <h2 id="toc-title" class="eyebrow">On this page</h2>
+          <ol role="list">
+            {toc.map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+            {s.citation && (
+              <li>
+                <a href="#cite">How to cite</a>
+              </li>
+            )}
+            {links.length > 0 && (
+              <li>
+                <a href="#links">Links</a>
+              </li>
+            )}
+          </ol>
+        </nav>
+      )
+    }
+
+    <div class="prose sw-prose">
+      <Content />
+    </div>
+
+    {
+      s.citation && (
+        <section class="block" aria-labelledby="cite">
+          <h2 id="cite">How to cite</h2>
+          <p>If you use {s.name} in a publication, please cite the paper:</p>
+          <div class="cite">
+            <p id="cite-text">
+              <Fragment set:html={citeHtml} />
+              {s.citation.doi && <> https://doi.org/{s.citation.doi}</>}
+            </p>
+            <CopyButton from="cite-text" label="Copy" srLabel="Copy reference" />
+          </div>
+          <p class="cite-links">
+            {s.citation.bib && (
+              <a href={`/publications/${s.citation.bib}/`}>
+                Paper page and BibTeX <span aria-hidden="true">→</span>
+              </a>
+            )}
+            {s.citation.software_doi && (
+              <span>
+                The code itself is archived on Zenodo:{' '}
+                <a href={`https://doi.org/${s.citation.software_doi}`}>doi:{s.citation.software_doi}</a>.
+              </span>
+            )}
+          </p>
+        </section>
+      )
+    }
+
+    {
+      s.license && (
+        <section class="block" aria-labelledby="license">
+          <h2 id="license">License</h2>
+          <p>
+            {s.name} is available under the {s.license} open-source license.
+          </p>
+        </section>
+      )
+    }
+
+    {
+      links.length > 0 && (
+        <section class="block" aria-labelledby="links">
+          <h2 id="links">Links</h2>
+          <ul class="links">
+            {links.map((l) => (
+              <li>
+                <a href={l.url}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {page.data.updated && <p class="updated">Page last checked against the current release in {formatMonth(page.data.updated)}.</p>}
+  </article>
+  <CodeCopy />
+</PageLayout>
+
+<style>
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+  .badges li {
+    padding: 0.1rem 0.6rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 550;
+    line-height: 1.6;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .stats span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+  }
+  .stats__asof {
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+  }
+
+  .article {
+    padding-bottom: var(--space-8);
+  }
+  .toc {
+    margin-bottom: var(--space-6);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .toc ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-5);
+    margin-top: var(--space-2);
+  }
+  .toc a {
+    font-size: var(--text-sm);
+    font-weight: 550;
+    text-decoration: none;
+  }
+  .toc a:hover {
+    text-decoration: underline;
+  }
+
+  /* Markdown body ---------------------------------------------------------- */
+  .sw-prose :global(h2),
+  .block h2 {
+    scroll-margin-top: calc(var(--header-height) + var(--space-4));
+  }
+  .sw-prose :global(h3) {
+    font-size: var(--text-lg);
+    scroll-margin-top: calc(var(--header-height) + var(--space-4));
+  }
+  .block :global(code) {
+    padding: 0.08em 0.35em;
+    border-radius: 4px;
+    background: var(--color-surface-2);
+    font-size: 0.88em;
+  }
+  /* "Updated September 2026" notes are plain > blockquotes. */
+  .sw-prose :global(blockquote) {
+    padding: var(--space-3) var(--space-4);
+    border-left: 3px solid var(--color-warm);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: var(--color-warm-soft);
+    color: var(--color-text);
+    font-style: normal;
+    font-size: var(--text-sm);
+  }
+  .sw-prose :global(blockquote strong) {
+    color: var(--color-warm-text);
+  }
+  .sw-prose :global(img) {
+    display: block;
+    max-width: min(100%, 30rem);
+    height: auto;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: #fff;
+  }
+
+  .block {
+    margin-top: var(--space-7);
+  }
+  .block > * + * {
+    margin-top: var(--space-3);
+  }
+  .cite {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .cite p {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+  .cite-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    font-size: var(--text-sm);
+  }
+  .cite-links a {
+    font-weight: 550;
+  }
+  .links {
+    padding-left: 1.2em;
+    list-style: disc;
+  }
+  .links li + li {
+    margin-top: var(--space-1);
+  }
+  .updated {
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+  }
+  @media (max-width: 36rem) {
+    .cite {
+      flex-direction: column;
+    }
+  }
+</style>

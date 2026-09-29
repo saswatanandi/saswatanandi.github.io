@@ -1,0 +1,38 @@
+---
+import SoftwareCard from '../../components/SoftwareCard.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getSoftware } from '../../lib/collections';
+
+const items = await getSoftware();
+const featured = items.filter((s) => s.data.featured);
+const rest = items.filter((s) => !s.data.featured);
+---
+
+<PageLayout title="Software" eyebrow="Open source" intro="Tools I have written for hydroclimate data." ridges={3}>
+  <div class="featured">
+    {featured.map((item) => <SoftwareCard item={item} feature level={2} />)}
+  </div>
+  {
+    rest.length > 0 && (
+      <div class="grid">
+        {rest.map((item) => (
+          <SoftwareCard item={item} level={2} />
+        ))}
+      </div>
+    )
+  }
+</PageLayout>
+
+<style>
+  .featured {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-7);
+  }
+</style>

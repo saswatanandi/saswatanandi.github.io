@@ -1,24 +1,85 @@
-# Software cards. Stats are entered by hand (no API calls at build time) —
-# update `stars`, `downloads` and `stats_updated` whenever you like; null = hidden.
+# ─────────────────────────────────────────────────────────────────────────────
+#  Software shown on /software/ (and IMDLIB on the home page).
+#  Everything is entered by hand; nothing is fetched when the site builds.
+#
+#  Fields (all optional except name and description):
+#    name, tagline (one short line), description
+#    repo, docs, website        full https:// links; missing = no button
+#    pypi: imdlib               PyPI package name (adds a PyPI button)
+#    conda: conda-forge/imdlib  channel/package
+#    language, license, version, status   small badges
+#    order: 1                   position on /software/ (1 = first; featured cards always come first)
+#    featured: true             large card, and the Software block on the home page
+#    page: true                 detail page /software/<slug>/ with text from
+#                               src/content/software/<slug>.md
+#    install                    install commands, one per line
+#    snippet                    short code example on the featured card
+#    stats                      stars, downloads, downloads_label, as_of (null = hidden)
+#    citation                   text (Markdown), doi, bib (key in publications.bib), software_doi
+#    links                      extra links on the detail page: - { label: …, url: https://… }
+#
+#  Update the stats now and then: stars from the GitHub repo page, downloads from
+#  https://pepy.tech/projects/imdlib, and set as_of to the day you copied them.
+# ─────────────────────────────────────────────────────────────────────────────
 
 - name: IMDLIB
+  order: 1
+  slug: imdlib
+  tagline: Python library for IMD gridded rainfall and temperature data.
+  description: Open-source Python package for retrieval, processing, and spatiotemporal analysis of gridded India Meteorological Department (IMD) observational datasets.
   repo: https://github.com/iamsaswata/imdlib
-  description: A Python library for the gridded rainfall and temperature data from the India Meteorological Department (IMD). It downloads the files and gives you xarray, NetCDF or GeoTIFF in a few lines of code.
-  language: Python
-  pypi: imdlib
-  # conda: imdlib            # TODO(Saswata): conda channel, if any
   docs: https://imdlib.readthedocs.io
-  paper_doi: 10.1016/j.envsoft.2023.105869
-  stars: null                # TODO(Saswata): GitHub stars
-  downloads: null            # TODO(Saswata): total PyPI downloads (e.g. from pepy.tech)
-  stats_updated: null
+  pypi: imdlib
+  conda: conda-forge/imdlib
+  language: Python
+  license: MIT
+  version: 0.1.22            # latest release on PyPI (21 Sep 2026)
   featured: true
+  page: true
+  install:
+    - pip install imdlib
+    - conda install -c conda-forge imdlib
   snippet: |
-    # install
-    $ pip install imdlib
-
-    # daily rainfall over India, 2020–2023
+    # daily rainfall over India, 2020 to 2023
     >>> import imdlib as imd
     >>> data = imd.get_data('rain', 2020, 2023)
     >>> ds = data.get_xarray()
+    >>> ds['rain'].mean('time').plot()
+  stats:
+    stars: null              # TODO(Saswata): GitHub stars (could not be read from here)
+    downloads: 284147        # total PyPI downloads, pepy.tech
+    downloads_label: PyPI downloads
+    as_of: 2026-09-28
+  citation:
+    text: >-
+      Nandi, S., Patel, P., and Swain, S. (2024). IMDLIB: An open-source library for retrieval,
+      processing and spatiotemporal exploratory assessments of gridded meteorological observation
+      datasets over India. *Environmental Modelling & Software*, 171, 105869.
+    doi: 10.1016/j.envsoft.2023.105869
+    bib: nandi2024imdlib
+    software_doi: 10.5281/zenodo.7205414   # the code on Zenodo
+  links:
+    - label: conda-forge
+      url: https://anaconda.org/conda-forge/imdlib
+    - label: Video tutorial (Albedo Foundation, YouTube)
+      url: https://www.youtube.com/watch?v=uSIPPY5WRaM
   tags: [python, climate-data, india, xarray]
+
+- name: prismdata
+  order: 2
+  description: Python package for programmatic access to PRISM climate data over the continental United States.
+  repo: https://github.com/iamsaswata/prismdata
+  docs: https://prismdata.readthedocs.io
+  pypi: prismdata
+  language: Python
+  license: MIT
+  version: 0.0.1
+  install:
+    - pip install prismdata
+  tags: [python, climate-data, usa]
+
+- name: ARWIN
+  order: 3
+  description: Real-time hydroclimate decision-support dashboard for the Upper American River Basin, built and maintained for El Dorado County Water Agency.
+  website: https://arwin.edwateragency.org/
+  tags: [dashboard, forecasting, california]
