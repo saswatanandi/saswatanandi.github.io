@@ -239,8 +239,6 @@ const membership = z.object({ org: req('org'), since: date, details, draft }).st
 
 export const cvSchema = z
   .object({
-    /** Optional note shown at the top of the web CV (not in the PDF). Delete when the CV is complete. */
-    notice: text,
     /** "Last updated" date shown on the page and the PDF (YYYY-MM or YYYY-MM-DD); empty = build date. */
     updated: z.preprocess(
       (v) => (v instanceof Date ? v.toISOString().slice(0, 10) : blank(v)),

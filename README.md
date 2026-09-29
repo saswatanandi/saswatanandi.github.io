@@ -13,7 +13,7 @@ Personal academic website of **Saswata Nandi** — built with [Astro](https://as
 | Reading list                          | `src/data/reading.yaml` (+ notes in `src/content/reading/notes/`) |
 | Research themes (text, picture) | `src/content/research/<slug>.md` — see below |
 | Blog posts                            | `src/content/blog/<slug>/index.md` (copy `example-post/`) |
-| CV entries                            | `src/data/cv.yaml`                     |
+| CV (the PDF at /cv.pdf)               | `src/data/cv.yaml`                     |
 | Headshot / social card                | `public/images/headshot.jpg`, `public/og-default.png` |
 
 Every file is validated at build time: a typo produces an error naming the file and field
@@ -38,7 +38,7 @@ pages and the CV all read from it.
 3. Commit. The key (e.g. `nandi2024imdlib`) becomes the page URL, so keep it once published.
 
 A ready-to-copy example is in `templates/new-paper.bib`, and the header of `publications.bib` explains
-every field. Your name is bolded automatically (last name "Nandi", first initial "S", set in `src/lib/bibtex.ts`).
+every field. Your name is bolded automatically (last name "Nandi", first initial "S", set in `src/lib/pubcore.ts`).
 "Copy BibTeX" gives visitors the entry without the site-only fields (`pubtype`, `topic`, `abstract`, …).
 Each paper page carries Google Scholar `citation_*` tags and schema.org data.
 
@@ -90,21 +90,29 @@ rewrites `src/assets/research/climate-extremes{,.narrow}.svg` and `climate-extre
 Natural Earth (public domain, via `world-atlas`), state lines US Census (public domain, via `us-atlas`); the IVT
 and SST-anomaly fields are synthetic, drawn for illustration.
 
-## CV (web page + PDF)
+## CV (PDF only)
 
-`src/data/cv.yaml` holds positions, education, grants, awards, talks, teaching, mentoring, service,
-skills, languages and memberships (instructions and examples are at the top of the file; empty
-sections are hidden). Publications are added automatically from `publications.bib`, grouped as
-journal articles, book chapters, proceedings and abstracts, numbered newest first (J16 … J1).
+The CV is a PDF at `/cv.pdf` (the nav "CV" link and the home-page button point there; the old
+`/cv/` address redirects to it). It is typeset with [Typst](https://typst.app) from:
 
-- `/cv/` renders it; `/cv.pdf` is typeset with [Typst](https://typst.app) from the same data.
-- The PDF is **generated, not committed**: GitHub Actions runs `npm run cv:pdf` before every build.
-  Locally, install Typst ≥ 0.12 (e.g. `brew install typst`, or a binary from its GitHub releases)
-  and run `npm run cv:pdf` → `public/cv.pdf` (git-ignored). Without it, `/cv/` shows "PDF coming soon".
+- `src/data/cv.yaml`: positions, education, grants, honours, software, teaching, mentoring, service,
+  press, skills, … (instructions and examples at the top of the file; empty sections are hidden);
+- `site.config.yaml`: name, role, affiliation, contact links;
+- `src/data/publications.bib`: grouped as journal articles, book chapters, conference papers and
+  abstracts, each group numbered 1, 2, 3 … from the newest.
+
+Publications are read by **one shared module**, `src/lib/pubcore.ts` (parsing, validation, sorting,
+owner-name bolding, author/venue formatting). The website (`src/lib/bibtex.ts`) and the PDF step both
+use it, so the site and the PDF always agree.
+
+- **On GitHub**: nothing to do. Every deploy installs Typst and runs `npm run cv:pdf` before the build;
+  a mistake in `cv.yaml` or `publications.bib` stops the deploy with a message naming the file and field.
+- **On your Mac**: `brew install typst` once, then `npm run cv:pdf` → `public/cv.pdf`
+  (git-ignored; `npm run dev` then serves it at `/cv.pdf`).
 - Paper size: `pdf.paper` in cv.yaml (`us-letter` or `a4`), or for a one-off copy:
   `npm run cv:data && typst compile --font-path cv/fonts --input paper=a4 cv/cv.typ cv-a4.pdf`.
-- Design: `cv/cv.typ`; fonts: `cv/fonts/` (Source Serif 4 + Inter, SIL OFL); shared section logic:
-  `src/lib/cv.ts`; schema: `src/schemas/cv.ts`; data step: `scripts/build-cv-data.mjs`.
+- Design: `cv/cv.typ`; fonts: `cv/fonts/` (Source Serif 4 + Inter, SIL OFL); sections: `src/lib/cv.ts`;
+  schema: `src/schemas/cv.ts`; data step: `scripts/build-cv-data.mjs` (writes `cv/build/cv-data.json`).
 
 ## Local development
 
@@ -115,7 +123,7 @@ npm run dev      # http://localhost:4321 (drafts visible)
 npm run build    # production build → dist/
 npm run preview  # serve dist/
 npm run check    # type-check .astro/.ts files
-npm run cv:pdf   # CV → public/cv.pdf (needs Typst)
+npm run cv:pdf   # CV → public/cv.pdf (needs Typst: brew install typst)
 ```
 
 ## Where things live
@@ -123,5 +131,6 @@ npm run cv:pdf   # CV → public/cv.pdf (needs Typst)
 - `src/styles/tokens.css` — colours (light + dark), type scale, spacing
 - `src/lib/contours.ts` — the generated contour-line motif (marching squares, seeded)
 - `src/content.config.ts`, `src/schemas/` — Zod schemas for all content
-- `src/lib/bibtex.ts` — BibTeX → publication objects (`@retorquere/bibtex-parser`)
+- `src/lib/pubcore.ts` — BibTeX → publication objects (`@retorquere/bibtex-parser`), shared by site and CV PDF;
+  `src/lib/bibtex.ts` adds the website bits
 - `.github/workflows/deploy.yml` — build & deploy

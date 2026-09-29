@@ -188,6 +188,3 @@ export const softwareSchema = z
     tags,
   })
   .strict();
-
-/** CV: see ./cv.ts (kept separate so the PDF build script can use it without Astro). */
-export { cvSchema, type Cv } from './cv';

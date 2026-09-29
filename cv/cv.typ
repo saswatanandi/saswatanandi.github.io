@@ -20,7 +20,7 @@
 
 #let serif = ("Source Serif 4", "Libertinus Serif")
 #let sans = ("Inter",)
-#let date-col = 1.0in
+#let date-col = 0.95in
 #let gutter = 12pt
 
 #let person = data.person
@@ -28,7 +28,7 @@
 
 #set page(
   paper: paper,
-  margin: (x: 0.8in, top: 0.8in, bottom: 0.75in),
+  margin: (x: 0.8in, top: 0.75in, bottom: 0.7in),
   header: context {
     if here().page() > 1 {
       set text(font: sans, size: 7.5pt, fill: faint)
@@ -54,7 +54,7 @@
 
 #let meta(body) = text(font: sans, size: 8pt, fill: faint, body)
 
-#let section-head(title) = block(above: 14pt, below: 7pt, sticky: true)[
+#let section-head(title) = block(above: 13pt, below: 7pt, sticky: true)[
   #set text(font: sans, size: 8.5pt, weight: "bold", fill: accent, tracking: 0.09em)
   #grid(
     columns: (auto, 1fr),
@@ -70,10 +70,10 @@
 ]
 
 // Date column + content column.
-#let entry(left, body, col: date-col) = block(
+#let entry(left, body, col: date-col, below: 6pt) = block(
   breakable: false,
   above: 0pt,
-  below: 6pt,
+  below: below,
   grid(columns: (col, 1fr), column-gutter: gutter, left, body),
 )
 
@@ -102,18 +102,21 @@
   },
 )
 
+// Publications: plain numbers (1 = newest, restarting in each group), right-aligned
+// against the citation; the owner's name in bold.
 #let pub(p) = entry(
-  text(font: sans, size: 8pt, weight: "semibold", fill: accent, p.label),
+  below: 4.5pt,
+  align(right, text(font: sans, size: 8pt, weight: "semibold", fill: accent, p.label)),
   {
     set text(size: 9.5pt)
-    for (i, a) in p.authors.enumerate() {
+    for a in p.authors {
       if a.self { text(weight: "bold", a.name) } else { a.name }
-      let n = p.authors.len()
-      if i < n - 2 [, ] else if i == n - 2 [ & ]
+      a.sep
     }
     [ (#p.year). ]
     maybe-link(p.at("url", default: none), p.title)
-    [. ]
+    if p.title.last() not in (".", "?", "!") [.]
+    [ ]
     if p.at("venue", default: none) != none { emph(p.venue) }
     if p.at("details", default: none) != none [, #p.details]
     [.]

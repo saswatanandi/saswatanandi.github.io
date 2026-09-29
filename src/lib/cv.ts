@@ -6,6 +6,8 @@
  * same order. Plain TypeScript with type-only imports: Node can run it directly.
  */
 import type { Cv } from '../schemas/cv';
+import type { Publication, PubType } from './pubcore';
+import { authorSep, venueDetails } from './pubcore.ts';
 
 /** One entry: a date (left column) + a title, muted lines and bullet points under it. */
 export interface CvRow {
@@ -34,28 +36,16 @@ export interface CvSection {
   groups: CvGroup[];
 }
 
-/** Minimal publication shape (a subset of lib/bibtex's Publication). */
-export interface CvPub {
-  pubtype: string;
-  title: string;
-  year: number;
-  authors: { display: string; isSelf: boolean }[];
-  venue?: string;
-  volume?: string;
-  issue?: string;
-  pages?: string;
-  doi?: string;
-  url?: string;
-}
 export interface CvPubEntry {
-  /** "J12" */
+  /** "1." (numbering restarts in each group; 1 = newest) */
   label: string;
   year: number;
   title: string;
   url?: string;
-  authors: { name: string; self: boolean }[];
+  /** Authors with the separator that follows each one ("A, B & C"). */
+  authors: { name: string; self: boolean; sep: string }[];
   venue?: string;
-  /** "12(3), 45–67" */
+  /** "12(3), 45–67" / "pp. 435–448" / "Abstract H23S-05" (same as the website). */
   details?: string;
 }
 export interface CvPubGroup {
@@ -383,45 +373,37 @@ export function withPublications<T extends { id: string }>(sections: T[], item: 
 
 /* ── Publications ──────────────────────────────────────────────────────── */
 
-/** Publication groups on the CV (pubtype → heading, label prefix). Talks live in cv.yaml. */
-export const PUB_GROUPS = [
-  { id: 'journal', heading: 'Journal articles', prefix: 'J' },
-  { id: 'chapter', heading: 'Book chapters', prefix: 'B' },
-  { id: 'proceedings', heading: 'Conference proceedings', prefix: 'P' },
-  { id: 'abstract', heading: 'Conference abstracts', prefix: 'A' },
-] as const;
+/** Publication groups on the CV, in order (pubtypes from pubcore.ts). */
+export const CV_PUB_GROUPS: readonly { id: string; heading: string; types: readonly PubType[] }[] = [
+  { id: 'journal', heading: 'Journal articles', types: ['journal'] },
+  { id: 'chapter', heading: 'Book chapters', types: ['chapter'] },
+  { id: 'proceedings', heading: 'Conference papers', types: ['proceedings'] },
+  { id: 'abstract', heading: 'Conference abstracts & talks', types: ['abstract', 'talk'] },
+];
 
 /**
- * Publications grouped by type, newest first, numbered downwards (J12 … J1) so a
- * paper keeps its number when new ones are added.
+ * Publications grouped by type, newest first, numbered 1, 2, 3 … from the newest,
+ * restarting in each group. `pubs` must already be sorted newest first (readPublications does).
  */
-export function pubGroups(pubs: CvPub[]): CvPubGroup[] {
-  return PUB_GROUPS.flatMap((g) => {
-    const items = pubs
-      .filter((p) => p.pubtype === g.id)
-      .sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
+export function pubGroups(pubs: Publication[]): CvPubGroup[] {
+  return CV_PUB_GROUPS.flatMap((g) => {
+    const items = pubs.filter((p) => g.types.includes(p.pubtype));
     if (!items.length) return [];
+    const heading = g.id === 'abstract' && !items.some((p) => p.pubtype === 'talk') ? 'Conference abstracts' : g.heading;
     return [
       {
         id: g.id,
-        heading: g.heading,
+        heading,
         entries: items.map((p, i) => ({
-          label: `${g.prefix}${items.length - i}`,
+          label: `${i + 1}.`,
           year: p.year,
           title: p.title,
           url: p.doi ? `https://doi.org/${p.doi}` : p.url,
-          authors: p.authors.map((a) => ({ name: a.display, self: a.isSelf })),
+          authors: p.authors.map((a, j) => ({ name: a.display, self: a.isSelf, sep: authorSep(j, p.authors.length) })),
           venue: p.venue,
-          details:
-            [p.volume && (p.issue ? `${p.volume}(${p.issue})` : p.volume), p.pages].filter(Boolean).join(', ') ||
-            undefined,
+          details: venueDetails(p) || undefined,
         })),
       },
     ];
   });
-}
-
-/** Author separators: "A, B & C" (as on the publications page). */
-export function authorSep(i: number, n: number): string {
-  return i < n - 2 ? ', ' : i === n - 2 ? ' & ' : '';
 }

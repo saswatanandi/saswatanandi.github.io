@@ -39,12 +39,12 @@ The website and the generated PDF take publications from `publications.bib` only
 - **Counting:**
   - Your CV says "22 papers": 20 published and 2 under review, with chapters and proceedings in one list.
   - The .bib holds 23 non-abstract items: 16 journal articles, 3 chapters and 4 proceedings, counting `kandhway2026crop` and the two 2017 IGARSS/I2CT papers.
-  - The web and PDF CV list them in separate groups (J, B, P, A).
+  - The PDF CV lists them in separate groups (journal articles, book chapters, conference papers, abstracts), each numbered 1, 2, 3 … from the newest.
 
 ### Conference presentations
 
 Your CV lists 12 conference presentations. The .bib has 6 of them as `pubtype = {abstract}`, and those
-are shown under "Conference abstracts". These 6 are **not in the .bib yet**, so they are missing from the web and PDF CV:
+are shown under "Conference abstracts". These 6 are **not in the .bib yet**, so they are missing from the PDF CV and the publications page:
 
 | Date | Title | Meeting |
 | ---- | ----- | ------- |
@@ -88,7 +88,7 @@ Small differences in the existing abstracts:
 - **Skills.** Copied as written, including "HEC-Suits". Did you mean "HEC-Suite"? RAPID (used in your papers) is not in the skills list.
 - **Summary.** The profile paragraph repeats hand-typed numbers: 22 papers, h-index 11, 567 citations, 251,000+ downloads. These will go stale, and they differ from `site.config.yaml` (`citations: 600`).
 - **Research Impact.** This section of your CV was not copied. The citation metrics live in `site.config.yaml` (`metrics:`) and are shown on the site.
-- **References.** Stored in cv.yaml but **hidden** (`show_references: false`). Their email addresses were deliberately left out because this repository is public. Set `show_references: true` if you want them on the web page and PDF, and add `email:` only if each referee agrees.
+- **References.** Stored in cv.yaml but **hidden** (`show_references: false`). Their email addresses were deliberately left out because this repository is public. Set `show_references: true` if you want them in the PDF, and add `email:` only if each referee agrees.
 - **Phone number.** Your CV shows +1 (209) 749-5962. It is not used anywhere on the site or in the generated PDF.
 
 ## 3. Suggestions for `site.config.yaml` (not changed)
@@ -114,6 +114,6 @@ Your CV also names "Dr" before your name. The site uses plain "Saswata Nandi".
 
 `public/pdfs/CV_SaswataNandi.pdf` (your hand-made CV) would be published as-is at
 `/pdfs/CV_SaswataNandi.pdf`. It includes your phone number and your referees' email addresses.
-The site's own "Download PDF" button points to the generated `/cv.pdf` instead.
+The site's "CV" links point to the generated `/cv.pdf` instead.
 
 Before publishing, decide whether to keep the old file, remove it, or strip the contact details.

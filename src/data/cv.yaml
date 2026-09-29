@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-#  cv.yaml — everything on /cv/ and in /cv.pdf except publications
+#  cv.yaml — everything in /cv.pdf except publications
 #  (publications come from src/data/publications.bib automatically).
 #
 #  • Every section is optional. An empty list ([]) or a missing section is hidden.

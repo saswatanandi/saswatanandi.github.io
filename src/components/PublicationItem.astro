@@ -8,7 +8,7 @@
  *                    data-* attributes used by the tab/filter script.
  */
 import type { Publication } from '../lib/bibtex';
-import { groupOf, venueDetails } from '../lib/bibtex';
+import { authorSep, groupOf, venueDetails } from '../lib/bibtex';
 import CopyButton from './CopyButton.astro';
 import Icon from './Icon.astro';
 import PubBadges from './PubBadges.astro';
@@ -47,7 +47,7 @@ const links = [
         pub.authors.map((a, i) => (
           <>
             {a.isSelf ? <strong class="pub__self">{a.display}</strong> : a.display}
-            {i < pub.authors.length - 2 ? ', ' : i === pub.authors.length - 2 ? ' & ' : ''}
+            {authorSep(i, pub.authors.length)}
           </>
         ))
       }

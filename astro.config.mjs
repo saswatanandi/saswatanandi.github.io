@@ -12,10 +12,12 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/404'),
+      // /cv/ only redirects to /cv.pdf.
+      filter: (page) => !page.includes('/404') && !/\/cv\/?$/.test(page),
     }),
   ],
-  // Old Hugo URLs (/en/...) are redirected in Phase 3.
-  redirects: {},
+  // /cv/ → /cv.pdf (the CV is a PDF only). Old Hugo URLs (/en/...) are added in Phase 3.
+  // Astro writes a small page with a meta refresh, a canonical link and a visible link.
+  redirects: { '/cv': '/cv.pdf' },
   devToolbar: { enabled: false },
 });

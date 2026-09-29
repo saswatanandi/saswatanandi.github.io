@@ -3,7 +3,6 @@ import { glob } from 'astro/loaders';
 import { yamlLoader } from './lib/yaml-loader';
 import {
   blogSchema,
-  cvSchema,
   newsSchema,
   readingNoteSchema,
   readingSchema,
@@ -51,9 +50,4 @@ const software = defineCollection({
   schema: softwareSchema,
 });
 
-const cv = defineCollection({
-  loader: yamlLoader({ path: 'src/data/cv.yaml', mode: 'single', singleId: 'cv' }),
-  schema: cvSchema,
-});
-
-export const collections = { blog, readingNotes, research, news, reading, software, cv };
+export const collections = { blog, readingNotes, research, news, reading, software };

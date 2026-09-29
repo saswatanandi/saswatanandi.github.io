@@ -4,19 +4,19 @@
  *
  *   src/data/cv.yaml          → validated with the same schema as the website (src/schemas/cv.ts)
  *   site.config.yaml          → name, role, affiliation, contact links (src/schemas/site.ts)
- *   src/data/publications.bib → parsed here with @retorquere/bibtex-parser (a small, independent
- *                               reader, so this script does not depend on Astro)
+ *   src/data/publications.bib → read by src/lib/pubcore.ts, the same rules the website uses
+ *                               (a bib error stops this script, and so the CI deploy, loudly)
  *
  * Sections are built by src/lib/cv.ts, the same code the /cv/ page uses.
  * Run via `npm run cv:pdf` (this script + `typst compile`).
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parse as parseBib } from '@retorquere/bibtex-parser';
 import { z } from 'astro/zod';
 import { parse as parseYaml } from 'yaml';
 import { boldSegments, cvSections, formatUpdated, PLAIN_SECTIONS, pubGroups, withPublications } from '../src/lib/cv.ts';
+import { readPublications } from '../src/lib/pubcore.ts';
 import { cvSchema } from '../src/schemas/cv.ts';
 import { siteConfigSchema } from '../src/schemas/site.ts';
 
@@ -43,56 +43,18 @@ function validate(file, schema) {
 const cv = validate('src/data/cv.yaml', cvSchema);
 const site = validate('site.config.yaml', siteConfigSchema);
 
-/* ── Publications (same rules as src/lib/bibtex.ts, only the fields the CV needs) ── */
+/* ── Publications: the same reader as the website (src/lib/pubcore.ts) ── */
 
-const SELF = { lastName: 'Nandi', firstInitial: 'S' };
-const guessPubtype = (t) =>
-  t === 'article'
-    ? 'journal'
-    : ['incollection', 'inbook', 'book'].includes(t)
-      ? 'chapter'
-      : ['inproceedings', 'proceedings', 'conference'].includes(t)
-        ? 'proceedings'
-        : 'journal';
-
-function toAuthor(c) {
-  const lastName = c.lastName ?? c.name ?? '';
-  const firstName = c.firstName ?? '';
-  const initials = firstName
-    .split(/[\s.]+/)
-    .filter(Boolean)
-    .map((p) => (p.includes('-') ? p.split('-').map((q) => `${q[0]}.`).join('-') : `${p[0]}.`))
-    .join(' ');
-  return {
-    display: initials ? `${lastName}, ${initials}` : lastName,
-    isSelf: lastName === SELF.lastName && firstName.trim().startsWith(SELF.firstInitial),
-  };
-}
-
-function readPublications() {
-  const lib = parseBib(read('src/data/publications.bib'), { english: false, sentenceCase: false });
-  if (lib.errors.length) fail(`publications.bib could not be parsed:\n${lib.errors.map((e) => `  • ${JSON.stringify(e)}`).join('\n')}`);
-  return lib.entries.flatMap((entry) => {
-    const f = entry.fields;
-    const str = (k) => (typeof f[k] === 'string' && f[k].trim() ? f[k].trim() : undefined);
-    const title = str('title');
-    const year = Number.parseInt(str('year') ?? str('date') ?? '', 10);
-    if (!title || !Number.isFinite(year)) return [];
-    return [
-      {
-        pubtype: (str('pubtype') ?? guessPubtype(entry.type)).toLowerCase(),
-        title,
-        year,
-        authors: (Array.isArray(f.author) ? f.author : []).map(toAuthor),
-        venue: str('journal') ?? str('journaltitle') ?? str('booktitle') ?? str('howpublished'),
-        volume: str('volume'),
-        issue: str('number') ?? str('issue'),
-        pages: str('pages')?.replace(/--/g, '–'),
-        doi: str('doi')?.replace(/^https?:\/\/(dx\.)?doi\.org\//, ''),
-        url: str('url'),
-      },
-    ];
-  });
+function publications() {
+  const topics = readdirSync(join(root, 'src/content/research'))
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => f.replace(/\.md$/, ''))
+    .sort();
+  try {
+    return readPublications(read('src/data/publications.bib'), { topics });
+  } catch (err) {
+    fail(String(err instanceof Error ? err.message : err).trim().replace(/^✖\s*/, ''));
+  }
 }
 
 /* ── Assemble ─────────────────────────────────────────────────────────────── */
@@ -100,7 +62,7 @@ function readPublications() {
 const updated = cv.updated ?? new Date().toISOString().slice(0, 10);
 let sections = cvSections(cv).map((s) => ({ kind: 'rows', ...s }));
 if (cv.pdf.publications) {
-  const groups = pubGroups(readPublications());
+  const groups = pubGroups(publications());
   if (groups.length) sections = withPublications(sections, { kind: 'pubs', id: 'publications', title: 'Publications', groups });
 }
 

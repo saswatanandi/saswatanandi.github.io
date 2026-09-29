@@ -34,8 +34,9 @@ links:
   x: "https://x.com/saswatanandi"                  # TODO(Saswata): https://x.com/…
   researchgate: "https://www.researchgate.net/profile/Saswata-Nandi"       # TODO(Saswata): https://www.researchgate.net/profile/…
 
-# Path to the CV (Phase 2 generates /cv.pdf from cv.yaml; the /cv page exists now).
-cv: /cv/
+# Link for the "CV" button on the home page. /cv.pdf is generated from src/data/cv.yaml +
+# publications.bib on every deploy (the old /cv/ address redirects there).
+cv: /cv.pdf
 
 # Main navigation (order = display order).
 nav:
@@ -44,7 +45,7 @@ nav:
   - { label: Software, href: /software/ }
   - { label: Blog, href: /blog/ }
   - { label: Reading, href: /reading/ }
-  - { label: CV, href: /cv/ }
+  - { label: CV, href: /cv.pdf }
 
 # Citation metrics — entered manually (no live API calls during the build).
 metrics:
