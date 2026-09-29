@@ -1,5 +1,4 @@
 ---
-import ComingSoon from '../../components/ComingSoon.astro';
 import ThemeTile from '../../components/ThemeTile.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
 import { getThemes } from '../../lib/collections';
@@ -18,11 +17,6 @@ const themes = await getThemes();
     }
   </ol>
 
-  <div class="soon-wrap">
-    <ComingSoon phase={4} icon="pin" title="Map of study basins">
-      <p>I am adding a map of the river basins I have worked in, with links to the papers.</p>
-    </ComingSoon>
-  </div>
 </PageLayout>
 
 <style>
@@ -30,9 +24,5 @@ const themes = await getThemes();
     max-width: 58rem;
     display: grid;
     gap: var(--space-5);
-  }
-  .soon-wrap {
-    max-width: 58rem;
-    margin-top: var(--space-8);
   }
 </style>
