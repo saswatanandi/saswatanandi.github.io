@@ -34,7 +34,12 @@ export async function getReading(): Promise<CollectionEntry<'reading'>[]> {
       );
     }
   }
-  return items.sort((a, b) => b.data.read.localeCompare(a.data.read) || a.data.title.localeCompare(b.data.title));
+  // A note set to draft: true is hidden, so drop its "Read note" link instead of pointing at a missing page.
+  const hiddenNotes = new Set(notes.filter((n) => !visible(n.data.draft)).map((n) => n.id));
+  const withLinks = items.map((r) =>
+    r.data.note && hiddenNotes.has(r.data.note) ? { ...r, data: { ...r.data, note: undefined } } : r,
+  );
+  return withLinks.sort((a, b) => b.data.read.localeCompare(a.data.read) || a.data.title.localeCompare(b.data.title));
 }
 
 /** A reading entry with its note, for the note pages /reading/<note>/. Drafts follow `visible`. */

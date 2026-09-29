@@ -848,7 +848,7 @@ in `npm run dev`):
 | Blog post | front matter of `index.md` (or the notebook's first cell) |
 | News item | the item in `news.yaml` |
 | Reading entry | the entry in `reading.yaml`. If it has a note, also in the note file (otherwise the build stops). |
-| Reading note only | front matter of the note file, and delete the `note:` line from its entry (otherwise the entry keeps a "Read note" link to a missing page). |
+| Reading note only | front matter of the note file. The entry stays and its "Read note" link disappears. |
 | CV item | the item in `cv.yaml` (positions, education, grants, awards, talks, teaching, mentoring, service items, press, software, references) |
 
 **No draft option:**
