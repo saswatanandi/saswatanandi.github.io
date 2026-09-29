@@ -31,10 +31,6 @@ const latestReading = (await getReading())[0];
     <Ridgelines variant="hero" />
     <div class="container hero__inner">
       <div class="hero__text">
-        <p class="eyebrow hero__eyebrow">
-          <span class="hero__dot" aria-hidden="true"></span>
-          Hydrology
-        </p>
         <h1 id="hero-name" class="hero__name">{site.name}</h1>
         <p class="hero__role">
           <span>{site.role}</span>
@@ -231,17 +227,7 @@ const latestReading = (await getReading())[0];
     align-items: center;
     gap: var(--space-7);
   }
-  .hero__eyebrow {
-    color: var(--color-text-muted);
-  }
-  .hero__dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--color-warm);
-  }
   .hero__name {
-    margin-top: var(--space-3);
     font-size: clamp(2.6rem, 1.9rem + 3vw, 4.1rem);
     font-weight: 600;
     letter-spacing: -0.028em;
