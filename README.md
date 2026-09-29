@@ -4,6 +4,8 @@ Personal academic website of **Saswata Nandi** — built with [Astro](https://as
 
 ## Everyday edits (no local setup needed — edit on GitHub, commit, done)
 
+Step-by-step instructions for each kind of update are in **[HOW-TO-UPDATE.md](HOW-TO-UPDATE.md)**.
+
 | I want to change…                     | Edit                                   |
 | ------------------------------------- | -------------------------------------- |
 | Name, title, affiliation, bio, links, nav, citation metrics, analytics | `site.config.yaml` |
