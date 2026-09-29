@@ -18,8 +18,8 @@ email: withsaswata@gmail.com                        # TODO(Saswata): confirm (sh
 bio: |
   I am a hydrologist working at the interface of **hydrology, land-surface modelling, remote sensing and climate impacts**.
   My research focuses on how forests, fire and a changing climate reshape our water.
-  I did my PhD in Water Resources Engineering at IIT Bombay and I support open, reproducible science:
-  I created and maintain [IMDLIB](/software/), an open-source Python library for Indian gridded weather data.
+  I received my PhD in Water Resources Engineering from IIT Bombay.
+  I also develop open-source tools for hydroclimate data, including [IMDLIB](/software/imdlib/), an open-source Python library for India Meteorological Department gridded data, used widely in hydroclimate research in India.
 
 # One-line description used in search results / social cards (≤ 160 characters).
 description: Hydrologist working on land-surface modelling, forests & fire, forecasting and climate impacts. Creator of the open-source IMDLIB Python library.
