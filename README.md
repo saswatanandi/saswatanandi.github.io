@@ -12,7 +12,7 @@ Personal academic website of **Saswata Nandi** — built with [Astro](https://as
 | Software cards / IMDLIB stats         | `src/data/software.yaml`               |
 | Reading list                          | `src/data/reading.yaml` (+ notes in `src/content/reading/notes/`) |
 | Research themes (text, picture) | `src/content/research/<slug>.md` — see below |
-| Blog posts                            | `src/content/blog/<slug>/index.md` (copy `example-post/`) |
+| Blog posts                            | `src/content/blog/<slug>/index.md` (copy `example-post/`) or `index.ipynb` (see below) |
 | CV (the PDF at /cv.pdf)               | `src/data/cv.yaml`                     |
 | Headshot / social card                | `public/images/headshot.jpg`, `public/og-default.png` |
 
@@ -137,6 +137,46 @@ use it, so the site and the PDF always agree.
   `npm run cv:data && typst compile --font-path cv/fonts --input paper=a4 cv/cv.typ cv-a4.pdf`.
 - Design: `cv/cv.typ`; fonts: `cv/fonts/` (Source Serif 4 + Inter, SIL OFL); sections: `src/lib/cv.ts`;
   schema: `src/schemas/cv.ts`; data step: `scripts/build-cv-data.mjs` (writes `cv/build/cv-data.json`).
+
+## Blog
+
+One folder per post: `src/content/blog/<slug>/index.md`, pictures next to it. The folder name is the
+address (`/blog/<slug>/`). Copy `src/content/blog/example-post/`; its front matter lists every field
+(`title`, `description`, `date`, `tags`, optional `updated`, `series`, `cover` + `cover_alt`, `toc`,
+`comments`, `draft`).
+
+- **Maths:** `$...$` inline, `$$ ... $$` on their own lines for display (KaTeX, rendered at build time).
+- **Code:** fenced blocks with a language (```` ```python ````) are highlighted and get a Copy button.
+- **Pictures:** `![What it shows](./figure.png "Caption")`; the caption is optional.
+- **Note boxes:** a quote starting with `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` or `[!CAUTION]`.
+- **Contents list:** automatic for posts with three or more sections (`##`/`###`).
+- **Series:** posts with the same `series:` name link to each other.
+- **Tags:** every tag has a page (`/tags/<tag>/`) listing posts and reading entries with that tag.
+
+**Jupyter notebook posts:** put `index.ipynb` in the post folder instead of `index.md`. The first cell
+must be a Markdown cell holding the front matter between `---` lines (or put it in `meta.yaml` next to
+the notebook). Save the notebook with its outputs: the site uses the saved outputs and runs nothing.
+`scripts/notebooks.mjs` turns it into `index.ipynb.md` plus `nb-output/` pictures before every
+`npm run dev` / `npm run build` (both git-ignored; commit only the notebook). Cell tags `remove-cell`,
+`remove-input` and `remove-output` hide parts. Example: `src/content/blog/example-notebook/` (a draft).
+
+**Comments (giscus):** off until set up. Enable Discussions on the repository, install the giscus app
+(https://github.com/apps/giscus), pick a category at https://giscus.app and copy `repo`, `repo_id`,
+`category` and `category_id` into `site.config.yaml` → `giscus`. `comments: false` in a post hides them there.
+
+**RSS:** `/rss.xml` lists all published posts.
+
+## Search
+
+The search button in the header (shortcut `/`) uses [Pagefind](https://pagefind.app). The index is
+built after the site by `npm run build` (settings in `pagefind.yml`), so search works on the built site
+(`npm run build && npm run preview`), not in `npm run dev`. Only the main content of pages is indexed;
+blog lists, tag pages and the 404 page are left out (`search={false}` on the layout).
+
+## Old addresses
+
+Every address of the old Hugo site (`/en/...`) redirects to its new page: see `docs/redirects.md`
+(map in `src/lib/redirects.mjs`). `docs/migration-notes.md` lists what changed in the three old posts.
 
 ## Local development
 

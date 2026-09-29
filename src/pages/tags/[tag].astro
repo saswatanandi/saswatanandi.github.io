@@ -1,0 +1,115 @@
+---
+import type { GetStaticPaths } from 'astro';
+import PostList from '../../components/blog/PostList.astro';
+import Icon from '../../components/Icon.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { formatYearMonth } from '../../lib/format';
+import { getTags, type Tag } from '../../lib/tags';
+
+export const getStaticPaths = (async () => {
+  const tags = await getTags();
+  return tags.map((tag) => ({ params: { tag: tag.slug }, props: { tag } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  tag: Tag;
+}
+const { tag } = Astro.props;
+const n = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
+const summary = [tag.posts.length && n(tag.posts.length, 'post'), tag.reading.length && n(tag.reading.length, 'paper')]
+  .filter(Boolean)
+  .join(', ');
+---
+
+<PageLayout
+  title={tag.label}
+  eyebrow="Tags"
+  eyebrowHref="/tags/"
+  intro={summary}
+  description={`Blog posts and papers tagged "${tag.label}".`}
+  ridges={7}
+  search={false}
+>
+  {
+    tag.posts.length > 0 && (
+      <section class="group" aria-labelledby="t-posts">
+        <h2 id="t-posts" class="group__title">Blog</h2>
+        <PostList posts={tag.posts} />
+      </section>
+    )
+  }
+  {
+    tag.reading.length > 0 && (
+      <section class="group" aria-labelledby="t-reading">
+        <h2 id="t-reading" class="group__title">Reading</h2>
+        <ol role="list" class="reading">
+          {tag.reading.map((r) => (
+            <li>
+              <p class="reading__title">
+                <a href={r.href} {...(r.external ? { rel: 'noopener' } : {})}>
+                  {r.title}
+                </a>
+                {r.external && <Icon name="external" size={13} class="reading__ext" />}
+              </p>
+              <p class="reading__src">
+                {r.source}
+                {/^\d{4}-\d{2}$/.test(r.read) && <span> · read {formatYearMonth(r.read)}</span>}
+              </p>
+              {r.why && <p class="reading__why">{r.why}</p>}
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+  }
+</PageLayout>
+
+<style>
+  .group {
+    max-width: 46rem;
+    margin-bottom: var(--space-8);
+  }
+  .group__title {
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-faint);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .reading {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .reading__title {
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: 600;
+    line-height: var(--leading-snug);
+  }
+  .reading__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .reading__title a:hover {
+    color: var(--color-accent);
+  }
+  .reading__title :global(.reading__ext) {
+    display: inline;
+    margin-left: 0.3em;
+    color: var(--color-text-faint);
+    vertical-align: -0.1em;
+  }
+  .reading__src {
+    margin-top: var(--space-1);
+    color: var(--color-text-faint);
+    font-size: var(--text-sm);
+  }
+  .reading__why {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+  }
+</style>

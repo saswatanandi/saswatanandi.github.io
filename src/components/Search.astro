@@ -1,0 +1,256 @@
+---
+/**
+ * Site search (Pagefind). The index is built after the site (`pagefind --site dist`, part of
+ * `npm run build`), so search works on the built site only. The Pagefind UI files are loaded
+ * the first time the dialog opens. Shortcut: "/".
+ */
+---
+
+<button type="button" class="search-button" data-search-open aria-haspopup="dialog" aria-keyshortcuts="/" title="Search (/)">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="6.5"></circle>
+    <path d="m20 20-4.2-4.2"></path>
+  </svg>
+  <span class="visually-hidden">Search</span>
+</button>
+
+<dialog class="search-dialog" aria-label="Search the site" data-search-dialog>
+  <div class="search-dialog__panel">
+    <div class="search-dialog__head">
+      <p class="search-dialog__title">Search</p>
+      <button type="button" class="search-dialog__close" data-search-close>
+        Close <kbd>Esc</kbd>
+      </button>
+    </div>
+    <div id="site-search" class="search-dialog__ui"></div>
+    <p class="search-dialog__msg" data-search-msg hidden>
+      Search works on the built site. Run <code>npm run build</code> and <code>npm run preview</code>.
+    </p>
+  </div>
+</dialog>
+
+<script>
+  type PagefindUIType = new (opts: Record<string, unknown>) => unknown;
+  const dialog = document.querySelector<HTMLDialogElement>('[data-search-dialog]');
+  const openers = document.querySelectorAll<HTMLButtonElement>('[data-search-open]');
+  const msg = document.querySelector<HTMLElement>('[data-search-msg]');
+  let loading: Promise<void> | undefined;
+
+  function loadUi(): Promise<void> {
+    loading ??= new Promise<void>((resolve, reject) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = '/pagefind/pagefind-ui.css';
+      document.head.appendChild(css);
+      const s = document.createElement('script');
+      s.src = '/pagefind/pagefind-ui.js';
+      s.onload = () => {
+        const PagefindUI = (window as unknown as { PagefindUI?: PagefindUIType }).PagefindUI;
+        if (!PagefindUI) return reject(new Error('no PagefindUI'));
+        new PagefindUI({
+          element: '#site-search',
+          showSubResults: true,
+          showImages: false,
+          excerptLength: 24,
+          resetStyles: false,
+          translations: { placeholder: 'Search posts, papers, software and notes' },
+        });
+        resolve();
+      };
+      s.onerror = () => reject(new Error('Pagefind not built'));
+      document.head.appendChild(s);
+    });
+    return loading;
+  }
+
+  async function open() {
+    if (!dialog || dialog.open) return;
+    dialog.showModal();
+    document.documentElement.classList.add('search-open');
+    try {
+      await loadUi();
+      dialog.querySelector<HTMLInputElement>('.pagefind-ui__search-input')?.focus();
+    } catch {
+      if (msg) msg.hidden = false;
+      dialog.querySelector<HTMLElement>('#site-search')?.setAttribute('hidden', '');
+    }
+  }
+
+  function close() {
+    dialog?.close();
+  }
+
+  if (dialog) {
+    openers.forEach((b) => b.addEventListener('click', open));
+    dialog.querySelector('[data-search-close]')?.addEventListener('click', close);
+    dialog.addEventListener('close', () => document.documentElement.classList.remove('search-open'));
+    // Click on the backdrop closes the dialog.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey || dialog.open) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return;
+      e.preventDefault();
+      open();
+    });
+  }
+</script>
+
+<style>
+  .search-button {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition:
+      color var(--duration) var(--ease),
+      border-color var(--duration) var(--ease);
+  }
+  .search-button:hover {
+    color: var(--color-accent);
+    border-color: var(--color-border);
+  }
+  :global(html:not(.js)) .search-button {
+    display: none;
+  }
+
+  .search-dialog {
+    width: min(42rem, calc(100vw - 2 * var(--gutter)));
+    max-width: none;
+    max-height: min(44rem, calc(100dvh - 4rem));
+    margin: 8vh auto auto;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg);
+    color: var(--color-text);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+  .search-dialog::backdrop {
+    background: rgb(14 24 30 / 0.45);
+    backdrop-filter: blur(3px);
+  }
+  :global(html.search-open) {
+    overflow: hidden;
+  }
+  .search-dialog__panel {
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+    padding: var(--space-4) var(--space-5) var(--space-5);
+  }
+  .search-dialog__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+  }
+  .search-dialog__title {
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .search-dialog__close {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.2rem 0.3rem 0.2rem 0.6rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+  .search-dialog__close:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .search-dialog__close kbd {
+    padding: 0 0.3em;
+    border-radius: 3px;
+    background: var(--color-surface-2);
+    font-size: 0.9em;
+  }
+  .search-dialog__ui {
+    overflow-y: auto;
+    min-height: 3rem;
+    /* Room for the input's focus ring inside the scroll box. */
+    margin-inline: -4px;
+    padding: 4px;
+    overscroll-behavior: contain;
+  }
+  .search-dialog__msg {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* Pagefind UI, in the site's colours and type. */
+  .search-dialog__ui {
+    --pagefind-ui-scale: 0.8;
+    --pagefind-ui-primary: var(--color-accent);
+    --pagefind-ui-text: var(--color-text);
+    --pagefind-ui-background: var(--color-surface);
+    --pagefind-ui-border: var(--color-border-strong);
+    --pagefind-ui-tag: var(--color-surface-2);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 10px;
+    --pagefind-ui-font: var(--font-body);
+  }
+  .search-dialog__ui :global(.pagefind-ui__search-input) {
+    font-weight: 400;
+    color: var(--color-text);
+  }
+  .search-dialog__ui :global(.pagefind-ui__search-input:focus) {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+  }
+  .search-dialog__ui :global(.pagefind-ui__search-clear) {
+    border: 0;
+    color: var(--color-text-faint);
+    font-family: var(--font-body);
+  }
+  .search-dialog__ui :global(.pagefind-ui__search-clear:hover) {
+    color: var(--color-accent);
+  }
+  .search-dialog__ui :global(.pagefind-ui__search-input::placeholder) {
+    color: var(--color-text-faint);
+    opacity: 1;
+  }
+  .search-dialog__ui :global(.pagefind-ui__result-link) {
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .search-dialog__ui :global(.pagefind-ui__result-link:hover) {
+    color: var(--color-accent);
+  }
+  .search-dialog__ui :global(.pagefind-ui__result-excerpt) {
+    color: var(--color-text-muted);
+  }
+  .search-dialog__ui :global(mark) {
+    background: var(--color-warm-soft);
+    color: var(--color-text);
+    padding: 0 0.1em;
+  }
+  .search-dialog__ui :global(.pagefind-ui__message) {
+    color: var(--color-text-faint);
+    font-weight: 500;
+  }
+  .search-dialog__ui :global(.pagefind-ui__button) {
+    border-radius: var(--radius-full);
+    color: var(--color-text);
+  }
+</style>

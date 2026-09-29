@@ -14,6 +14,8 @@ interface Props extends HeadProps {
   intro?: string;
   /** Seed for the header ridgelines (a different storm pattern per page). */
   ridges?: number;
+  /** false = leave this page out of site search. */
+  search?: boolean;
 }
 const { title, eyebrow, eyebrowHref, intro, ridges = 1, narrow = false, ...head } = Astro.props;
 ---

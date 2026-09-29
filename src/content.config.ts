@@ -13,9 +13,21 @@ import {
 
 /* Markdown ------------------------------------------------------------------ */
 
-/** Blog posts: src/content/blog/<slug>/index.md (images live next to the post). */
+/**
+ * Blog posts: src/content/blog/<slug>/index.md (images live next to the post).
+ * Notebook posts: <slug>/index.ipynb is converted to <slug>/index.ipynb.md by scripts/notebooks.mjs
+ * (runs before dev/build). Either way the folder name is the URL: /blog/<slug>/.
+ */
 const blog = defineCollection({
-  loader: glob({ base: './src/content/blog', pattern: '**/*.md' }),
+  loader: glob({
+    base: './src/content/blog',
+    pattern: '**/*.md',
+    generateId: ({ entry }) =>
+      entry
+        .replace(/\/index(\.ipynb)?\.md$/, '')
+        .replace(/\.md$/, '')
+        .toLowerCase(),
+  }),
   schema: blogSchema,
 });
 

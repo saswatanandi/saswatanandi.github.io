@@ -1,0 +1,45 @@
+---
+/**
+ * Behaviour for the Copy buttons that src/lib/markdown-plugins.mjs adds to code blocks.
+ * Included once in BaseLayout, so it works on every page that renders Markdown.
+ */
+---
+
+<script>
+  async function copy(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      ta.remove();
+      return ok;
+    }
+  }
+
+  document.addEventListener('click', async (e) => {
+    const btn = (e.target as Element | null)?.closest<HTMLButtonElement>('.code-copy');
+    const pre = btn?.parentElement?.querySelector('pre');
+    if (!btn || !pre) return;
+    const ok = await copy((pre.textContent ?? '').replace(/\n$/, ''));
+    btn.dataset.state = ok ? 'done' : 'error';
+    btn.textContent = ok ? 'Copied' : 'Failed';
+    btn.setAttribute('aria-label', ok ? 'Code copied' : 'Copy failed');
+    window.setTimeout(() => {
+      delete btn.dataset.state;
+      btn.textContent = 'Copy';
+      btn.setAttribute('aria-label', 'Copy code');
+    }, 1600);
+  });
+</script>

@@ -2,22 +2,30 @@
 import BaseHead, { type Props as HeadProps } from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import CodeCopy from '../components/blog/CodeCopy.astro';
 
-type Props = HeadProps;
+type Props = HeadProps & {
+  /** false = leave this page out of site search (lists, tag pages). Pages with noindex are always left out. */
+  search?: boolean;
+};
+const { search = true, ...head } = Astro.props;
+// Pagefind indexes only what is inside data-pagefind-body, so the header and footer never show in results.
+const indexed = search && !head.noindex;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead {...Astro.props} />
+    <BaseHead {...head} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <Header />
-    <main id="main" tabindex="-1">
+    <main id="main" tabindex="-1" data-pagefind-body={indexed ? '' : undefined}>
       <slot />
     </main>
     <Footer />
+    <CodeCopy />
   </body>
 </html>
 

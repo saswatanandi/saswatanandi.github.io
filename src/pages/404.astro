@@ -2,9 +2,15 @@
 import Ridgelines from '../components/Ridgelines.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../lib/config';
+
+// Old site (Hugo) addresses all started with /en/. Known ones have their own redirect pages
+// (src/lib/redirects.mjs); for any other /en/... address, try the same address without /en/
+// (with the old section names mapped to the new ones) before showing this page.
+const oldSiteScript = `(function(){var p=location.pathname;if(!/^\\/en(\\/|$)/.test(p))return;p=p.replace(/^\\/en/,'')||'/';p=p.replace(/^\\/posts(\\/|$)/,'/blog$1').replace(/^\\/softwares(\\/|$)/,'/software$1').replace(/^\\/publication(\\/|$)/,'/publications$1').replace(/^\\/categories(\\/|$)/,'/tags$1');if(/^\\/blog\\//.test(p))p=p.replace(/_/g,'-');location.replace(p+location.search+location.hash);})();`;
 ---
 
 <BaseLayout title="Page not found" description="Page not found." noindex>
+  <script is:inline set:html={oldSiteScript} />
   <section class="nf">
     <Ridgelines variant="page" seed={404} />
     <div class="container">

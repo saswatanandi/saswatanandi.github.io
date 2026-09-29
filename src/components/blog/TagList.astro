@@ -1,0 +1,49 @@
+---
+/** Tags as small links to their /tags/<slug>/ pages. */
+import { tagHref } from '../../lib/blog';
+
+interface Props {
+  tags: string[];
+  /** Screen-reader label for the list. */
+  label?: string;
+  class?: string;
+}
+const { tags, label = 'Tags', class: className } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul role="list" class:list={['tag-list', className]} aria-label={label}>
+      {tags.map((t) => (
+        <li>
+          <a class="tag" href={tagHref(t)}>
+            {t}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .tag {
+    display: inline-flex;
+    padding: 0.1em 0.6em;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    line-height: 1.6;
+    text-decoration: none;
+  }
+  .tag:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+</style>

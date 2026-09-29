@@ -1,0 +1,140 @@
+---
+/**
+ * Table of contents from the post's h2/h3 headings.
+ * Wide screens: a sticky list beside the text column (the column keeps its width).
+ * Narrower screens: a collapsed "Contents" box above the text.
+ */
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<details class="toc toc--inline" data-pagefind-ignore>
+  <summary>Contents</summary>
+  <ol role="list">
+    {
+      items.map((h) => (
+        <li class:list={[`toc__d${h.depth}`]}>
+          <a href={`#${h.slug}`}>{h.text}</a>
+        </li>
+      ))
+    }
+  </ol>
+</details>
+
+<nav class="toc toc--side" aria-label="Contents" data-pagefind-ignore>
+  <div class="toc__inner">
+    <p class="toc__title">Contents</p>
+    <ol role="list">
+      {
+        items.map((h) => (
+          <li class:list={[`toc__d${h.depth}`]}>
+            <a href={`#${h.slug}`} data-toc-link={h.slug}>
+              {h.text}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</nav>
+
+<script>
+  // Highlight the section being read in the side list.
+  const links = new Map<string, HTMLAnchorElement>();
+  document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]').forEach((a) => links.set(a.dataset.tocLink!, a));
+  const targets = [...links.keys()].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+  if (targets.length && 'IntersectionObserver' in window) {
+    const visible = new Set<string>();
+    const update = () => {
+      const current = targets.find((t) => visible.has(t.id)) ?? null;
+      if (!current) return;
+      links.forEach((a, id) => (id === current.id ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id);
+        update();
+      },
+      { rootMargin: '-64px 0px -60% 0px' },
+    );
+    targets.forEach((t) => io.observe(t));
+  }
+</script>
+
+<style>
+  .toc ol {
+    display: grid;
+    gap: 0.3rem;
+  }
+  .toc a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+  .toc a:hover {
+    color: var(--color-accent);
+  }
+  .toc__d3 {
+    padding-left: 0.9rem;
+  }
+
+  /* Collapsed box above the text. */
+  .toc--inline {
+    margin-bottom: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-size: var(--text-sm);
+  }
+  .toc--inline summary {
+    padding: var(--space-3) var(--space-4);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .toc--inline ol {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+
+  /* Beside the column: only where there is room for it. */
+  .toc--side {
+    display: none;
+  }
+  @media (min-width: 84rem) {
+    .toc--inline {
+      display: none;
+    }
+    .toc--side {
+      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(100% + 3rem);
+      width: 13rem;
+    }
+    .toc__inner {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-5));
+      max-height: calc(100vh - var(--header-height) - var(--space-7));
+      overflow-y: auto;
+      padding-left: var(--space-4);
+      border-left: 1px solid var(--color-border);
+      font-size: var(--text-sm);
+      line-height: var(--leading-snug);
+    }
+    .toc__title {
+      margin-bottom: var(--space-3);
+      color: var(--color-text-faint);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .toc--side a[aria-current] {
+      color: var(--color-accent);
+      font-weight: 550;
+    }
+  }
+</style>

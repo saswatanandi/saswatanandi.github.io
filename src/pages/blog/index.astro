@@ -1,69 +1,44 @@
 ---
-import ComingSoon from '../../components/ComingSoon.astro';
+import PostList from '../../components/blog/PostList.astro';
+import Pager from '../../components/blog/Pager.astro';
+import Icon from '../../components/Icon.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
+import { POSTS_PER_PAGE } from '../../lib/blog';
 import { getPosts } from '../../lib/collections';
-import { formatDate, isoDate } from '../../lib/format';
 
 const posts = await getPosts();
+const pages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
 ---
 
-<PageLayout
-  title="Blog"
-  eyebrow="Blog"
-  intro="Notes and how-to posts on hydrology and climate data."
-  ridges={5}
->
-  {
-    posts.length > 0 && (
-      <ol role="list" class="posts">
-        {posts.map((p) => (
-          <li>
-            <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date)}</time>
-            <h2>
-              <a href={`/blog/${p.id}/`}>{p.data.title}</a>
-              {p.data.draft && <span class="chip">draft</span>}
-            </h2>
-            <p>{p.data.description}</p>
-          </li>
-        ))}
-      </ol>
-    )
-  }
-
-  <ComingSoon phase={3} icon="docs" title="Posts coming soon">
-    <p>
-      I am moving my old posts here, including the IMDLIB tutorials. The RSS feed is at <a href="/rss.xml">/rss.xml</a>.
-    </p>
-  </ComingSoon>
+<PageLayout title="Blog" eyebrow="Blog" intro="Notes and how-to posts on hydrology and climate data." ridges={5} search={false}>
+  <p slot="header" class="feed">
+    <a href="/tags/">All tags</a>
+    <span aria-hidden="true">·</span>
+    <a href="/rss.xml"><Icon name="rss" size={14} /> RSS feed</a>
+  </p>
+  {posts.length > 0 ? <PostList posts={posts.slice(0, POSTS_PER_PAGE)} /> : <p class="empty">No posts yet.</p>}
+  <Pager current={1} total={pages} />
 </PageLayout>
 
 <style>
-  .posts {
-    display: grid;
-    gap: var(--space-6);
-    max-width: var(--width-prose);
-    margin-bottom: var(--space-7);
-  }
-  .posts time {
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  .posts h2 {
-    font-size: var(--text-lg);
+  .feed {
     display: flex;
-    gap: var(--space-2);
+    flex-wrap: wrap;
     align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
   }
-  .posts h2 a {
-    color: var(--color-text);
-    text-decoration: none;
+  .feed a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
   }
-  .posts h2 a:hover {
-    color: var(--color-accent);
+  .feed span {
+    color: var(--color-text-faint);
   }
-  .posts p {
+  .empty {
     color: var(--color-text-muted);
+    margin-bottom: var(--space-7);
   }
 </style>

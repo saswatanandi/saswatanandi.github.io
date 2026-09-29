@@ -1,0 +1,5 @@
+# Site search index (https://pagefind.app), built by `npm run build` after `astro build`.
+# Only the <main> of each page is indexed (data-pagefind-body in BaseLayout.astro).
+# The glob skips the redirect pages for old addresses (en/…) and /cv/.
+site: dist
+glob: "{*.html,[!ec]*/**/*.html,e[!n]*/**/*.html,c[!v]*/**/*.html}"

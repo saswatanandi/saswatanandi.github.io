@@ -1,0 +1,85 @@
+---
+/** The list of posts on /blog/ (and its later pages). */
+import { formatDate, isoDate } from '../../lib/format';
+import { readingTime, type Post } from '../../lib/blog';
+import TagList from './TagList.astro';
+
+interface Props {
+  posts: Post[];
+}
+const { posts } = Astro.props;
+---
+
+<ol role="list" class="post-list">
+  {
+    posts.map((p) => (
+      <li class="post-item">
+        <p class="post-item__meta">
+          <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date)}</time>
+          <span aria-hidden="true">·</span>
+          <span>{readingTime(p.body)} min read</span>
+          {p.data.series && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span class="post-item__series">Series: {p.data.series}</span>
+            </>
+          )}
+          {p.data.draft && <span class="chip">draft</span>}
+        </p>
+        <h2 class="post-item__title">
+          <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+        </h2>
+        <p class="post-item__desc">{p.data.description}</p>
+        <TagList tags={p.data.tags} class="post-item__tags" />
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .post-list {
+    display: grid;
+    max-width: 46rem;
+  }
+  .post-item {
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .post-item:first-child {
+    padding-top: 0;
+  }
+  .post-item:last-child {
+    border-bottom: 0;
+  }
+  .post-item__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    color: var(--color-text-faint);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+  .post-item__series {
+    color: var(--color-warm-text);
+  }
+  .post-item__title {
+    margin-top: var(--space-2);
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+  }
+  .post-item__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .post-item__title a:hover {
+    color: var(--color-accent);
+  }
+  .post-item__desc {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+  }
+  .post-item :global(.post-item__tags) {
+    margin-top: var(--space-3);
+  }
+</style>

@@ -1,0 +1,211 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Markdown extras for posts and notes (.prose): code blocks (Shiki, two themes),
+   copy button, maths (KaTeX), figures, callouts, tables, heading anchors.
+   The Markdown side is in src/lib/markdown-plugins.mjs.
+   ────────────────────────────────────────────────────────────────────────── */
+@import 'katex/dist/katex.min.css';
+
+/* ── Inline code ─────────────────────────────────────────────────────────── */
+.prose :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--color-surface-2);
+  font-size: 0.88em;
+  overflow-wrap: anywhere;
+}
+
+/* ── Code blocks ─────────────────────────────────────────────────────────── */
+.prose .code-block {
+  position: relative;
+}
+.prose pre {
+  overflow-x: auto;
+  padding: var(--space-4) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface) !important;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  tab-size: 4;
+}
+.prose pre:focus-visible {
+  outline-offset: 1px;
+}
+.prose pre code {
+  font-size: inherit;
+}
+/* Shiki dual themes (defaultColor: false): pick the light or dark colour from the site theme. */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+}
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .astro-code,
+  :root:not([data-theme='light']) .astro-code span {
+    color: var(--shiki-dark);
+    font-style: var(--shiki-dark-font-style);
+    font-weight: var(--shiki-dark-font-weight);
+  }
+}
+
+.code-copy {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-faint);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--duration) var(--ease),
+    color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.code-block:hover .code-copy,
+.code-block:focus-within .code-copy,
+.code-copy[data-state] {
+  opacity: 1;
+}
+@media (hover: none) {
+  .code-copy {
+    opacity: 1;
+  }
+}
+.code-copy:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.code-copy[data-state='done'] {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+html:not(.js) .code-copy {
+  display: none;
+}
+
+/* ── Maths ───────────────────────────────────────────────────────────────── */
+.prose .katex {
+  font-size: 1.08em;
+}
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25em;
+}
+
+/* ── Figures ─────────────────────────────────────────────────────────────── */
+.prose img {
+  border-radius: var(--radius-sm);
+}
+.prose figure,
+.prose .md-figure {
+  margin-inline: 0;
+}
+.prose figure img {
+  margin-inline: auto;
+}
+.prose figcaption {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+.prose .table-wrap {
+  overflow-x: auto;
+}
+.prose table {
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+.prose th,
+.prose td {
+  padding: 0.45rem 1.25rem 0.45rem 0;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+.prose th {
+  border-bottom-color: var(--color-border-strong);
+  font-weight: 600;
+}
+
+/* ── Callouts: > [!NOTE] ────────────────────────────────────────────────── */
+.prose .callout {
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--color-accent-soft);
+  font-style: normal;
+}
+.prose .callout > * + * {
+  margin-top: 0.6em;
+}
+.prose .callout__title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.prose .callout--warning,
+.prose .callout--caution,
+.prose .callout--important {
+  border-left-color: var(--color-warm);
+  background: var(--color-warm-soft);
+}
+.prose .callout--warning .callout__title,
+.prose .callout--caution .callout__title,
+.prose .callout--important .callout__title {
+  color: var(--color-warm-text);
+}
+
+/* ── Headings: "link to this section" ───────────────────────────────────── */
+.prose .heading-anchor {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 0.35em;
+  color: var(--color-text-faint);
+  opacity: 0;
+  transition: opacity var(--duration) var(--ease);
+}
+.prose :is(h2, h3, h4):hover .heading-anchor,
+.prose .heading-anchor:focus-visible {
+  opacity: 1;
+}
+.prose .heading-anchor:hover {
+  color: var(--color-accent);
+}
+.prose h4 {
+  font-size: var(--text-md);
+  margin-top: 1.4em;
+}
+
+/* ── Misc ────────────────────────────────────────────────────────────────── */
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin-block: var(--space-6);
+}
+.prose h2 + *,
+.prose h3 + *,
+.prose h4 + * {
+  margin-top: 0.6em;
+}

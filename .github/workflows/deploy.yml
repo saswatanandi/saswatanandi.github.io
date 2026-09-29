@@ -36,12 +36,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ── Phase 3: Jupyter notebooks → Markdown (stored outputs, not executed) ──
-      # - uses: actions/setup-python@v5
-      #   with: { python-version: '3.12' }
-      # - run: pip install nbconvert
-      # - run: python scripts/convert_notebooks.py
-
       # CV PDF (public/cv.pdf) from cv.yaml + site.config.yaml + publications.bib.
       # Built before the site so /cv/ shows the "Download PDF" button.
       - name: Set up Typst
@@ -52,11 +46,10 @@ jobs:
       - name: Build CV PDF
         run: npm run cv:pdf
 
+      # npm run build = notebook posts → Markdown (scripts/notebooks.mjs, saved outputs, nothing
+      # executed), then astro build, then the Pagefind search index (dist/pagefind/).
       - name: Build
         run: npm run build
-
-      # ── Phase 3: search index ──
-      # - run: npx pagefind --site dist
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

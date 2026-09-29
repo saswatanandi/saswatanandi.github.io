@@ -17,7 +17,7 @@ interface Props {
 const { from, label = 'Copy', srLabel, class: className } = Astro.props;
 ---
 
-<button type="button" class:list={['copy-btn', className]} data-copy-from={from} aria-label={srLabel}>
+<button type="button" class:list={['copy-btn', className]} data-copy-from={from} aria-label={srLabel} data-pagefind-ignore>
   <span class="copy-btn__idle"><Icon name="copy" size={13} /> {label}</span>
   <span class="copy-btn__done" aria-hidden="true"><Icon name="check" size={13} /> Copied</span>
 </button>

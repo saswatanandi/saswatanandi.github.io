@@ -1,31 +1,199 @@
 ---
-/** Minimal post page (Phase 3 adds ToC, tags, maths, code copy, comments). */
+/**
+ * A blog post: title, dates, reading time and tags; optional cover, series box and contents;
+ * the text; older/newer links; comments (when giscus is set up in site.config.yaml).
+ */
 import type { GetStaticPaths } from 'astro';
+import { getImage, Image } from 'astro:assets';
 import { render, type CollectionEntry } from 'astro:content';
+import Giscus from '../../components/blog/Giscus.astro';
+import SeriesNav from '../../components/blog/SeriesNav.astro';
+import TagList from '../../components/blog/TagList.astro';
+import Toc from '../../components/blog/Toc.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
+import { readingTime, seriesOf } from '../../lib/blog';
 import { getPosts } from '../../lib/collections';
-import { formatDate } from '../../lib/format';
+import { site } from '../../lib/config';
+import { formatDate, isoDate } from '../../lib/format';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts();
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    // getPosts() is newest first.
+    props: { post, newer: posts[i - 1], older: posts[i + 1], series: seriesOf(post, posts) },
+  }));
 }) satisfies GetStaticPaths;
 
 interface Props {
   post: CollectionEntry<'blog'>;
+  newer?: CollectionEntry<'blog'>;
+  older?: CollectionEntry<'blog'>;
+  series: CollectionEntry<'blog'>[];
 }
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { post, newer, older, series } = Astro.props;
+const { Content, headings } = await render(post);
+const d = post.data;
+const minutes = readingTime(post.body);
+const showToc = d.toc && headings.filter((h) => h.depth === 2 || h.depth === 3).length >= 3;
+const ogImage = d.cover ? (await getImage({ src: d.cover, width: 1200, format: 'jpeg' })).src : undefined;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: d.title,
+    description: d.description,
+    datePublished: d.date.toISOString(),
+    ...(d.updated ? { dateModified: d.updated.toISOString() } : {}),
+    author: { '@type': 'Person', name: site.name, url: Astro.site?.toString() },
+    url: new URL(`/blog/${post.id}/`, Astro.site).toString(),
+    keywords: d.tags.join(', '),
+    ...(ogImage ? { image: new URL(ogImage, Astro.site).toString() } : {}),
+  },
+];
 ---
 
 <PageLayout
-  title={post.data.title}
-  eyebrow={formatDate(post.data.date)}
-  intro={post.data.description}
-  description={post.data.description}
+  title={d.title}
+  eyebrow="Blog"
+  eyebrowHref="/blog/"
+  intro={d.description}
+  description={d.description}
+  image={ogImage}
   type="article"
+  jsonLd={jsonLd}
+  ridges={21}
+  narrow
 >
-  <article class="prose">
-    <Content />
-  </article>
+  <Fragment slot="header">
+    <p class="post-meta" data-pagefind-ignore>
+      <time datetime={isoDate(d.date)}>{formatDate(d.date)}</time>
+      {
+        d.updated && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span>
+              Updated <time datetime={isoDate(d.updated)}>{formatDate(d.updated)}</time>
+            </span>
+          </>
+        )
+      }
+      <span aria-hidden="true">·</span>
+      <span>{minutes} min read</span>
+      {d.draft && <span class="chip">draft</span>}
+    </p>
+    <div data-pagefind-ignore><TagList tags={d.tags} class="post-tags" /></div>
+  </Fragment>
+
+  <div class="post">
+    {showToc && <Toc headings={headings} />}
+    {d.series && <SeriesNav name={d.series} posts={series} current={post.id} />}
+    {
+      d.cover && (
+        <figure class="post-cover">
+          <Image src={d.cover} alt={d.cover_alt ?? ''} widths={[400, 736, 1100]} sizes="(min-width: 50rem) 46rem, 100vw" loading="eager" />
+        </figure>
+      )
+    }
+    <article class="prose post-body">
+      <Content />
+    </article>
+
+    {
+      (newer || older) && (
+        <nav class="post-nav" aria-label="More posts" data-pagefind-ignore>
+          {older ? (
+            <a class="post-nav__link" href={`/blog/${older.id}/`} rel="prev">
+              <span class="post-nav__label">← Older</span>
+              <span class="post-nav__title">{older.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {newer && (
+            <a class="post-nav__link post-nav__link--next" href={`/blog/${newer.id}/`} rel="next">
+              <span class="post-nav__label">Newer →</span>
+              <span class="post-nav__title">{newer.data.title}</span>
+            </a>
+          )}
+        </nav>
+      )
+    }
+
+    {d.comments && !d.draft && <Giscus />}
+  </div>
 </PageLayout>
+
+<style>
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    margin-top: var(--space-4);
+    color: var(--color-text-faint);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  :global(.post-tags) {
+    margin-top: var(--space-3);
+  }
+  .post {
+    position: relative;
+    padding-bottom: var(--space-8);
+  }
+  .post-cover {
+    margin: 0 0 var(--space-6);
+  }
+  .post-cover :global(img) {
+    width: auto;
+    max-height: 22rem;
+    margin-inline: auto;
+    border-radius: var(--radius-md);
+  }
+  .post-body {
+    max-width: none;
+  }
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+  .post-nav__link {
+    display: grid;
+    gap: var(--space-1);
+    text-decoration: none;
+  }
+  .post-nav__link--next {
+    grid-column: 2;
+    text-align: right;
+  }
+  .post-nav__label {
+    color: var(--color-text-faint);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .post-nav__title {
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
+    color: var(--color-text);
+  }
+  .post-nav__link:hover .post-nav__title {
+    color: var(--color-accent);
+  }
+  @media (max-width: 36rem) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+    .post-nav__link--next {
+      grid-column: 1;
+    }
+  }
+</style>

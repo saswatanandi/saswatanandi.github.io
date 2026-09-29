@@ -2,6 +2,7 @@
 import { site } from '../lib/config';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+import Search from './Search.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 const path = Astro.url.pathname.replace(/\/?$/, '/');
@@ -30,6 +31,7 @@ const isActive = (href: string) => href !== '/' && path.startsWith(href.replace(
     </nav>
 
     <div class="site-header__actions">
+      <Search />
       <ThemeToggle />
       <button
         class="menu-button"

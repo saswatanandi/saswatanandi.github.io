@@ -1,0 +1,99 @@
+---
+/**
+ * giscus comments (GitHub Discussions). Renders nothing until all four ids are set in
+ * site.config.yaml → giscus. The script loads only when the reader scrolls near the comments,
+ * and the widget follows the site's light/dark theme.
+ */
+import { site } from '../../lib/config';
+
+const g = site.giscus;
+const ready = Boolean(g.repo && g.repo_id && g.category && g.category_id);
+---
+
+{
+  ready && (
+    <section class="comments" aria-labelledby="comments-title" data-pagefind-ignore>
+      <h2 id="comments-title">Comments</h2>
+      <div
+        class="comments__frame"
+        data-giscus
+        data-repo={g.repo}
+        data-repo-id={g.repo_id}
+        data-category={g.category}
+        data-category-id={g.category_id}
+      >
+        <noscript>Comments need JavaScript. You can also reply on GitHub Discussions.</noscript>
+      </div>
+    </section>
+  )
+}
+
+<script>
+  const box = document.querySelector<HTMLElement>('[data-giscus]');
+  const root = document.documentElement;
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => ((root.dataset.theme ?? (media.matches ? 'dark' : 'light')) === 'dark' ? 'dark_dimmed' : 'light');
+
+  function load(el: HTMLElement) {
+    const s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+    const d = el.dataset;
+    const attrs: Record<string, string> = {
+      'data-repo': d.repo!,
+      'data-repo-id': d.repoId!,
+      'data-category': d.category!,
+      'data-category-id': d.categoryId!,
+      'data-mapping': 'pathname',
+      'data-strict': '1',
+      'data-reactions-enabled': '1',
+      'data-emit-metadata': '0',
+      'data-input-position': 'top',
+      'data-theme': theme(),
+      'data-lang': 'en',
+      'data-loading': 'lazy',
+    };
+    for (const [k, v] of Object.entries(attrs)) s.setAttribute(k, v);
+    el.appendChild(s);
+  }
+
+  function sync() {
+    const frame = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+    frame?.contentWindow?.postMessage({ giscus: { setConfig: { theme: theme() } } }, 'https://giscus.app');
+  }
+
+  if (box) {
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io.disconnect();
+            load(box);
+          }
+        },
+        { rootMargin: '600px 0px' },
+      );
+      io.observe(box);
+    } else {
+      load(box);
+    }
+    new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    media.addEventListener('change', sync);
+  }
+</script>
+
+<style>
+  .comments {
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+  .comments h2 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+  }
+  .comments__frame {
+    min-height: 8rem;
+  }
+</style>

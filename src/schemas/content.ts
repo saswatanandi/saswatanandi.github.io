@@ -4,6 +4,7 @@
  * with the file name and field path, instead of silently rendering wrong.
  */
 import { z } from 'astro/zod';
+import type { SchemaContext } from 'astro:content';
 
 /**
  * Research theme slugs = the file names in src/content/research/ (without .md).
@@ -28,21 +29,39 @@ const yearMonth = z
 
 /* ── Markdown collections ─────────────────────────────────────────────── */
 
-export const blogSchema = z
-  .object({
-    title: z.string().min(1),
-    description: z.string().min(1).max(300),
-    date: z.coerce.date(),
-    updated: z.coerce.date().optional(),
-    tags,
-    topics: z.array(topic).default([]),
-    series: z.string().optional(),
-    draft: z.boolean().default(false),
-    math: z.boolean().default(false),
-    /** Canonical URL if the post was first published elsewhere. */
-    canonical: url.optional(),
-  })
-  .strict();
+/**
+ * Blog posts. `image` is Astro's image() helper (from the collection schema context), so
+ * `cover: ./cover.jpg` resolves a picture next to index.md and fails the build if it is missing.
+ */
+export const blogSchema = ({ image }: SchemaContext) =>
+  z
+    .object({
+      title: z.string().min(1),
+      description: z.string().min(1).max(300),
+      date: z.coerce.date(),
+      updated: z.coerce.date().optional(),
+      tags,
+      topics: z.array(topic).default([]),
+      /** Posts with the same series name are linked to each other, oldest first. */
+      series: z.string().optional(),
+      draft: z.boolean().default(false),
+      /** Kept for old posts; maths ($...$, $$...$$) is always rendered. */
+      math: z.boolean().default(false),
+      /** Optional picture shown under the title and used for social cards: a file next to index.md. */
+      cover: image().optional(),
+      cover_alt: z.string().optional(),
+      /** false = no table of contents even with many headings. */
+      toc: z.boolean().default(true),
+      /** false = no comment box under this post (when comments are set up). */
+      comments: z.boolean().default(true),
+      /** Canonical URL if the post was first published elsewhere. */
+      canonical: url.optional(),
+    })
+    .strict()
+    .refine((d) => !d.cover || !!d.cover_alt, {
+      error: 'cover_alt: describe the cover picture in a sentence (for screen readers)',
+      path: ['cover_alt'],
+    });
 
 /**
  * A longer note on a paper in reading.yaml: src/content/reading/notes/<slug>.md,

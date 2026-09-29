@@ -1,0 +1,36 @@
+---
+/** Newer / older page links for /blog/ (renders nothing when there is one page). */
+interface Props {
+  current: number;
+  total: number;
+}
+const { current, total } = Astro.props;
+const href = (n: number) => (n === 1 ? '/blog/' : `/blog/page/${n}/`);
+---
+
+{
+  total > 1 && (
+    <nav class="pager" aria-label="Blog pages">
+      {current > 1 ? <a href={href(current - 1)}>← Newer posts</a> : <span />}
+      <span class="pager__count">
+        Page {current} of {total}
+      </span>
+      {current < total ? <a href={href(current + 1)}>Older posts →</a> : <span />}
+    </nav>
+  )
+}
+
+<style>
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    max-width: 46rem;
+    margin-block: var(--space-6) var(--space-8);
+    font-size: var(--text-sm);
+  }
+  .pager__count {
+    color: var(--color-text-faint);
+  }
+</style>

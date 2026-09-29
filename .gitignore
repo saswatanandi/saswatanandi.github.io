@@ -21,3 +21,7 @@ npm-debug.log*
 # generated CV (npm run cv:pdf; built in CI)
 public/cv.pdf
 cv/build/
+
+# Generated from notebook posts by scripts/notebooks.mjs (commit only index.ipynb / meta.yaml)
+src/content/blog/**/index.ipynb.md
+src/content/blog/**/nb-output/
