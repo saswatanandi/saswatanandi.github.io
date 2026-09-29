@@ -61,6 +61,10 @@ export const redirects = {
   '/en/archive': '/blog/',
   '/en/softwares': '/software/',
   '/en/softwares/imdlib': '/software/imdlib/',
+  // Linked from the IMDLIB repository README (without /en/).
+  '/softwares': '/software/',
+  '/softwares/imdlib': '/software/imdlib/',
+  '/posts': '/blog/',
   '/en/publication': '/publications/',
   '/en/presentation': '/',
   '/en/private': '/',
