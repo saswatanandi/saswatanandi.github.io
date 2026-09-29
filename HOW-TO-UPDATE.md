@@ -399,9 +399,9 @@ metrics:
   updated: 2026-10-01
 ```
 
-Copy the numbers from your Google Scholar profile. They appear on the home page and at the top of
-/publications/, with "Google Scholar · Oct 2026" underneath. Use `null` to hide a number. Numbers
-have no quotes.
+Copy the numbers from your Google Scholar profile. They appear at the top of /publications/ only.
+`source` and `updated` are for your own record and are not shown. Use `null` to hide a number.
+Numbers have no quotes.
 
 ---
 

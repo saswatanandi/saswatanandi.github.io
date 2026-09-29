@@ -23,12 +23,6 @@ const featured = (await getSoftware()).find((s) => s.data.featured);
 const latestPost = (await getPosts())[0];
 const latestReading = (await getReading())[0];
 
-const m = site.metrics;
-const metrics = [
-  { label: 'Citations', value: m.citations },
-  { label: 'h-index', value: m.h_index },
-  { label: 'i10-index', value: m.i10 },
-].filter((x): x is { label: string; value: number } => typeof x.value === 'number');
 ---
 
 <BaseLayout type="profile">
@@ -110,24 +104,6 @@ const metrics = [
           }
         </ul>
 
-        {
-          metrics.length > 0 && (
-            <dl class="metrics" aria-label={`Citation metrics${m.source ? ` (${m.source})` : ''}`}>
-              {metrics.map((x) => (
-                <div>
-                  <dt>{x.label}</dt>
-                  <dd>{x.value.toLocaleString('en')}</dd>
-                </div>
-              ))}
-              {(m.source || m.updated) && (
-                <p class="metrics__src">
-                  {m.source}
-                  {m.updated && <> · {formatMonth(m.updated)}</>}
-                </p>
-              )}
-            </dl>
-          )
-        }
       </div>
       <div class="hero__photo">
         <HeadshotFrame src="/images/headshot.jpg" alt={`Photo of ${site.name}`} />
@@ -317,33 +293,6 @@ const metrics = [
     display: grid;
     place-items: center;
     width: clamp(240px, 26vw, 320px);
-  }
-
-  .metrics {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: var(--space-2) var(--space-6);
-    margin-top: var(--space-6);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border);
-    max-width: 36rem;
-  }
-  .metrics dt {
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .metrics dd {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: var(--text-xl);
-    font-weight: 600;
-  }
-  .metrics__src {
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
   }
 
   /* Sections --------------------------------------------------------------- */

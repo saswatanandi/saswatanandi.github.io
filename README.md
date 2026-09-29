@@ -56,7 +56,7 @@ publications:
     in_list: false     # true = also show them in the /publications/ list
 ```
 
-The citations / h-index / i10 numbers at the top of `/publications/` (and on the home page) are the
+The citations / h-index / i10 numbers at the top of `/publications/` are the
 `metrics:` block in `site.config.yaml`, entered by hand. `docs/publications-notes.md` lists what to check
 after the conversion from `publication.txt`.
 
