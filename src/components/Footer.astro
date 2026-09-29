@@ -43,19 +43,7 @@ const year = new Date().getFullYear();
       </li>
     </ul>
 
-    <p class="site-footer__meta">
-      <span>© {year} {site.name}</span>
-      <span aria-hidden="true" class="site-footer__sep">·</span>
-      <span>
-        Built with <a href="https://astro.build">Astro</a>{
-          site.repo && (
-            <>
-              {' '}· <a href={site.repo}>source on GitHub</a>
-            </>
-          )
-        }
-      </span>
-    </p>
+    <p class="site-footer__meta">© {year} {site.name}</p>
   </div>
 </footer>
 
@@ -102,28 +90,13 @@ const year = new Date().getFullYear();
   }
   .site-footer__meta {
     grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
+    text-align: center;
     padding-top: var(--space-4);
     border-top: 1px solid var(--color-border);
     color: var(--color-text-faint);
     font-size: var(--text-xs);
   }
-  .site-footer__meta a {
-    color: inherit;
-  }
-  .site-footer__meta a:hover {
-    color: var(--color-accent);
-  }
   @media (max-width: 40rem) {
-    .site-footer__meta {
-      flex-direction: column;
-      gap: 0.25em;
-    }
-    .site-footer__sep {
-      display: none;
-    }
     .site-footer__inner {
       grid-template-columns: 1fr;
     }
