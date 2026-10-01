@@ -1,14 +1,18 @@
 # ─────────────────────────────────────────────────────────────────────────────
 #  Software shown on /software/ (and IMDLIB on the home page).
 #  Everything is entered by hand; nothing is fetched when the site builds.
+#  Cards appear in the order of this file, in two sections: Packages, then Dashboards.
 #
 #  Fields (all optional except name and description):
+#    kind: dashboard            dashboard = the Dashboards section (needs website);
+#                               leave it out for a package
 #    name, tagline (one short line), description
+#    subtitle                   one line under the name on a dashboard card
 #    repo, docs, website        full https:// links; missing = no button
+#                               (a dashboard card has one button, "Open <name>", to website)
 #    pypi: imdlib               PyPI package name (adds a PyPI button)
 #    conda: conda-forge/imdlib  channel/package
 #    language, license, version, status   small badges
-#    order: 1                   position on /software/ (1 = first; featured cards always come first)
 #    featured: true             large card, and the Software block on the home page
 #    page: true                 detail page /software/<slug>/ with text from
 #                               src/content/software/<slug>.md
@@ -23,7 +27,6 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 - name: IMDLIB
-  order: 1
   slug: imdlib
   tagline: Python library for IMD gridded rainfall and temperature data.
   description: Open-source Python package for retrieval, processing, and spatiotemporal analysis of gridded India Meteorological Department (IMD) observational datasets.
@@ -66,7 +69,6 @@
   tags: [python, climate-data, india, xarray]
 
 - name: prismdata
-  order: 2
   description: Python package for programmatic access to PRISM climate data over the continental United States.
   repo: https://github.com/iamsaswata/prismdata
   docs: https://prismdata.readthedocs.io
@@ -78,8 +80,14 @@
     - pip install prismdata
   tags: [python, climate-data, usa]
 
+- name: FLARE
+  subtitle: Fire, Land, And River Erosion
+  description: A decision-support tool for wildfire, hydrology and soil erosion in the Upper San Joaquin River Basin. It maps soil loss and erosion severity, burn probability and fire severity, and evapotranspiration, runoff, soil moisture and snowpack.
+  website: https://flare.ucwater.org/
+  kind: dashboard
+
 - name: ARWIN
-  order: 3
+  kind: dashboard
   description: Real-time hydroclimate decision-support dashboard for the Upper American River Basin, built and maintained for El Dorado County Water Agency.
   website: https://arwin.edwateragency.org/
   tags: [dashboard, forecasting, california]

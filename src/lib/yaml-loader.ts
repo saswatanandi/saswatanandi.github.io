@@ -27,7 +27,7 @@ interface Options {
   singleId?: string;
 }
 
-export function slugify(input: string): string {
+function slugify(input: string): string {
   return input
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
@@ -43,6 +43,20 @@ function defaultId(item: Item, index: number): string {
     if (typeof v === 'string' && v.trim()) return slugify(v);
   }
   return String(index + 1);
+}
+
+/**
+ * Entry ids for the items of a list file, in file order: `idFn` (default: a slug of id / slug / name / title),
+ * with -2, -3 … added to repeats. Also used to sort a collection in the order of its file.
+ */
+export function listIds(items: Item[], idFn: Options['id'] = defaultId): string[] {
+  const seen = new Map<string, number>();
+  return items.map((item, index) => {
+    const id = idFn(item, index);
+    const n = seen.get(id) ?? 0;
+    seen.set(id, n + 1);
+    return n > 0 ? `${id}-${n + 1}` : id;
+  });
 }
 
 export function yamlLoader(opts: Options): Loader {
@@ -75,17 +89,16 @@ export function yamlLoader(opts: Options): Loader {
         if (!Array.isArray(data)) {
           throw new Error(`\n✖ ${opts.path} must be a YAML list (each item starts with "- ").\n`);
         }
-        const seen = new Map<string, number>();
         for (const [index, raw] of data.entries()) {
           if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
             throw new Error(`\n✖ ${opts.path}: item #${index + 1} must be a mapping of "key: value" fields.\n`);
           }
-          const item = raw as Item;
-          let id = (opts.id ?? defaultId)(item, index);
-          // Keep ids unique without making the author care about it.
-          const n = seen.get(id) ?? 0;
-          seen.set(id, n + 1);
-          if (n > 0) id = `${id}-${n + 1}`;
+        }
+        const items = data as Item[];
+        // Unique ids without making the author care about it.
+        const ids = listIds(items, opts.id);
+        for (const [index, item] of items.entries()) {
+          const id = ids[index]!;
           const parsed = await parseData({ id, data: item, filePath });
           store.set({ id, data: parsed, filePath: opts.path });
         }

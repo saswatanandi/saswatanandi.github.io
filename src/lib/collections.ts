@@ -1,5 +1,8 @@
 /** Collection helpers: draft handling and sorting in one place. */
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { parse } from 'yaml';
+import softwareYaml from '../data/software.yaml?raw';
+import { listIds } from './yaml-loader';
 
 /** Drafts are visible in `npm run dev` only. */
 const visible = (draft: boolean) => import.meta.env.DEV || !draft;
@@ -63,7 +66,7 @@ export async function getThemes(): Promise<CollectionEntry<'research'>[]> {
   return items.sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title));
 }
 
-/** Software, featured first, then by `order`. Checks that `page: true` items have a text file. */
+/** Software in the order of software.yaml, featured first. Checks that `page: true` items have a text file. */
 export async function getSoftware(): Promise<CollectionEntry<'software'>[]> {
   const items = await getCollection('software');
   const pages = new Set((await getCollection('softwarePages')).map((p) => p.id));
@@ -74,9 +77,10 @@ export async function getSoftware(): Promise<CollectionEntry<'software'>[]> {
       );
     }
   }
-  return items.sort(
-    (a, b) => Number(b.data.featured) - Number(a.data.featured) || a.data.order - b.data.order || a.data.name.localeCompare(b.data.name),
-  );
+  // getCollection does not keep the order of the file, so sort by the position in software.yaml.
+  const position = new Map(listIds(parse(softwareYaml) ?? []).map((id, i) => [id, i]));
+  const at = (s: CollectionEntry<'software'>) => position.get(s.id) ?? Infinity;
+  return items.sort((a, b) => Number(b.data.featured) - Number(a.data.featured) || at(a) - at(b));
 }
 
 /** Where a reading entry links: its DOI, else its url. */

@@ -2,6 +2,7 @@
 /**
  * A software card from src/data/software.yaml.
  * `feature` = the large IMDLIB-style card with a code panel (home page and top of /software/).
+ * `kind: dashboard` = name, subtitle, description and one "Open <name>" button (no badges or install line).
  */
 import type { CollectionEntry } from 'astro:content';
 import { compactNumber, formatDate } from '../lib/format';
@@ -11,18 +12,16 @@ import Icon from './Icon.astro';
 interface Props {
   item: CollectionEntry<'software'>;
   feature?: boolean;
-  /** Heading level of the name: 2 on /software/, 3 under a section heading. */
-  level?: 2 | 3;
 }
-const { item, feature = false, level = 3 } = Astro.props;
+const { item, feature = false } = Astro.props;
 const s = item.data;
-const Heading = level === 2 ? 'h2' : 'h3';
 const detail = s.page ? `/software/${item.id}/` : undefined;
-const badges = [s.language, s.license && `${s.license} license`, s.version && `v${s.version}`, s.status].filter(
+const dashboard = s.kind === 'dashboard';
+const badges = dashboard ? [] : [s.language, s.license && `${s.license} license`, s.version && `v${s.version}`, s.status].filter(
   (b): b is string => Boolean(b),
 );
 const stats = s.stats;
-const hasStats = stats.stars !== null || stats.downloads !== null;
+const hasStats = !dashboard && (stats.stars !== null || stats.downloads !== null);
 
 // Tiny highlighter for the code panel: comments, prompts, strings, numbers, keywords.
 const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -36,7 +35,7 @@ const highlight = (line: string) => {
     .replace(/\b(\d+)\b/g, '<span class="n">$1</span>');
   return prompt + code;
 };
-const firstInstall = s.install[0];
+const firstInstall = dashboard ? undefined : s.install[0];
 const panel = [firstInstall && `$ ${firstInstall}`, firstInstall && s.snippet && '', s.snippet?.trimEnd()]
   .filter((l): l is string => typeof l === 'string')
   .join('\n');
@@ -44,7 +43,7 @@ const panelHtml = panel ? panel.split('\n').map(highlight).join('\n') : '';
 const installId = `install-${item.id}`;
 ---
 
-<article class:list={['sw', { 'sw--feature': feature }]} aria-labelledby={`sw-${item.id}`}>
+<article class:list={['sw', { 'sw--feature': feature, 'sw--dashboard': dashboard }]} aria-labelledby={`sw-${item.id}`}>
   <div class="sw__main">
     {
       badges.length > 0 && (
@@ -55,9 +54,10 @@ const installId = `install-${item.id}`;
         </ul>
       )
     }
-    <Heading id={`sw-${item.id}`} class="sw__name">
+    <h3 id={`sw-${item.id}`} class="sw__name">
       {detail ? <a href={detail}>{s.name}</a> : s.name}
-    </Heading>
+    </h3>
+    {dashboard && s.subtitle && <p class="sw__subtitle">{s.subtitle}</p>}
     <p class="sw__desc">{s.description}</p>
 
     {
@@ -89,38 +89,48 @@ const installId = `install-${item.id}`;
 
     <p class="sw__links">
       {
-        s.website && (
-          <a class:list={['btn', { 'btn--primary': !s.repo }]} href={s.website}>
-            <Icon name="external" /> Website
+        dashboard ? (
+          <a class="btn btn--primary" href={s.website}>
+            Open {s.name} <span aria-hidden="true">↗</span>
           </a>
-        )
-      }
-      {
-        s.repo && (
-          <a class="btn btn--primary" href={s.repo}>
-            <Icon name="github" /> Repository
-          </a>
-        )
-      }
-      {
-        s.docs && (
-          <a class="btn" href={s.docs}>
-            <Icon name="docs" /> Documentation
-          </a>
-        )
-      }
-      {
-        s.pypi && (
-          <a class="btn" href={`https://pypi.org/project/${s.pypi}/`}>
-            <Icon name="package" /> PyPI
-          </a>
-        )
-      }
-      {
-        s.citation?.doi && (
-          <a class="btn" href={`https://doi.org/${s.citation.doi}`}>
-            <Icon name="quote" /> Paper
-          </a>
+        ) : (
+          <>
+            {
+              s.website && (
+                <a class:list={['btn', { 'btn--primary': !s.repo }]} href={s.website}>
+                  <Icon name="external" /> Website
+                </a>
+              )
+            }
+            {
+              s.repo && (
+                <a class="btn btn--primary" href={s.repo}>
+                  <Icon name="github" /> Repository
+                </a>
+              )
+            }
+            {
+              s.docs && (
+                <a class="btn" href={s.docs}>
+                  <Icon name="docs" /> Documentation
+                </a>
+              )
+            }
+            {
+              s.pypi && (
+                <a class="btn" href={`https://pypi.org/project/${s.pypi}/`}>
+                  <Icon name="package" /> PyPI
+                </a>
+              )
+            }
+            {
+              s.citation?.doi && (
+                <a class="btn" href={`https://doi.org/${s.citation.doi}`}>
+                  <Icon name="quote" /> Paper
+                </a>
+              )
+            }
+          </>
         )
       }
     </p>
@@ -204,12 +214,21 @@ const installId = `install-${item.id}`;
     font-size: var(--text-2xl);
     letter-spacing: -0.02em;
   }
+  .sw__name:first-child {
+    margin-top: 0;
+  }
   .sw__name a {
     color: inherit;
     text-decoration: none;
   }
   .sw__name a:hover {
     color: var(--color-accent);
+  }
+  .sw__subtitle {
+    margin-top: var(--space-1);
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    font-weight: 600;
   }
   .sw__desc {
     margin-top: var(--space-2);
@@ -259,6 +278,11 @@ const installId = `install-${item.id}`;
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-top: var(--space-5);
+  }
+  /* Dashboard cards in a row keep their button on one line, at the bottom. */
+  .sw--dashboard .sw__links {
+    margin-top: auto;
+    padding-top: var(--space-5);
   }
   .sw__more {
     margin-top: var(--space-4);

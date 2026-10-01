@@ -217,6 +217,12 @@ const doi = z
 export const softwareSchema = z
   .object({
     name: z.string().min(1),
+    /** Which section of /software/ the card goes in: a code package, or a dashboard (a web app). */
+    kind: z
+      .enum(['package', 'dashboard'], { error: 'kind must be package or dashboard (or leave it out for a package)' })
+      .default('package'),
+    /** One line under the name on a dashboard card, e.g. what the acronym stands for. */
+    subtitle: z.string().min(1).optional(),
     /** URL part for the detail page (/software/<slug>/). Defaults to the name in lowercase. */
     slug: z
       .string()
@@ -242,8 +248,6 @@ export const softwareSchema = z
     version: z.string().optional(),
     /** Short status word shown as a badge, e.g. "Active" (optional). */
     status: z.string().optional(),
-    /** Position on /software/ (1 = first). */
-    order: z.number().int().default(99),
     featured: z.boolean().default(false),
     /** true = a detail page /software/<slug>/ from src/content/software/<slug>.md */
     page: z.boolean().default(false),
@@ -279,4 +283,8 @@ export const softwareSchema = z
     links: z.array(z.object({ label: z.string().min(1), url }).strict()).default([]),
     tags,
   })
-  .strict();
+  .strict()
+  .refine((d) => d.kind !== 'dashboard' || !!d.website, {
+    error: 'a dashboard (kind: dashboard) needs website: its full https:// address',
+    path: ['website'],
+  });

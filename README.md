@@ -11,7 +11,7 @@ Step-by-step instructions for each kind of update are in **[HOW-TO-UPDATE.md](HO
 | Name, title, affiliation, bio, links, nav, citation metrics, analytics | `site.config.yaml` |
 | News on the home page                 | `src/data/news.yaml`                   |
 | Publications (list, paper pages, home "Selected") | `src/data/publications.bib` — see below |
-| Software cards / IMDLIB stats         | `src/data/software.yaml`               |
+| Software (packages, dashboards) / IMDLIB stats | `src/data/software.yaml`     |
 | Reading list                          | `src/data/reading.yaml` (+ notes in `src/content/reading/notes/`) |
 | Research themes (text, picture) | `src/content/research/<slug>.md` — see below |
 | Blog posts                            | `src/content/blog/<slug>/index.md` (copy `example-post/`) or `index.ipynb` (see below) |
@@ -112,7 +112,11 @@ The newest entry also shows on the home page under "Blog and reading".
 ## Software
 
 Cards on `/software/` and the IMDLIB block on the home page come from **`src/data/software.yaml`**
-(fields explained at the top of the file). `page: true` adds a page `/software/<slug>/` whose text is
+(fields explained at the top of the file). The page has two sections, each shown only when it has entries:
+**Packages** (the default; badges, install line, repository/docs/PyPI buttons, the `featured: true` package
+as a large card with a code panel) and **Dashboards** (`kind: dashboard`: name, optional `subtitle`,
+description and one "Open <name> ↗" button to the required `website`). Cards keep the order of the file.
+`page: true` adds a page `/software/<slug>/` whose text is
 `src/content/software/<slug>.md`; the badges, buttons, citation, license and links on it come from the YAML.
 Stars and downloads are typed by hand with an `as_of` date. `docs/software-notes.md` records what was checked.
 

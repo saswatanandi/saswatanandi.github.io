@@ -13,7 +13,7 @@ the log names the file and the field, and the live site stays as it was until yo
 5. [Write a post as a Jupyter notebook](#write-a-post-as-a-jupyter-notebook)
 6. [Add a paper to Reading](#add-a-paper-to-reading)
 7. [Update citation numbers](#update-citation-numbers)
-8. [Software](#software)
+8. [Software (packages and dashboards)](#software)
 9. [Update the CV](#update-the-cv)
 10. [Profile and site settings](#profile-and-site-settings)
 11. [Research themes](#research-themes)
@@ -424,14 +424,18 @@ Change the `stats` block of the package:
 Stars from the GitHub repository page, downloads from https://pepy.tech/projects/imdlib, `as_of`
 the day you copied them. `null` hides a number. Also update `version:` after a release.
 
+/software/ has two sections: **Packages** (code you install) and **Dashboards** (web apps people
+open in the browser). `kind: dashboard` puts an entry in Dashboards; without `kind`, it is a package.
+A section with no entries is not shown. Cards appear in the order of the file, so to move a card,
+move its block.
+
 ### Add a package
 
-Add a block to the list:
+Add a block to the list, after the other packages:
 
 ```yaml
 - name: snowdrought
   slug: snowdrought
-  order: 3
   tagline: Snow-drought indices from daily snow water equivalent.
   description: Python package to compute warm and dry snow-drought indices from SNOTEL and gridded SWE data.
   repo: https://github.com/iamsaswata/snowdrought
@@ -453,21 +457,39 @@ Add a block to the list:
 
 Only `name` and `description` are required. Other fields you can add:
 
-- `conda: conda-forge/snowdrought` (a conda button), `website: https://...` (for a dashboard or project site).
+- `conda: conda-forge/snowdrought` (a conda button), `website: https://...` (a project site).
 - `citation:` with `text`, `doi`, `bib` (a key in publications.bib) and `software_doi` (see IMDLIB).
 - `links:` extra links on the detail page, for example `- { label: Tutorial, url: https://... }`.
 - `snippet:` a short code example, shown on the featured card only.
 - `page: true` gives the package its own page `/software/snowdrought/`. Then also create
   `src/content/software/snowdrought.md` (copy `imdlib.md` and rewrite the text), or the build stops.
 
-The card appears on /software/.
+The card appears under Packages on /software/. It shows the badges (`language`, `license`,
+`version`, `status`), the first `install` line with a Copy button, and buttons for the links.
 
-### Order and featured
+`featured: true` gives a large card with a code panel (first install line and the snippet), first
+under Packages. The home page shows the first featured package (now IMDLIB). Keep only one package
+featured.
 
-- `order: 1` is first on /software/. Featured packages always come first.
-- Cards show the first `install` line with a Copy button.
-- `featured: true` gives a large card with a code panel (first install line and the snippet). The home page
-  shows the first featured package (now IMDLIB). Keep only one package featured.
+### Add a dashboard
+
+Add a block to the list, after the other dashboards:
+
+```yaml
+- name: SNOWCAST
+  subtitle: Snow Outlook for California Streams
+  description: Weekly snowpack and streamflow outlook for the Sierra Nevada, with maps of snow water equivalent and forecast flows for the main reservoirs.
+  website: https://snowcast.example.org/
+  kind: dashboard
+```
+
+- `kind: dashboard` puts it under Dashboards.
+- `website` is the dashboard's address. It is required: the card's one button, "Open SNOWCAST ↗", goes there.
+- `subtitle` (optional) is one line under the name, for example what the name stands for.
+- `description` is a sentence or two on what the dashboard shows.
+- Badges, install lines and stats are not shown on dashboard cards, so leave those fields out.
+
+FLARE and ARWIN in `software.yaml` are working examples.
 
 ### Edit the IMDLIB page
 
@@ -854,7 +876,7 @@ in `npm run dev`):
 **No draft option:**
 
 - **Paper:** delete the `@` in front of `@article` to hide it (see [Add a paper](#add-a-paper)).
-- **Software package:** delete its block from `software.yaml`. If it had `page: true`, also
+- **Software package or dashboard:** delete its block from `software.yaml`. If it had `page: true`, also
   delete `src/content/software/<slug>.md`.
 - **Research theme:** first remove its slug from every `topic` in `publications.bib` (and any
   `topics:` in posts and reading entries), then delete the file.
@@ -973,7 +995,7 @@ Before each editing session, run `git pull` to get changes you made on GitHub.
 | Reading notes | `src/content/reading/notes/<name>.md` |
 | Research themes | `src/content/research/<theme>.md` |
 | Research pictures | `src/assets/research/` |
-| Software cards | `src/data/software.yaml` |
+| Software cards (packages and dashboards) | `src/data/software.yaml` |
 | IMDLIB page text | `src/content/software/imdlib.md`, pictures in `src/content/software/images/` |
 | CV | `src/data/cv.yaml` |
 | Name, role, bio, links, menu, metrics, badges, analytics, comments | `site.config.yaml` |

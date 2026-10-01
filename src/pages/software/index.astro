@@ -1,38 +1,66 @@
 ---
+import SectionHeader from '../../components/SectionHeader.astro';
 import SoftwareCard from '../../components/SoftwareCard.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
 import { getSoftware } from '../../lib/collections';
 
 const items = await getSoftware();
-const featured = items.filter((s) => s.data.featured);
-const rest = items.filter((s) => !s.data.featured);
+const packages = items.filter((s) => s.data.kind === 'package');
+const featured = packages.filter((s) => s.data.featured);
+const rest = packages.filter((s) => !s.data.featured);
+const dashboards = items.filter((s) => s.data.kind === 'dashboard');
 ---
 
 <PageLayout title="Software" eyebrow="Open source" intro="Tools I have written for hydroclimate data." ridges={3}>
-  <div class="featured">
-    {featured.map((item) => <SoftwareCard item={item} feature level={2} />)}
-  </div>
   {
-    rest.length > 0 && (
-      <div class="grid">
-        {rest.map((item) => (
-          <SoftwareCard item={item} level={2} />
-        ))}
-      </div>
+    packages.length > 0 && (
+      <section class="group" aria-labelledby="packages">
+        <SectionHeader id="packages" title="Packages" />
+        {featured.length > 0 && (
+          <div class="featured">
+            {featured.map((item) => (
+              <SoftwareCard item={item} feature />
+            ))}
+          </div>
+        )}
+        {rest.length > 0 && (
+          <div class="grid">
+            {rest.map((item) => (
+              <SoftwareCard item={item} />
+            ))}
+          </div>
+        )}
+      </section>
+    )
+  }
+  {
+    dashboards.length > 0 && (
+      <section class="group" aria-labelledby="dashboards">
+        <SectionHeader id="dashboards" title="Dashboards" />
+        <div class="grid">
+          {dashboards.map((item) => (
+            <SoftwareCard item={item} />
+          ))}
+        </div>
+      </section>
     )
   }
 </PageLayout>
 
 <style>
+  .group {
+    margin-bottom: var(--space-7);
+  }
   .featured {
     display: grid;
     gap: var(--space-5);
   }
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
     gap: var(--space-5);
+  }
+  .featured + .grid {
     margin-top: var(--space-5);
-    margin-bottom: var(--space-7);
   }
 </style>
