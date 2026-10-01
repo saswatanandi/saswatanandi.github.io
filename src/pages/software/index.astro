@@ -11,7 +11,7 @@ const rest = packages.filter((s) => !s.data.featured);
 const dashboards = items.filter((s) => s.data.kind === 'dashboard');
 ---
 
-<PageLayout title="Software" eyebrow="Open source" intro="Tools I have written for hydroclimate data." ridges={3}>
+<PageLayout title="Software" ridges={3}>
   {
     packages.length > 0 && (
       <section class="group" aria-labelledby="packages">
