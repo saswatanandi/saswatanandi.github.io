@@ -227,7 +227,6 @@ cover_alt: Snow-covered peaks above a half-empty reservoir in early summer.
 toc: true                        # false hides the contents list
 comments: true                   # false hides the comment box on this post
 topics: [climate-extremes]       # research theme slugs (checked, not shown yet)
-# canonical: https://...         # only if the post was first published elsewhere
 ---
 ```
 
@@ -452,12 +451,11 @@ Add a block to the list, after the other packages:
     downloads: 850
     downloads_label: PyPI downloads
     as_of: 2026-10-01
-  tags: [python, snow, drought]
 ```
 
 Only `name` and `description` are required. Other fields you can add:
 
-- `conda: conda-forge/snowdrought` (a conda button), `website: https://...` (a project site).
+- `website: https://...` (a project site).
 - `citation:` with `text`, `doi`, `bib` (a key in publications.bib) and `software_doi` (see IMDLIB).
 - `links:` extra links on the detail page, for example `- { label: Tutorial, url: https://... }`.
 - `snippet:` a short code example, shown on the featured card only.
@@ -734,10 +732,9 @@ figures:
   - image: burn-scar-2021.jpg
     alt: Satellite image of the 2021 Dixie Fire burn scar above Lake Almanor, with the burned area in dark red.
     caption: The Dixie Fire burn scar in October 2021.
-    full: https://earthobservatory.nasa.gov/
 ```
 
-- `alt` is required; `caption` and `full` (a "View full diagram" link) are optional.
+- `alt` is required; `caption` is optional.
 - A third picture is a second item in the list, placed with `<!-- figure 3 -->`.
 - A marker with no matching picture stops the build with a message.
 - `modelling-water-cycle.md` already uses `figures:`; look at it for a working example.
@@ -754,7 +751,6 @@ figures:
    title: Snow and mountain water supply
    order: 4
    summary: I study how a shrinking snowpack changes the timing and amount of water that mountain rivers deliver.
-   icon: thermometer
    image: snow-hydrology.jpg
    image_alt: Snow survey site in the Sierra Nevada with a snow pillow and a meteorological tower.
    image_caption: A snow monitoring site in the American River basin.
@@ -767,7 +763,6 @@ figures:
    My work combines field observations with land-surface modelling.
    ```
 
-   `icon` is one of `fire`, `layers`, `forecast`, `thermometer`, `code`.
 4. Tag papers with it in `publications.bib`: `topic = {snow-hydrology}` or
    `topic = {snow-hydrology, climate-extremes}`.
 5. Commit.

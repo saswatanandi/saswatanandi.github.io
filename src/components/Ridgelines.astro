@@ -12,9 +12,8 @@ import { HERO_NARROW, HERO_WIDE, pageRidges, ridgeHeight, ridgelinesSvg } from '
 interface Props {
   variant?: 'hero' | 'page';
   seed?: number;
-  class?: string;
 }
-const { variant = 'page', seed = 1, class: className } = Astro.props;
+const { variant = 'page', seed = 1 } = Astro.props;
 
 const wide = variant === 'hero' ? HERO_WIDE : pageRidges(seed);
 const wideSvg = ridgelinesSvg({ ...wide, id: `rw${variant}${seed}`, class: 'ridges__svg ridges__svg--wide' });
@@ -25,7 +24,7 @@ const narrowH = ridgeHeight(HERO_NARROW);
 ---
 
 <div
-  class:list={['ridges', `ridges--${variant}`, className]}
+  class:list={['ridges', `ridges--${variant}`]}
   style={`--ridge-h:${wideH}px;--ridge-h-narrow:${narrowH}px;--ridge-ratio:${(wideH / wide.width).toFixed(4)}`}
   aria-hidden="true"
 >

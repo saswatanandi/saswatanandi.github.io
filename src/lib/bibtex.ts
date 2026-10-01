@@ -22,10 +22,6 @@ export function getSelectedPublications(): Publication[] {
   return getPublications().filter((p) => p.selected);
 }
 
-export function getPublication(key: string): Publication | undefined {
-  return getPublications().find((p) => p.key === key);
-}
-
 /** Which /publications/ tab a publication belongs to. */
 export function groupOf(p: Publication): PubGroupId {
   return PUB_GROUPS.find((g) => (g.types as readonly PubType[]).includes(p.pubtype))!.id;

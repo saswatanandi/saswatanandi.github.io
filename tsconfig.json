@@ -8,11 +8,6 @@
     "dist"
   ],
   "compilerOptions": {
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "allowImportingTsExtensions": true
   }
 }

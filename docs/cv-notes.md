@@ -109,11 +109,3 @@ Your CV also names "Dr" before your name. The site uses plain "Saswata Nandi".
 
 - Sections with nothing in them yet (hidden until filled): invited talks, languages, conference sessions, outreach.
 - Optional extra detail: month for the UC Merced start, year for the MHRD fellowship, `since:` year for AGU membership.
-
-## 5. The original PDF on the site
-
-`public/pdfs/CV_SaswataNandi.pdf` (your hand-made CV) would be published as-is at
-`/pdfs/CV_SaswataNandi.pdf`. It includes your phone number and your referees' email addresses.
-The site's "CV" links point to the generated `/cv.pdf` instead.
-
-Before publishing, decide whether to keep the old file, remove it, or strip the contact details.

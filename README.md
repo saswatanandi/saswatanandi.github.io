@@ -67,8 +67,8 @@ One Markdown file per theme in `src/content/research/`; the file name is the the
 see `docs/topic-mapping.md`). Papers tagged with a theme are listed on its page automatically.
 
 **Where the pictures go:** put a line `<!-- figure -->` in the theme text where the main picture (`image:`)
-should appear. A theme can have more pictures in a `figures:` list (each with `image`, `alt`, optional
-`caption` and `full`); place them with `<!-- figure 2 -->`, `<!-- figure 3 -->`, … Any picture without
+should appear. A theme can have more pictures in a `figures:` list (each with `image`, `alt` and an optional
+`caption`); place them with `<!-- figure 2 -->`, `<!-- figure 3 -->`, … Any picture without
 a marker goes after the text; a marker with no matching picture stops the build with a clear message. The `summary` is used on cards (home and /research/), not on the theme page.
 
 **Swapping a theme picture:** put your file in `src/assets/research/` and set `image:` to its name.
@@ -78,11 +78,10 @@ a marker goes after the text; a marker with no matching picture stops the build 
   An optional phone version `name.narrow.svg` next to it replaces it when the figure is narrower than 30rem.
 - Update `image_alt` (what the picture shows, for screen readers) and optionally `image_caption`.
 - The home-page card uses `thumbnail:` if set, otherwise `image` (text labels in inline SVGs are hidden on cards).
-- `image_full:` adds a "View full diagram" link (e.g. `/images/research/cwis-flowchart.png` in `public/`).
 
 The CWIS workflow on theme 2 is an HTML component (`image: cwis-pipeline`,
 wording in `src/components/research/CwisPipeline.astro`); replace it with an image file name the same way.
-`collaborators` and `funding` are optional; empty ones are hidden. (`feature` is kept as data but not shown.)
+`collaborators` and `funding` are optional; empty ones are hidden.
 
 The theme-2 model-chain drawing is generated: `node scripts/figures/make-india-svg.mjs` rewrites
 `src/assets/research/model-chain-india{,.narrow}.svg`.
@@ -199,7 +198,7 @@ npm run cv:pdf   # CV → public/cv.pdf (needs Typst: brew install typst)
 ## Where things live
 
 - `src/styles/tokens.css` — colours (light + dark), type scale, spacing
-- `src/lib/contours.ts` — the generated contour-line motif (marching squares, seeded)
+- `src/lib/ridgelines.ts` — the hydrograph ridgelines under the page headers (seeded)
 - `src/content.config.ts`, `src/schemas/` — Zod schemas for all content
 - `src/lib/pubcore.ts` — BibTeX → publication objects (`@retorquere/bibtex-parser`), shared by site and CV PDF;
   `src/lib/bibtex.ts` adds the website bits

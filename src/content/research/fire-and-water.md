@@ -2,15 +2,10 @@
 title: Fire and water in mountain watersheds
 order: 1
 summary: I study how wildfire and forest management change the water cycle of mountain watersheds, from forest water use to soil loss after fire.
-icon: fire
 image: flare.jpg
 thumbnail: fire-and-water.svg
 image_alt: Screenshot of the FLARE dashboard showing a map of annual erosion severity for 2005 across the Upper San Joaquin River Basin, ranging from low in the southwest to severe and extreme in the upper basin, with a control panel for time period, erodibility method and year.
 image_caption: FLARE, an interactive dashboard I developed to map post-fire erosion risk in the Upper San Joaquin River Basin. Shown here, historical erosion severity for 2005.
-feature:
-  title: FLARE
-  description: An interactive dashboard of post-fire erosion risk in the Upper San Joaquin River Basin
-  url: '' # TODO(Saswata): add the FLARE link when it is public
 collaborators: []
 funding: []
 ---

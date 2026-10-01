@@ -15,9 +15,9 @@ import { parse } from '@retorquere/bibtex-parser';
 import { z } from 'astro/zod';
 
 /** How to recognise "me" in author lists (bolded everywhere). */
-export const SELF = { lastName: 'Nandi', firstInitial: 'S' } as const;
+const SELF = { lastName: 'Nandi', firstInitial: 'S' } as const;
 
-export const PUBTYPES = ['journal', 'chapter', 'proceedings', 'abstract', 'talk'] as const;
+const PUBTYPES = ['journal', 'chapter', 'proceedings', 'abstract', 'talk'] as const;
 export type PubType = (typeof PUBTYPES)[number];
 
 /** Human labels for each pubtype (singular). */
@@ -38,7 +38,7 @@ export const PUB_GROUPS = [
 ] as const satisfies readonly { id: string; label: string; types: readonly PubType[] }[];
 export type PubGroupId = (typeof PUB_GROUPS)[number]['id'];
 
-export interface Author {
+interface Author {
   /** "Nandi, S." */
   display: string;
   lastName: string;
@@ -190,7 +190,7 @@ const paragraphs = (s: string) =>
  * Remove site-only fields from a raw BibTeX entry, keeping everything else exactly as written
  * (brace protection, field order, formatting). Walks the entry at brace depth 1.
  */
-export function stripSiteFields(entry: string): string {
+function stripSiteFields(entry: string): string {
   const open = entry.indexOf('{');
   const close = entry.lastIndexOf('}');
   if (open < 0 || close < open) return entry;
@@ -344,7 +344,7 @@ export function authorSep(i: number, n: number): string {
 }
 
 /** "Nandi, S., Patel, P., & Swain, S." (APA-style author list). */
-export function formatAuthorsApa(authors: Author[]): string {
+function formatAuthorsApa(authors: Author[]): string {
   const names = authors.map((a) => a.display);
   if (names.length <= 1) return names.join('');
   if (names.length === 2) return `${names[0]}, & ${names[1]}`;

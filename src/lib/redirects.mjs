@@ -9,14 +9,14 @@
  */
 
 /** Old Hugo post file name → new post folder (src/content/blog/<folder>/). */
-export const OLD_POSTS = {
+const OLD_POSTS = {
   cdo_install: 'cdo-install',
   imdlib_update_real: 'imdlib-update-real',
   climate_indices_imdlib: 'climate-indices-imdlib',
 };
 
 /** Old publication pages (/en/publication/<type>/<folder>/) → BibTeX keys in src/data/publications.bib. */
-export const OLD_PUBLICATIONS = {
+const OLD_PUBLICATIONS = {
   article: {
     joh_2022: 'nandi2022integrated', // Journal of Hydrology 2022, VIC-RAPID-LISFLOOD-FP
     h20_2020: 'nandi2020comparative', // H2Open Journal 2020

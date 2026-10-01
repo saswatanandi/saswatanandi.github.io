@@ -14,11 +14,10 @@ import type { SchemaContext } from 'astro:content';
 export const TOPICS: string[] = Object.keys(import.meta.glob('../content/research/*.md'))
   .map((p) => p.split('/').pop()!.replace(/\.md$/, ''))
   .sort();
-export const topic = z.string().refine((v) => TOPICS.includes(v), {
+const topic = z.string().refine((v) => TOPICS.includes(v), {
   error: (iss) =>
     `"${String(iss.input)}" is not a research theme. Use one of: ${TOPICS.join(', ')} (the file names in src/content/research/)`,
 });
-export type Topic = string;
 
 const url = z.url({ protocol: /^https?$/, error: 'must be a full URL starting with https://' });
 const tags = z.array(z.string().trim().toLowerCase().min(1)).default([]);
@@ -45,8 +44,6 @@ export const blogSchema = ({ image }: SchemaContext) =>
       /** Posts with the same series name are linked to each other, oldest first. */
       series: z.string().optional(),
       draft: z.boolean().default(false),
-      /** Kept for old posts; maths ($...$, $$...$$) is always rendered. */
-      math: z.boolean().default(false),
       /** Optional picture shown under the title and used for social cards: a file next to index.md. */
       cover: image().optional(),
       cover_alt: z.string().optional(),
@@ -54,8 +51,6 @@ export const blogSchema = ({ image }: SchemaContext) =>
       toc: z.boolean().default(true),
       /** false = no comment box under this post (when comments are set up). */
       comments: z.boolean().default(true),
-      /** Canonical URL if the post was first published elsewhere. */
-      canonical: url.optional(),
     })
     .strict()
     .refine((d) => !d.cover || !!d.cover_alt, {
@@ -107,17 +102,11 @@ export const researchSchema = z
     order: z.number().int().default(99),
     /** 1–2 sentences shown on the home-page card and under the page title. */
     summary: z.string().min(1).max(320),
-    /** Small glyph from src/components/Icon.astro. */
-    icon: z.enum(['fire', 'layers', 'forecast', 'thermometer', 'code'], {
-      error: 'icon must be one of: fire, layers, forecast, thermometer, code',
-    }),
     /** The theme's picture (see `figure` above). */
     image: figure,
     /** Describe the picture for screen readers (required). */
     image_alt: z.string().min(10, 'image_alt: describe the picture in a sentence'),
     image_caption: z.string().optional(),
-    /** Optional link under the figure, e.g. to a full-size original. */
-    image_full: optionalUrl,
     /**
      * Extra figures for the theme page. In the text, `<!-- figure 2 -->` places the first
      * of these, `<!-- figure 3 -->` the second, … (`<!-- figure -->` = the main `image`).
@@ -129,24 +118,12 @@ export const researchSchema = z
             image: figure,
             alt: z.string().min(10, 'figures[].alt: describe the picture in a sentence'),
             caption: z.string().optional(),
-            /** Optional "View full diagram" link. */
-            full: optionalUrl,
           })
           .strict(),
       )
       .default([]),
     /** Optional smaller picture for the home-page card (defaults to `image`). */
     thumbnail: figure.optional(),
-    /** Optional highlighted tool, dataset or project. Leave `url` empty for no link. */
-    feature: z
-      .object({
-        title: z.string().min(1),
-        subtitle: z.string().optional(),
-        description: z.string().min(1),
-        url: optionalUrl,
-      })
-      .strict()
-      .optional(),
     /** Hidden when empty. */
     collaborators: z
       .array(z.object({ name: z.string().min(1), affiliation: z.string().optional(), url: optionalUrl }).strict())
@@ -235,11 +212,6 @@ export const softwareSchema = z
     docs: url.optional(),
     /** PyPI package name, e.g. imdlib. */
     pypi: z.string().optional(),
-    /** conda channel and package, e.g. conda-forge/imdlib. */
-    conda: z
-      .string()
-      .regex(/^[\w.-]+\/[\w.-]+$/, 'conda should look like conda-forge/imdlib (channel/package)')
-      .optional(),
     /** A project website that is not the repository or the docs (a dashboard, a lab page). */
     website: url.optional(),
     language: z.string().optional(),
@@ -281,7 +253,6 @@ export const softwareSchema = z
       .optional(),
     /** Extra links for the detail page, e.g. a video tutorial. */
     links: z.array(z.object({ label: z.string().min(1), url }).strict()).default([]),
-    tags,
   })
   .strict()
   .refine((d) => d.kind !== 'dashboard' || !!d.website, {

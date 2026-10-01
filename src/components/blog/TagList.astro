@@ -4,16 +4,14 @@ import { tagHref } from '../../lib/blog';
 
 interface Props {
   tags: string[];
-  /** Screen-reader label for the list. */
-  label?: string;
   class?: string;
 }
-const { tags, label = 'Tags', class: className } = Astro.props;
+const { tags, class: className } = Astro.props;
 ---
 
 {
   tags.length > 0 && (
-    <ul role="list" class:list={['tag-list', className]} aria-label={label}>
+    <ul role="list" class:list={['tag-list', className]} aria-label="Tags">
       {tags.map((t) => (
         <li>
           <a class="tag" href={tagHref(t)}>

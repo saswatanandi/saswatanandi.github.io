@@ -5,10 +5,6 @@
  */
 import { site } from '../lib/config';
 
-interface Props {
-  class?: string;
-}
-const { class: className } = Astro.props;
 const m = site.metrics;
 const metrics = [
   { label: 'Citations', value: m.citations },
@@ -19,7 +15,7 @@ const metrics = [
 
 {
   metrics.length > 0 && (
-    <dl class:list={['metrics', className]} aria-label={`Citation metrics${m.source ? ` (${m.source})` : ''}`}>
+    <dl class="metrics" aria-label={`Citation metrics${m.source ? ` (${m.source})` : ''}`}>
       {metrics.map((x) => (
         <div>
           <dt>{x.label}</dt>

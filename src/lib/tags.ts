@@ -6,7 +6,7 @@ import { getCollection } from 'astro:content';
 import { tagSlug, type Post } from './blog';
 import { getPosts } from './collections';
 
-export interface ReadingItem {
+interface ReadingItem {
   title: string;
   /** Note page on this site, else the DOI or URL, else /reading/. */
   href: string;

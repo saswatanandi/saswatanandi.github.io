@@ -12,7 +12,7 @@ Slugs are the file names in `src/content/research/`:
 A paper appears on every theme page it is tagged with (newest first). An unknown slug stops the build
 with a message listing the valid ones.
 
-Status: all entries below are in `publications.bib` (Phase 2) with this tagging; ✅ = the four selected papers.
+Status: all entries below are in `publications.bib` with this tagging; ✅ = the four selected papers.
 
 | Year | Paper (short) | Venue | `topic` |
 | --- | --- | --- | --- |

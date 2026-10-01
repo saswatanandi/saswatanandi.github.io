@@ -16,7 +16,7 @@
 #  abstracts are NOT listed here: they come from src/data/publications.bib.
 # ─────────────────────────────────────────────────────────────────────────────
 
-# "Last updated" on the page and PDF. Empty = the date the site was built.
+# "Last updated" in the PDF. Empty = the date the PDF was built.
 updated: ""
 
 # Short profile paragraph at the top of the CV (**bold** allowed).

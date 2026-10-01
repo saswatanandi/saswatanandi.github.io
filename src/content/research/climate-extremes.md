@@ -2,7 +2,6 @@
 title: Climate extremes and water security
 order: 3
 summary: I study how large-scale climate variability and climate change shape floods, droughts and extreme precipitation.
-icon: forecast
 image: climate-extremes.svg
 thumbnail: climate-extremes-card.svg
 image_alt: Map of the North Pacific and western North America. A narrow plume of high integrated water vapour transport, an atmospheric river, extends from the subtropical Pacific near Hawaiʻi northeastward to landfall on the central California coast, where it brings extreme precipitation; arrows show the transport direction. Warm sea-surface temperature anomalies mark El Niño in the Niño 3.4 region of the equatorial Pacific, and the positive phase of the Pacific Decadal Oscillation appears as a cool anomaly in the central North Pacific and warm water along the North American coast.

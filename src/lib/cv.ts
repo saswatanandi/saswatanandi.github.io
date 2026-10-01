@@ -1,16 +1,15 @@
 /**
  * Turns validated cv.yaml data (+ publications) into display-ready sections.
  *
- * Shared by the web page (src/pages/cv.astro) and the PDF data script
- * (scripts/build-cv-data.mjs → cv/cv.typ), so both show the same content in the
- * same order. Plain TypeScript with type-only imports: Node can run it directly.
+ * Used by the PDF data script (scripts/build-cv-data.mjs → cv/cv.typ).
+ * Plain TypeScript with type-only imports: Node can run it directly.
  */
 import type { Cv } from '../schemas/cv';
 import type { Publication, PubType } from './pubcore';
 import { authorSep, venueDetails } from './pubcore.ts';
 
 /** One entry: a date (left column) + a title, muted lines and bullet points under it. */
-export interface CvRow {
+interface CvRow {
   when?: string;
   title: string;
   url?: string;
@@ -22,7 +21,7 @@ export interface CvRow {
   bullets: string[];
 }
 /** A block inside a section: optional sub-heading + rows and/or an inline list. */
-export interface CvGroup {
+interface CvGroup {
   heading?: string;
   rows: CvRow[];
   /** Inline list (e.g. journals reviewed for), shown as "A · B · C". */
@@ -36,7 +35,7 @@ export interface CvSection {
   groups: CvGroup[];
 }
 
-export interface CvPubEntry {
+interface CvPubEntry {
   /** "1." (numbering restarts in each group; 1 = newest) */
   label: string;
   year: number;
@@ -59,7 +58,7 @@ export interface CvPubGroup {
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** "2021" → "2021", "2021-08" → "Aug 2021", "present" → "present". */
-export function formatCvDate(d?: string): string | undefined {
+function formatCvDate(d?: string): string | undefined {
   if (!d) return undefined;
   if (d === 'present') return 'present';
   const [y, m] = d.split('-');
@@ -67,7 +66,7 @@ export function formatCvDate(d?: string): string | undefined {
 }
 
 /** "Aug 2021 – present", "2019 – 2021", "2021" (start only or start = end). */
-export function formatRange(start?: string, end?: string): string | undefined {
+function formatRange(start?: string, end?: string): string | undefined {
   const a = formatCvDate(start);
   const b = formatCvDate(end);
   if (a && b) {
@@ -104,7 +103,7 @@ const present = (...lines: (string | undefined | false)[]) => lines.filter((l): 
 /* ── Sections ──────────────────────────────────────────────────────────── */
 
 /** Section order; "publications" is filled in by the caller (see pubGroups). */
-export const SECTION_ORDER = [
+const SECTION_ORDER = [
   'interests',
   'positions',
   'education',
@@ -121,9 +120,9 @@ export const SECTION_ORDER = [
   'memberships',
   'references',
 ] as const;
-export type SectionId = (typeof SECTION_ORDER)[number];
+type SectionId = (typeof SECTION_ORDER)[number];
 
-export const SECTION_TITLES: Record<SectionId, string> = {
+const SECTION_TITLES: Record<SectionId, string> = {
   interests: 'Research interests',
   positions: 'Positions',
   education: 'Education',
@@ -374,7 +373,7 @@ export function withPublications<T extends { id: string }>(sections: T[], item: 
 /* ── Publications ──────────────────────────────────────────────────────── */
 
 /** Publication groups on the CV, in order (pubtypes from pubcore.ts). */
-export const CV_PUB_GROUPS: readonly { id: string; heading: string; types: readonly PubType[] }[] = [
+const CV_PUB_GROUPS: readonly { id: string; heading: string; types: readonly PubType[] }[] = [
   { id: 'journal', heading: 'Journal articles', types: ['journal'] },
   { id: 'chapter', heading: 'Book chapters', types: ['chapter'] },
   { id: 'proceedings', heading: 'Conference papers', types: ['proceedings'] },

@@ -6,9 +6,7 @@
  *  - A YAML syntax error there is only logged; here it stops the build with the
  *    line/column so the mistake is obvious in the GitHub Actions log.
  *
- * Modes:
- *  - "list":   the file is a YAML list; every item becomes one entry.
- *  - "single": the whole file is one entry (id = `singleId`), e.g. cv.yaml.
+ * The file is a YAML list; every item becomes one entry.
  */
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -20,11 +18,8 @@ type Item = Record<string, unknown>;
 interface Options {
   /** Path relative to the project root, e.g. "src/data/news.yaml". */
   path: string;
-  mode?: 'list' | 'single';
   /** Build an id for a list item (defaults to a slug of `id` / `name` / `title`, else the index). */
   id?: (item: Item, index: number) => string;
-  /** Id used in "single" mode. */
-  singleId?: string;
 }
 
 function slugify(input: string): string {
@@ -60,7 +55,6 @@ export function listIds(items: Item[], idFn: Options['id'] = defaultId): string[
 }
 
 export function yamlLoader(opts: Options): Loader {
-  const mode = opts.mode ?? 'list';
   return {
     name: 'yaml-data-loader',
     load: async ({ config, store, parseData, logger, watcher }) => {
@@ -78,13 +72,6 @@ export function yamlLoader(opts: Options): Loader {
         }
 
         store.clear();
-        if (mode === 'single') {
-          const id = opts.singleId ?? 'default';
-          const parsed = await parseData({ id, data: (data ?? {}) as Item, filePath });
-          store.set({ id, data: parsed, filePath: opts.path });
-          return;
-        }
-
         if (data == null) data = [];
         if (!Array.isArray(data)) {
           throw new Error(`\n✖ ${opts.path} must be a YAML list (each item starts with "- ").\n`);

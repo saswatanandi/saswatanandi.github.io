@@ -1,7 +1,7 @@
 ---
 /**
  * One figure on a research theme page: the picture (raster pictures open full size
- * when clicked), its caption and an optional "View full diagram" link.
+ * when clicked) and its caption.
  */
 import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
@@ -11,9 +11,8 @@ interface Props {
   image: string;
   alt: string;
   caption?: string;
-  full?: string;
 }
-const { image, alt, caption, full } = Astro.props;
+const { image, alt, caption } = Astro.props;
 
 const rasters = import.meta.glob<{ default: ImageMetadata }>('/src/assets/research/*.{png,jpg,jpeg,webp,avif,PNG,JPG,JPEG}', {
   eager: true,
@@ -32,21 +31,7 @@ const zoomHref = meta ? (await getImage({ src: meta, width: meta.width })).src :
       <ThemeFigure src={image} alt={alt} />
     )
   }
-  {
-    (caption || full) && (
-      <figcaption>
-        {caption}
-        {full && (
-          <>
-            {' '}
-            <a href={full}>
-              View full diagram<span aria-hidden="true"> ↗</span>
-            </a>
-          </>
-        )}
-      </figcaption>
-    )
-  }
+  {caption && <figcaption>{caption}</figcaption>}
 </figure>
 
 <style>
@@ -72,9 +57,5 @@ const zoomHref = meta ? (await getImage({ src: meta, width: meta.width })).src :
     font-size: var(--text-sm);
     color: var(--color-text-muted);
     text-align: center;
-  }
-  .figure figcaption a {
-    font-weight: 600;
-    white-space: nowrap;
   }
 </style>

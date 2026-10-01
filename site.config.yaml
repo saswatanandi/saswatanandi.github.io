@@ -10,7 +10,7 @@ name: Saswata Nandi
 role: Postdoctoral Researcher · Hydrology          # TODO(Saswata): current title
 affiliation:
   name: "University of California, Merced"          # TODO(Saswata): current institution (empty = hidden)
-  url: "https://ecohydrology.ucmerced.edu/"                                           # TODO(Saswata): institution / lab URL
+  url: "https://ecohydrology.ucmerced.edu/"
 location: California, USA                           # TODO(Saswata): confirm
 email: withsaswata@gmail.com                        # TODO(Saswata): confirm (shown obfuscated, never as plain text in HTML)
 
@@ -26,14 +26,15 @@ bio: |
 description: Hydrologist working on land-surface modelling, forests & fire, forecasting and climate impacts. Creator of the open-source IMDLIB Python library.
 
 # Profile links — all optional. Empty or missing = not rendered.
+# Each can be a full https:// address; ORCID, GitHub, LinkedIn, Bluesky and X also take the bare id or handle.
 links:
-  scholar: "https://scholar.google.com/citations?user=hXkanPEAAAAJ"            # TODO(Saswata): https://scholar.google.com/citations?user=XXXX
-  orcid: "0000-0003-3833-966X"              # TODO(Saswata): https://orcid.org/0000-0000-0000-0000
-  github: "https://github.com/iamsaswata"      # TODO(Saswata): confirm handle
-  linkedin: "https://www.linkedin.com/in/nandisaswata"           # TODO(Saswata): https://www.linkedin.com/in/…
-  bluesky: ""            # TODO(Saswata): https://bsky.app/profile/…
-  x: "https://x.com/saswatanandi"                  # TODO(Saswata): https://x.com/…
-  researchgate: "https://www.researchgate.net/profile/Saswata-Nandi"       # TODO(Saswata): https://www.researchgate.net/profile/…
+  scholar: "https://scholar.google.com/citations?user=hXkanPEAAAAJ"
+  orcid: "0000-0003-3833-966X"
+  github: "https://github.com/iamsaswata"
+  linkedin: "https://www.linkedin.com/in/nandisaswata"
+  bluesky: ""            # e.g. https://bsky.app/profile/name.bsky.social
+  x: "https://x.com/saswatanandi"
+  researchgate: "https://www.researchgate.net/profile/Saswata-Nandi"
 
 # Link for the "CV" button on the home page. /cv.pdf is generated from src/data/cv.yaml +
 # publications.bib on every deploy (the old /cv/ address redirects there).
@@ -50,9 +51,9 @@ nav:
 
 # Citation metrics — entered manually (no live API calls during the build).
 metrics:
-  citations: 600        # TODO(Saswata): e.g. 350 (null = hidden; no ""quotes"")
-  h_index: 11          # TODO(Saswata)
-  i10: 11              # TODO(Saswata)
+  citations: 600        # null = hidden; numbers without quotes
+  h_index: 11
+  i10: 11
   source: Google Scholar
   updated: null          # TODO(Saswata): date you copied the numbers, e.g. 2026-09-01
 
@@ -66,14 +67,11 @@ publications:
     dimensions: true
     in_list: false
 
-# Source repository (footer link + "edit" links later).
-repo: https://github.com/saswatanandi/saswatanandi.github.io
-
 # Cookie-free analytics. Put your GoatCounter code (the "xyz" in xyz.goatcounter.com) to enable.
 analytics:
   goatcounter: "snandi"        # TODO(Saswata): create account at goatcounter.com
 
-# giscus comments (Phase 3). Get the ids from https://giscus.app after enabling Discussions.
+# giscus comments on blog posts. Get the ids from https://giscus.app after enabling Discussions.
 giscus:
   repo: ""
   repo_id: ""

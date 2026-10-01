@@ -23,12 +23,12 @@ interface Props {
   index: number;
 }
 const { theme, prev, next, index } = Astro.props;
-const { image, image_alt, image_caption, image_full, figures, collaborators, funding } = theme.data;
+const { image, image_alt, image_caption, figures, collaborators, funding } = theme.data;
 
 // Figure 1 is `image`; figures 2, 3, … come from the `figures:` list.
 const allFigures = [
-  { image, alt: image_alt, caption: image_caption, full: image_full },
-  ...(figures ?? []).map((f) => ({ image: f.image, alt: f.alt, caption: f.caption, full: f.full })),
+  { image, alt: image_alt, caption: image_caption },
+  ...(figures ?? []).map((f) => ({ image: f.image, alt: f.alt, caption: f.caption })),
 ];
 
 // The text is split at marker lines `<!-- figure -->` / `<!-- figure N -->`; each marker is

@@ -17,9 +17,8 @@ interface Props {
   src: string;
   alt: string;
   variant?: 'full' | 'thumb';
-  class?: string;
 }
-const { src, alt, variant = 'full', class: className } = Astro.props;
+const { src, alt, variant = 'full' } = Astro.props;
 const thumb = variant === 'thumb';
 
 const svgs = import.meta.glob<string>('/src/assets/research/*.svg', { query: '?raw', import: 'default', eager: true });
@@ -60,7 +59,7 @@ if (src.startsWith('/')) {
 }
 ---
 
-<div class:list={['tfig', `tfig--${variant}`, svgNarrow && 'tfig--dual', className]}>
+<div class:list={['tfig', `tfig--${variant}`, svgNarrow && 'tfig--dual']}>
   {svg && <Fragment set:html={svg} />}
   {svgNarrow && <Fragment set:html={svgNarrow} />}
   {

@@ -11,7 +11,7 @@
 // shapes chosen to resemble a reanalysis composite, for illustration only — not data.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { geoMercator, geoPath, geoGraticule } from 'd3-geo';
+import { geoMercator, geoPath } from 'd3-geo';
 import { contours } from 'd3-contour';
 import { feature, mesh } from 'topojson-client';
 

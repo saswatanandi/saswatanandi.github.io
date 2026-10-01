@@ -11,7 +11,6 @@
 #    repo, docs, website        full https:// links; missing = no button
 #                               (a dashboard card has one button, "Open <name>", to website)
 #    pypi: imdlib               PyPI package name (adds a PyPI button)
-#    conda: conda-forge/imdlib  channel/package
 #    language, license, version, status   small badges
 #    featured: true             large card, and the Software block on the home page
 #    page: true                 detail page /software/<slug>/ with text from
@@ -33,7 +32,6 @@
   repo: https://github.com/iamsaswata/imdlib
   docs: https://imdlib.readthedocs.io
   pypi: imdlib
-  conda: conda-forge/imdlib
   language: Python
   license: MIT
   version: 0.1.22            # latest release on PyPI (21 Sep 2026)
@@ -66,7 +64,6 @@
       url: https://anaconda.org/conda-forge/imdlib
     - label: Video tutorial (Albedo Foundation, YouTube)
       url: https://www.youtube.com/watch?v=uSIPPY5WRaM
-  tags: [python, climate-data, india, xarray]
 
 - name: prismdata
   description: Python package for programmatic access to PRISM climate data over the continental United States.
@@ -78,7 +75,6 @@
   version: 0.0.1
   install:
     - pip install prismdata
-  tags: [python, climate-data, usa]
 
 - name: FLARE
   subtitle: Fire, Land, And River Erosion
@@ -90,4 +86,3 @@
   kind: dashboard
   description: Real-time hydroclimate decision-support dashboard for the Upper American River Basin, built and maintained for El Dorado County Water Agency.
   website: https://arwin.edwateragency.org/
-  tags: [dashboard, forecasting, california]

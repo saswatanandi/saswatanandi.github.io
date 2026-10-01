@@ -37,21 +37,12 @@ export function tree(p, x, y, h, cls = 'tree') {
   ];
   return `<path class="${p}-${cls}" d="M${P(d)} Z"/><rect class="${p}-${cls}" x="${f(x - 1.4)}" y="${f(y - 0.6)}" width="2.8" height="${f(h * 0.22)}"/>`;
 }
-export const shrub = (p, x, y, r = 6) => `<path class="${p}-shrub" d="M${f(x - r)},${f(y)} a${r},${r * 0.83} 0 0 1 ${2 * r},0 Z"/>`;
 export function cloud(p, x, y, s = 1) {
   // theme 1's cloud outline, scaled about its left end
   const pts = 'M210,60 C192,60 188,38 206,35 C208,20 230,14 242,24 C250,8 282,6 292,22 C304,12 330,14 332,30 C352,26 366,42 356,56 C360,60 358,60 350,60 Z';
   return `<path class="${p}-cloud" transform="translate(${f(x)} ${f(y)}) scale(${s}) translate(-210 -60)" d="${pts}"/>`;
 }
 export const rain = (p, x, y, len = 16) => `<line class="${p}-rain" x1="${f(x)}" y1="${f(y)}" x2="${f(x - len / 2)}" y2="${f(y + len)}"/>`;
-export function flake(p, x, y, r = 4) {
-  let d = '';
-  for (let k = 0; k < 3; k++) {
-    const a = (k * Math.PI) / 3 + Math.PI / 2;
-    d += `M${f(x - r * Math.cos(a))},${f(y - r * Math.sin(a))}L${f(x + r * Math.cos(a))},${f(y + r * Math.sin(a))}`;
-  }
-  return `<path class="${p}-snow" d="${d}"/>`;
-}
 /** ET arrow: wavy shaft + filled head (theme 1 geometry). */
 export function et(p, x, y0, y1, small = false) {
   const m = (y0 + y1) / 2;
@@ -76,6 +67,3 @@ export const sun = (p, x, y, r = 9) => {
   }
   return `<circle class="${p}-sun" cx="${x}" cy="${y}" r="${r}"/>${rays}`;
 };
-export const wrap = (p, extraCss, body) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" class="${p}">\n${style(p).replace('</style>', extraCss + '\n</style>')}\n${grad(p)}\n${body}\n</svg>\n`;
-

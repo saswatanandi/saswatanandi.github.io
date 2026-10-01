@@ -12,7 +12,7 @@
 const n = (v: number) => +v.toFixed(2);
 
 /** Geometric drop: circle (cx, cy, r) with straight tangents meeting at a tip k·r above the centre. */
-export function dropPath(cx: number, cy: number, r: number, k = 1.72): string {
+function dropPath(cx: number, cy: number, r: number, k = 1.72): string {
   const phi = Math.acos(1 / k);
   const a1 = -Math.PI / 2 + phi;
   const a2 = -Math.PI / 2 - phi;
@@ -26,7 +26,7 @@ export function dropPath(cx: number, cy: number, r: number, k = 1.72): string {
 const wave = (y: number, amp: number) =>
   `M6 ${n(y)}C17 ${n(y - amp)} 23 ${n(y - amp)} 32 ${n(y)}S47 ${n(y + amp)} 58 ${n(y)}`;
 
-export const DROP = dropPath(32, 39.5, 21.5, 1.72);
+const DROP = dropPath(32, 39.5, 21.5, 1.72);
 
 /** The inner SVG (64×64 box) of the mark. `id` must be unique within the page. */
 export function markBody(id: string, small: boolean, fill = 'currentColor'): string {
@@ -47,14 +47,6 @@ export function markBody(id: string, small: boolean, fill = 'currentColor'): str
     `<rect width="64" height="64" fill="#fff"/>` +
     `<g stroke="#000" stroke-width="${sw}" stroke-linecap="round" fill="none">${lines.map(([y, a]) => `<path d="${wave(y, a)}"/>`).join('')}</g>` +
     `</mask><path d="${DROP}" fill="${fill}" mask="url(#${id})"/>`
-  );
-}
-
-/** Stand-alone mark SVG at a given pixel size. */
-export function markSvg(size: number, id = 'mark', fill = 'currentColor'): string {
-  return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="${size}" height="${size}" fill="none" aria-hidden="true" focusable="false">` +
-    `${markBody(id, size <= 24, fill)}</svg>`
   );
 }
 

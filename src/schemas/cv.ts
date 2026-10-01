@@ -1,8 +1,8 @@
 /**
  * Zod schema for `src/data/cv.yaml`.
  *
- * Self-contained on purpose (imports only zod): it is used by the Astro build (content
- * collection) AND by `scripts/build-cv-data.mjs`, which feeds the Typst PDF.
+ * Self-contained on purpose (imports only zod), so `scripts/build-cv-data.mjs`, which
+ * feeds the Typst PDF, can run it directly with Node.
  *
  * Every section is optional; an empty or missing list is simply not shown.
  * Dates are flexible: a year (2021) or year-month (2021-08). `end` may also be "present".
@@ -57,7 +57,7 @@ const draft = z.boolean().default(false);
 /** A YAML list; `~`/null/missing = empty. */
 const list = <T extends z.ZodType>(item: T) => z.preprocess((v) => v ?? [], z.array(item));
 
-export const cvPosition = z
+const cvPosition = z
   .object({
     title: req('title'),
     org: req('org'),
@@ -70,7 +70,7 @@ export const cvPosition = z
   })
   .strict();
 
-export const cvEducation = z
+const cvEducation = z
   .object({
     degree: req('degree'),
     field: text,
@@ -88,7 +88,7 @@ export const cvEducation = z
   })
   .strict();
 
-export const cvAward = z
+const cvAward = z
   .object({
     title: req('title'),
     org: text,
@@ -99,7 +99,7 @@ export const cvAward = z
   })
   .strict();
 
-export const cvGrant = z
+const cvGrant = z
   .object({
     title: req('title'),
     /** e.g. PI, Co-PI, Co-I, Contributor. */
@@ -115,7 +115,7 @@ export const cvGrant = z
   })
   .strict();
 
-export const cvTalk = z
+const cvTalk = z
   .object({
     title: req('title'),
     /** Event, department or institution. */
@@ -128,7 +128,7 @@ export const cvTalk = z
   })
   .strict();
 
-export const cvTeaching = z
+const cvTeaching = z
   .object({
     course: req('course'),
     /** e.g. Instructor, Teaching Assistant, Guest lecturer. */
@@ -141,7 +141,7 @@ export const cvTeaching = z
   })
   .strict();
 
-export const cvMentee = z
+const cvMentee = z
   .object({
     name: req('name'),
     /** e.g. PhD student, MS student, Undergraduate, Intern. */
@@ -194,7 +194,7 @@ const session = z
   .strict();
 const outreach = z.object({ title: req('title'), org: text, year: date, url, details, draft }).strict();
 
-export const cvService = z
+const cvService = z
   .object({
     /** Journals you review for (one name per line). */
     reviewer: list(z.string().trim().min(1)),

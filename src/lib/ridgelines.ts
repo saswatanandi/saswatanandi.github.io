@@ -13,7 +13,7 @@
 
 type Pt = [number, number];
 
-export interface Storm {
+interface Storm {
   /** time of the peak, in viewBox x units */
   t: number;
   /** relative peak height (0–1) */

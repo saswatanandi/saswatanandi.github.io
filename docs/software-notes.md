@@ -68,5 +68,3 @@ the caption note says so. Replace it with a fresh plot when convenient.
 - ARWIN: from this machine, https://arwin.edwateragency.org/ failed TLS verification with "certificate has expired".
   The link is kept. Please open it in a browser; if it warns, renew the certificate or remove `website:`.
 - prismdata docs show `from prism import download_prism`; the package imports as `prismdata`. Worth fixing in the repo.
-- The IMDLIB repo README still links the tutorial at saswatanandi.github.io/softwares/imdlib; the redirect map
-  should send that to /software/imdlib/.

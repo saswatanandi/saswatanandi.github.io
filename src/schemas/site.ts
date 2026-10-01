@@ -125,7 +125,6 @@ export const siteConfigSchema = z
       })
       .strict()
       .prefault({}),
-    repo: optionalUrl,
     analytics: z
       .object({
         goatcounter: optionalText

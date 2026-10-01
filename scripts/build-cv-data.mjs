@@ -2,12 +2,12 @@
 /**
  * Collects everything the PDF CV needs into cv/build/cv-data.json, which cv/cv.typ reads.
  *
- *   src/data/cv.yaml          → validated with the same schema as the website (src/schemas/cv.ts)
+ *   src/data/cv.yaml          → validated with src/schemas/cv.ts
  *   site.config.yaml          → name, role, affiliation, contact links (src/schemas/site.ts)
  *   src/data/publications.bib → read by src/lib/pubcore.ts, the same rules the website uses
  *                               (a bib error stops this script, and so the CI deploy, loudly)
  *
- * Sections are built by src/lib/cv.ts, the same code the /cv/ page uses.
+ * Sections are built by src/lib/cv.ts.
  * Run via `npm run cv:pdf` (this script + `typst compile`).
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';

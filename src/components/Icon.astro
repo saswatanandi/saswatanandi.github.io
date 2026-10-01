@@ -2,12 +2,11 @@
 /**
  * Inline SVG icons — no icon font, no CDN.
  * Brand glyphs: Simple Icons v16 (CC0). UI glyphs: drawn for this site (stroke style).
- * Decorative by default (aria-hidden); pass `label` to make an icon meaningful.
+ * Decorative (aria-hidden): put the meaning in the text next to the icon.
  */
 interface Props {
   name: IconName;
   size?: number | string;
-  label?: string;
   class?: string;
 }
 
@@ -36,7 +35,6 @@ const ui = {
   moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   close: '<path d="M6 6l12 12M18 6 6 18"/>',
-  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
   external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/>',
   package: '<path d="m12 2 9 5v10l-9 5-9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/>',
@@ -51,17 +49,11 @@ const ui = {
   file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
   slides: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8"/>',
   data: '<ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v12c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3V6M4.5 12c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3"/>',
-  /* Research theme glyphs */
-  fire: '<path d="M12 3c.5 3.5 5 5.5 5 10.5a5 5 0 0 1-10 0c0-2.3 1.2-3.6 2.3-4.6.3 1.6 1 2.6 1.9 3.1C11 9.5 10.8 6 12 3z"/>',
-  layers: '<path d="m12 3 9 4.5-9 4.5-9-4.5z"/><path d="m3 12 9 4.5 9-4.5M3 16.5 12 21l9-4.5"/>',
-  forecast: '<path d="M7 16a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17 8.5a3.75 3.75 0 0 1 .5 7.47"/><path d="M8 19v2M12 18v3M16 19v2"/>',
-  thermometer: '<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/><path d="M12 11v6"/>',
-  code: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/>',
 } as const;
 
 export type IconName = keyof typeof brand | keyof typeof ui;
 
-const { name, size = '1em', label, class: className } = Astro.props;
+const { name, size = '1em', class: className } = Astro.props;
 const isBrand = name in brand;
 ---
 
@@ -75,9 +67,7 @@ const isBrand = name in brand;
       fill="currentColor"
       class:list={['icon', className]}
       focusable="false"
-      role={label ? 'img' : undefined}
-      aria-label={label}
-      aria-hidden={label ? undefined : 'true'}
+      aria-hidden="true"
     >
       <path d={brand[name as keyof typeof brand]} />
     </svg>
@@ -94,9 +84,7 @@ const isBrand = name in brand;
       stroke-linejoin="round"
       class:list={['icon', className]}
       focusable="false"
-      role={label ? 'img' : undefined}
-      aria-label={label}
-      aria-hidden={label ? undefined : 'true'}
+      aria-hidden="true"
       set:html={ui[name as keyof typeof ui]}
     />
   )

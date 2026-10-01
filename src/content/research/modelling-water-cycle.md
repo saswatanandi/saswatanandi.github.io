@@ -2,7 +2,6 @@
 title: Modelling a changing water cycle
 order: 2
 summary: I develop large-scale hydrological models that represent the water cycle as it changes, from soil moisture and evapotranspiration to streamflow, floods and reservoirs.
-icon: layers
 image: cwis-pipeline
 thumbnail: modelling-water-cycle-card.svg
 figures:
@@ -11,11 +10,6 @@ figures:
     caption: Coupling a land-surface model (VIC) with river routing (RAPID) and floodplain hydraulics (LISFLOOD-FP).
 image_alt: The CWIS workflow in six stages. Data acquisition and assimilation (meteorological, satellite vegetation and AI vegetation-forecast toolboxes) feeds hydrologic simulation with the VIC model at 1 km, daily, and a forecast run. Results are verified against CDEC and SNOTEL stations, with re-calibration when unsatisfactory, stored in a hydrologic data bank with an API, and delivered through a web application.
 image_caption: The California Water Information System (CWIS), from data acquisition to the web application.
-feature:
-  title: CWIS
-  subtitle: California Water Information System
-  description: From satellite vegetation and weather data to daily 1 km simulations of evapotranspiration, soil moisture, snow and streamflow, verified against station observations and delivered through a web application.
-  url: '' # TODO(Saswata): add the CWIS link if it becomes public
 collaborators: []
 funding: []
 ---
