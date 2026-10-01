@@ -60,7 +60,7 @@ File: `src/data/publications.bib`
 1. Get the BibTeX entry from Google Scholar (Cite, then BibTeX), Zotero, or the DOI:
    `curl -LH "Accept: application/x-bibtex" https://doi.org/10.1029/2026WR041234`
 2. Paste it into the file, anywhere (the site sorts by date). The top of the file is easiest.
-3. Add the site fields (`pubtype`, `topic` and any optional ones below).
+3. Add `pubtype`, and `topic` if the paper belongs to a research theme, plus any optional fields below.
 4. Commit.
 
 A journal article with every field:
@@ -98,7 +98,7 @@ What each site field does:
 | --- | --- |
 | key (`nandi2026snow`) | The paper's address: `/publications/nandi2026snow/`. Letters, digits, `-` and `_` only. Do not change it once the paper is online. |
 | `pubtype` | The tab on /publications/: `journal`, `chapter` (Book chapters), `proceedings` (Conference papers), `abstract` or `talk` (both under Talks & abstracts). If missing, it is guessed from `@article`, `@incollection`, `@inproceedings`, `@misc`. |
-| `topic` | Research themes, separated by commas: `fire-and-water`, `modelling-water-cycle`, `climate-extremes` (the file names in `src/content/research/`). The paper is listed on each theme's page and can be filtered by theme on /publications/. |
+| `topic` | Optional. Research themes, separated by commas: `fire-and-water`, `modelling-water-cycle`, `climate-extremes` (the file names in `src/content/research/`). The paper is listed on each theme's page and can be filtered by theme on /publications/. Leave the line out if the paper fits no theme: it still appears on /publications/ (hidden only while a theme filter is selected), on its own page and in the CV, but on no theme page. |
 | `selected = {true}` | Shows the paper under "Selected papers" on the home page. The home page shows the **four newest** selected papers. Older selected papers stay in the list on /publications/. |
 | `pdf`, `code`, `data`, `slides` | Buttons (PDF, Code, Data, Slides) in the list and on the paper's page. Use a full `https://` link. For `pdf` and `slides` you can also put the file in `public/` and write its path: `public/papers/nandi2026snow.pdf` is written `/papers/nandi2026snow.pdf`. |
 | `summary` | One or two plain sentences, shown in an "In brief" box on the paper's page and used as its description in search results. |
@@ -108,7 +108,7 @@ What each site field does:
 The DOI gives a DOI button. Your name is bolded automatically. "Copy BibTeX" on the paper's page
 gives visitors the entry without the site fields.
 
-Afterwards the paper appears on /publications/, on its own page, on the theme pages in `topic`,
+Afterwards the paper appears on /publications/, on its own page, on the theme pages in `topic` (if any),
 on the home page if selected, and in the CV PDF.
 
 **Shorter examples**
