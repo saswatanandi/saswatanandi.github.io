@@ -1,5 +1,5 @@
 # Copy this block to the top of src/data/reading.yaml and fill it in.
-# Delete the lines you do not need (venue, doi, url, topics, note).
+# Delete the lines you do not need (venue, doi, url, note).
 
 - title: Paper title
   authors: Surname, A., Surname, B. and Surname, C.

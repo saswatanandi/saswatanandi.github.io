@@ -8,17 +8,12 @@ import type { SchemaContext } from 'astro:content';
 
 /**
  * Research theme slugs = the file names in src/content/research/ (without .md).
- * Publications (bib `topic`), posts and reading entries refer to themes by slug,
+ * Publications refer to themes by slug (bib `topic`, checked in src/lib/pubcore.ts),
  * so adding or renaming a theme file is all it takes; a stale slug fails the build.
  */
 export const TOPICS: string[] = Object.keys(import.meta.glob('../content/research/*.md'))
   .map((p) => p.split('/').pop()!.replace(/\.md$/, ''))
   .sort();
-const topic = z.string().refine((v) => TOPICS.includes(v), {
-  error: (iss) =>
-    `"${String(iss.input)}" is not a research theme. Use one of: ${TOPICS.join(', ')} (the file names in src/content/research/)`,
-});
-
 const url = z.url({ protocol: /^https?$/, error: 'must be a full URL starting with https://' });
 const tags = z.array(z.string().trim().toLowerCase().min(1)).default([]);
 /** "2026-03" or "2026-03-14" (YAML may already hand us a Date). */
@@ -40,7 +35,6 @@ export const blogSchema = ({ image }: SchemaContext) =>
       date: z.coerce.date(),
       updated: z.coerce.date().optional(),
       tags,
-      topics: z.array(topic).default([]),
       /** Posts with the same series name are linked to each other, oldest first. */
       series: z.string().optional(),
       draft: z.boolean().default(false),
@@ -163,7 +157,6 @@ export const readingSchema = z
     /** When you read it: YYYY-MM. */
     read: yearMonth,
     tags,
-    topics: z.array(topic).default([]),
     /** One line: why it is worth reading. */
     why: z.string().min(1),
     /** Slug of a longer note: src/content/reading/notes/<slug>.md (optional). */

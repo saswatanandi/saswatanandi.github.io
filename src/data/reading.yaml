@@ -11,7 +11,6 @@
 #    url      link used when there is no DOI                optional
 #    read     month you read it: 2026-09
 #    tags     [snow, remote-sensing]  (lowercase)
-#    topics   research theme slugs (file names in src/content/research/)   optional
 #    why      one line: why it is worth reading
 #    note     file name of a longer note in src/content/reading/notes/ (without .md)   optional
 #    draft    true = hidden on the live site
@@ -25,7 +24,6 @@
   doi: 10.1016/j.jhydrol.2005.07.007
   read: 2026-09
   tags: [uncertainty, calibration]
-  topics: [modelling-water-cycle]
   why: Example entry. Replace it with a paper you have just read.
   note: example-note
   draft: true

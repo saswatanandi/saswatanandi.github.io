@@ -226,7 +226,6 @@ cover: ./cover.jpg               # a picture in this folder, shown under the tit
 cover_alt: Snow-covered peaks above a half-empty reservoir in early summer.
 toc: true                        # false hides the contents list
 comments: true                   # false hides the comment box on this post
-topics: [climate-extremes]       # research theme slugs (checked, not shown yet)
 ---
 ```
 
@@ -351,7 +350,7 @@ Add a block to the top of the list:
 - `authors` is typed as you want it shown.
 - `year` is a number (no quotes). `read` is the month you read it, `YYYY-MM`.
 - `doi` without `https://doi.org/`. If there is no DOI, use `url: https://...` instead.
-- `venue`, `doi`/`url` and `note` are optional. `topics: [climate-extremes]` is optional too.
+- `venue`, `doi`/`url` and `note` are optional.
 - Add `draft: true` to hide the entry. If it has a note, add `draft: true` to the note too, or the
   build stops.
 
@@ -873,8 +872,8 @@ in `npm run dev`):
 - **Paper:** delete the `@` in front of `@article` to hide it (see [Add a paper](#add-a-paper)).
 - **Software package or dashboard:** delete its block from `software.yaml`. If it had `page: true`, also
   delete `src/content/software/<slug>.md`.
-- **Research theme:** first remove its slug from every `topic` in `publications.bib` (and any
-  `topics:` in posts and reading entries), then delete the file.
+- **Research theme:** first remove its slug from every `topic` in `publications.bib`, then delete
+  the file.
 
 **Deleting safely**
 
