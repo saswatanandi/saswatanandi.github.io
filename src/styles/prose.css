@@ -41,6 +41,14 @@
   font-style: var(--shiki-light-font-style);
   font-weight: var(--shiki-light-font-weight);
 }
+/* Two vitesse-light colours (strings, comments) are too faint on white for WCAG AA: darken them.
+   Light mode only; the dark-mode rules below are more specific and win there. */
+.astro-code span[style*='--shiki-light:#B56959'] {
+  color: #9a4c3e;
+}
+.astro-code span[style*='--shiki-light:#A0ADA0'] {
+  color: #66726a;
+}
 :root[data-theme='dark'] .astro-code,
 :root[data-theme='dark'] .astro-code span {
   color: var(--shiki-dark);
@@ -124,6 +132,11 @@ html:not(.js) .code-copy {
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   text-align: center;
+}
+
+/* Notebook HTML outputs (pandas tables): scroll sideways on narrow screens. */
+.prose .nb-html {
+  overflow-x: auto;
 }
 
 /* ── Tables ──────────────────────────────────────────────────────────────── */
