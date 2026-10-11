@@ -226,11 +226,16 @@ cover: ./cover.jpg               # a picture in this folder, shown under the tit
 cover_alt: Snow-covered peaks above a half-empty reservoir in early summer.
 toc: true                        # false hides the contents list
 comments: true                   # false hides the comment box on this post
+social_image: ./figure.png       # picture for share cards only (default: the cover)
+share: true                      # false hides the share row on this post
 ---
 ```
 
 - `description` is up to 300 characters. It appears on the blog list, in search results and in RSS.
 - `cover` needs `cover_alt`. The file must exist, or the build stops.
+- **Sharing:** every post gets a share card (the title, your name, and the cover or `social_image`
+  if there is one) and a share row at the end: Copy link, LinkedIn, X, WhatsApp and Email. Phones
+  show one Share button. Nothing to set up.
 - **Tags:** lowercase words joined by hyphens, for example `remote-sensing`, `imdlib`. Each tag
   gets a page `/tags/<tag>/` listing the posts and reading entries with that tag.
 - **Series:** give two or more posts the same `series:` text, for example `series: Snow drought`.
@@ -816,7 +821,8 @@ stops, and add a [redirect](#redirect-an-old-address) from the old address.
   that is not square is cropped to its centre.
 
 **Social card:** `public/og-default.png`, 1200 × 630 pixels. It is the picture shown when someone
-shares a link to the site (posts with a `cover` use their cover instead). It shows your name and
+shares a link to the site. Blog posts, reading notes, software pages and papers get their own card
+instead, made at every build. It shows your name and
 role. You can replace the file with any 1200 × 630 PNG. To regenerate it after changing
 `name` or `role` in `site.config.yaml`, run on your computer:
 
@@ -949,6 +955,10 @@ npm run build      # the whole site, same as GitHub
 npm run check      # checks the site code and content types
 npm run cv:data    # checks cv.yaml, site.config.yaml and publications.bib for the CV
 ```
+
+
+**Local preview misses a change** (for example, a new field has no effect): stop `npm run dev`,
+delete the folder `node_modules/.astro`, and start it again.
 
 ---
 
