@@ -820,20 +820,10 @@ stops, and add a [redirect](#redirect-an-old-address) from the old address.
 - It is cropped to a circle, so keep your face in the centre with some space around it. A picture
   that is not square is cropped to its centre.
 
-**Social card:** `public/og-default.png`, 1200 × 630 pixels. It is the picture shown when someone
-shares a link to the site. Blog posts, reading notes, software pages and papers get their own card
-instead, made at every build. It shows your name and
-role. You can replace the file with any 1200 × 630 PNG. To regenerate it after changing
-`name` or `role` in `site.config.yaml`, run on your computer:
-
-```sh
-npm i -D playwright && npx playwright install chromium
-node scripts/generate-images.mjs
-```
-
-This needs Playwright (a browser the script drives) and rewrites the favicon files too. Commit the
-changed PNG files, but not the `package.json` and `package-lock.json` changes that the install made
-(`git checkout package.json package-lock.json`).
+**Social card:** the picture shown when someone shares a link to your home page (or any page
+without its own card). It shows your name and role, and is made at every build from `name` and
+`role` in `site.config.yaml`, so there is nothing to update by hand. Blog posts, reading notes,
+software pages and papers get their own card.
 
 ---
 
@@ -1037,7 +1027,7 @@ Before each editing session, run `git pull` to get changes you made on GitHub.
 | CV | `src/data/cv.yaml` |
 | Name, role, bio, links, menu, metrics, badges, analytics, comments | `site.config.yaml` |
 | Headshot | `public/images/headshot.jpg` |
-| Social card | `public/og-default.png` (script: `scripts/generate-images.mjs`) |
+| Social card | made at build from `name` and `role` in `site.config.yaml` |
 | Redirects | `src/lib/redirects.mjs` (record: `docs/redirects.md`) |
 | Build and deploy | `.github/workflows/deploy.yml` |
 

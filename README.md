@@ -16,7 +16,7 @@ Step-by-step instructions for each kind of update are in **[HOW-TO-UPDATE.md](HO
 | Research themes (text, picture) | `src/content/research/<slug>.md` — see below |
 | Blog posts                            | `src/content/blog/<slug>/index.md` (copy `templates/blog-post/`) or `index.ipynb` (see below) |
 | CV (the PDF at /cv.pdf)               | `src/data/cv.yaml`                     |
-| Headshot / social card                | `public/images/headshot.jpg`, `public/og-default.png` |
+| Headshot / social card                | `public/images/headshot.jpg`; card made at build from `site.config.yaml` |
 
 Every file is validated at build time: a typo produces an error naming the file and field
 (see the "Build" step log in the Actions tab). Set `draft: true` to hide an item on the live site.
