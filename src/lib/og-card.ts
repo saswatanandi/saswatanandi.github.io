@@ -276,3 +276,29 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   const svg = await satori(root as Parameters<typeof satori>[0], { width: OG_WIDTH, height: OG_HEIGHT, fonts: loadFonts() });
   return sharp(Buffer.from(svg)).jpeg({ quality: 86, mozjpeg: true }).toBuffer();
 }
+
+/* ── The site card (home page and every page without its own card) ───────── */
+
+/**
+ * Mark, name and role over the ridgeline band, as on the home page. Made at every build from
+ * site.config.yaml, so changing `name` or `role` there updates the card too.
+ */
+export async function renderSiteCard(input: { name: string; role: string; seed: string }): Promise<Buffer> {
+  const RIDGE_H = 200;
+  const mark = await markPng(96);
+  const id = el('div', { position: 'absolute', left: 80, top: 150, display: 'flex', alignItems: 'center', gap: 32 }, [
+    el('img', { width: 96, height: 96 }, undefined, { src: mark, width: 96, height: 96 }),
+    el('div', { display: 'flex', flexDirection: 'column' }, [
+      el('div', { fontFamily: 'Serif', fontWeight: 600, fontSize: 84, lineHeight: 1, letterSpacing: '-0.025em', color: C.text }, input.name),
+      el('div', { marginTop: 20, fontFamily: 'Sans', fontWeight: 500, fontSize: 30, color: C.muted }, input.role),
+    ]),
+  ]);
+  const ridges = el('img', { position: 'absolute', left: 0, bottom: 0, width: OG_WIDTH, height: RIDGE_H }, undefined, {
+    src: await ridgesPng(input.seed, OG_WIDTH, RIDGE_H),
+    width: OG_WIDTH,
+    height: RIDGE_H,
+  });
+  const root = el('div', { display: 'flex', position: 'relative', width: OG_WIDTH, height: OG_HEIGHT, background: C.bg }, [id, ridges]);
+  const svg = await satori(root as Parameters<typeof satori>[0], { width: OG_WIDTH, height: OG_HEIGHT, fonts: loadFonts() });
+  return sharp(Buffer.from(svg)).jpeg({ quality: 86, mozjpeg: true }).toBuffer();
+}

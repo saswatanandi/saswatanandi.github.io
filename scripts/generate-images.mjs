@@ -5,13 +5,13 @@
  *
  *   public/favicon-32.png        32×32   contour-drop mark (PNG fallback for favicon.svg)
  *   public/apple-touch-icon.png  180×180 white mark on a teal tile
- *   public/og-default.png        1200×630 social card: mark, name, role, ridgelines
  *
  * Usage:  node scripts/generate-images.mjs
  * Needs:  Node >= 22.18 (runs the .ts libraries directly) and Playwright with
  *         Chromium (`npm i -D playwright && npx playwright install chromium`),
  *         or point PLAYWRIGHT_MODULE at an existing install's index.mjs.
- * The name and role come from site.config.yaml, so nothing is hard-coded here.
+ * The site share card is no longer made here: /og/site.jpg is drawn at every build
+ * (src/pages/og/site.jpg.ts).
  */
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -55,27 +55,6 @@ const jobs = [
     h: 180,
     html: page(180, 180, `<div class="t">${mark(118, '#ffffff', false)}</div>`,
       `.t{width:180px;height:180px;background:${LIGHT.accent};display:grid;place-items:center}.t svg{margin-top:-4px}`),
-  },
-  {
-    out: 'public/og-default.png',
-    w: 1200,
-    h: 630,
-    html: page(
-      1200,
-      630,
-      `<div class="og">
-        <div class="id">${mark(92, LIGHT.accent, false)}
-          <div><p class="name">${esc(site.name)}</p><p class="role">${esc(site.role)}</p></div>
-        </div>
-        <div class="ridges">${ridgelinesSvg({ ...HERO_WIDE, id: 'og' }).replace('xMidYMax', 'xMaxYMax')}</div>
-      </div>`,
-      `.og{position:relative;width:1200px;height:630px;background:${LIGHT.bg};color:${LIGHT.text};font-family:Inter,sans-serif}
-       .id{position:absolute;left:80px;top:160px;display:flex;align-items:center;gap:30px}
-       .name{margin:0;font-family:"Source Serif 4",serif;font-weight:600;font-size:84px;letter-spacing:-.025em;line-height:1}
-       .role{margin:18px 0 0;font-size:30px;font-weight:500;color:${LIGHT.muted}}
-       .ridges{position:absolute;left:0;right:0;bottom:0;height:230px;color:${LIGHT.contour}}
-       .ridges svg{display:block;width:100%;height:100%}`,
-    ),
   },
 ];
 

@@ -1,6 +1,6 @@
 /**
  * Share cards: /og/<section>/<id>.jpg for every blog post, reading note, software page and
- * publication page, drawn at build time (src/lib/og-card.ts). Other pages use /og-default.png.
+ * publication page, drawn at build time (src/lib/og-card.ts). Other pages use /og/site.jpg (src/pages/og/site.jpg.ts).
  * Picture on the card: blog `social_image`, else `cover`; a publication's `image` (a file in
  * public/); otherwise the ridgeline pattern.
  */

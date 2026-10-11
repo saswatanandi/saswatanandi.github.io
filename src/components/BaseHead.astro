@@ -19,7 +19,7 @@ import interItalicLatin from '@fontsource-variable/inter/files/inter-latin-wght-
 export interface Props {
   title?: string;
   description?: string;
-  /** Share-card image (site-relative or absolute URL); defaults to /og-default.png. */
+  /** Share-card image (site-relative or absolute URL); defaults to /og/site.jpg (made from site.config.yaml). */
   image?: string;
   /** Text alternative for `image` (defaults to the site owner's name and role). */
   imageAlt?: string;
@@ -34,7 +34,7 @@ export interface Props {
 const {
   title,
   description = site.description,
-  image = '/og-default.png',
+  image = '/og/site.jpg',
   imageAlt,
   type = 'website',
   noindex = false,
