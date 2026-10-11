@@ -69,7 +69,7 @@ publications:
 
 # Cookie-free analytics. Put your GoatCounter code (the "xyz" in xyz.goatcounter.com) to enable.
 analytics:
-  goatcounter: "snandi"        # TODO(Saswata): create account at goatcounter.com
+  goatcounter: "snandi"
 
 # giscus comments on blog posts. Get the ids from https://giscus.app after enabling Discussions.
 giscus:

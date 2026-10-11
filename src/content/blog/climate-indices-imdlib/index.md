@@ -6,7 +6,7 @@ tags: [imdlib, climate, installation, software, tool]
 ---
 
 > [!NOTE]
-> Updated September 2026: the current IMDLIB release is 0.1.22. The functions used below (`open_data`, `fill_na`, `clip`, `compute` and `get_xarray`) work the same way in it.
+> This post uses an older version of IMDLIB. For the current way, see the [IMDLIB page](/software/imdlib/).
 
 ## Description
 

@@ -1,0 +1,252 @@
+---
+/**
+ * "Share" row at the end of a post or detail page: Copy link, LinkedIn, X, WhatsApp, Email.
+ * On phones (when the browser has a share sheet) it shows one "Share" button plus Copy link.
+ * Plain links only: no third-party scripts, nothing loads until someone clicks.
+ * Clicks are counted as GoatCounter events (share-<channel>-<page path>) when GoatCounter is on.
+ * Without JavaScript the links still work (Copy link and the share-sheet button are hidden).
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Absolute URL to share (defaults to this page's canonical URL). */
+  url?: string;
+  /** Text shared with the link: the page title (for a paper, "<title>, <Journal> (<year>)"). */
+  text: string;
+  /** Optional one-line summary, used in the email body. */
+  description?: string;
+  class?: string;
+}
+const { url = new URL(Astro.url.pathname, Astro.site).toString(), text, description, class: className } = Astro.props;
+const e = encodeURIComponent;
+const page = Astro.url.pathname;
+
+const links = [
+  { channel: 'linkedin', label: 'Share on LinkedIn', icon: 'linkedin', href: `https://www.linkedin.com/sharing/share-offsite/?url=${e(url)}` },
+  { channel: 'x', label: 'Share on X', icon: 'x', href: `https://x.com/intent/post?text=${e(text)}&url=${e(url)}` },
+  { channel: 'whatsapp', label: 'Share on WhatsApp', icon: 'whatsapp', href: `https://wa.me/?text=${e(text)}%20${e(url)}` },
+  {
+    channel: 'email',
+    label: 'Share by email',
+    icon: 'mail',
+    href: `mailto:?subject=${e(text)}&body=${description ? `${e(description)}%0A%0A` : ''}${e(url)}`,
+  },
+] as const;
+---
+
+<aside
+  class:list={['share', className]}
+  aria-label="Share this page"
+  data-share
+  data-share-url={url}
+  data-share-text={text}
+  data-share-page={page}
+  data-pagefind-ignore
+>
+  <span class="share__label" aria-hidden="true">Share</span>
+  <ul role="list" class="share__list">
+    <li class="share__native">
+      <button type="button" class="share__btn share__btn--native" data-share-channel="native">
+        <Icon name="share" size={18} /> <span>Share</span>
+      </button>
+    </li>
+    <li class="share__js">
+      <button type="button" class="share__btn" data-share-channel="copy" aria-label="Copy link" title="Copy link">
+        <span class="share__idle"><Icon name="link" size={18} /></span>
+        <span class="share__done"><Icon name="check" size={18} /></span>
+      </button>
+    </li>
+    {
+      links.map((l) => (
+        <li class="share__link">
+          <a
+            class="share__btn"
+            href={l.href}
+            data-share-channel={l.channel}
+            aria-label={l.label}
+            title={l.label}
+            {...(l.channel === 'email' ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
+          >
+            <Icon name={l.icon} size={l.channel === 'email' ? 19 : 17} />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <span class="share__status" role="status" aria-live="polite"></span>
+</aside>
+
+<script>
+  type GC = { count?: (o: { path: string; title: string; event: boolean }) => void };
+  function track(row: HTMLElement, channel: string) {
+    try {
+      const gc = (window as unknown as { goatcounter?: GC }).goatcounter;
+      gc?.count?.({ path: `share-${channel}-${row.dataset.sharePage ?? location.pathname}`, title: `Share: ${channel}`, event: true });
+    } catch {
+      /* analytics must never break sharing */
+    }
+  }
+
+  async function copyText(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      ta.remove();
+      return ok;
+    }
+  }
+
+  // Phones and tablets with a system share sheet get one "Share" button instead of the icon row.
+  const nativeOk =
+    typeof navigator.share === 'function' &&
+    (matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 40rem)').matches);
+  for (const row of document.querySelectorAll<HTMLElement>('[data-share]')) {
+    if (nativeOk) row.dataset.mode = 'native';
+  }
+
+  document.addEventListener('click', async (ev) => {
+    const btn = (ev.target as Element | null)?.closest<HTMLElement>('[data-share-channel]');
+    const row = btn?.closest<HTMLElement>('[data-share]');
+    if (!btn || !row) return;
+    const channel = btn.dataset.shareChannel!;
+    const url = row.dataset.shareUrl ?? location.href;
+    track(row, channel);
+    const status = row.querySelector<HTMLElement>('.share__status');
+    if (channel === 'copy') {
+      const ok = await copyText(url);
+      btn.dataset.state = ok ? 'done' : 'error';
+      if (status) status.textContent = ok ? 'Link copied' : 'Copy failed';
+      window.setTimeout(() => {
+        delete btn.dataset.state;
+        if (status) status.textContent = '';
+      }, 1800);
+    } else if (channel === 'native') {
+      try {
+        await navigator.share({ title: row.dataset.shareText, url });
+      } catch {
+        /* dismissed */
+      }
+    }
+  });
+</script>
+
+<style>
+  .share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    margin-top: var(--space-7);
+    color: var(--color-text-muted);
+  }
+  .share__label {
+    color: var(--color-text-faint);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .share__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .share__btn {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      color var(--duration) var(--ease),
+      border-color var(--duration) var(--ease),
+      background-color var(--duration) var(--ease);
+  }
+  .share__btn:hover,
+  .share__btn:focus-visible {
+    color: var(--color-accent);
+    border-color: var(--color-border-strong);
+    background: var(--color-accent-soft);
+  }
+  .share__btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .share__btn--native {
+    display: inline-flex;
+    gap: 0.45em;
+    padding-inline: 0.9rem;
+    border-color: var(--color-border-strong);
+  }
+  /* Copy link: idle and done icons share one cell. */
+  .share__btn > span:not(:only-child) {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    transition: opacity var(--duration) var(--ease);
+  }
+  .share__done {
+    opacity: 0;
+    color: var(--color-accent);
+  }
+  .share__btn[data-state='done'] .share__idle {
+    opacity: 0;
+  }
+  .share__btn[data-state='done'] .share__done {
+    opacity: 1;
+  }
+  .share__status {
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+  .share__status:empty {
+    display: none;
+  }
+
+  /* Without JavaScript: only the plain links. With a share sheet: Share + Copy link. */
+  .share__native {
+    display: none;
+  }
+  :global(html:not(.js)) .share__js {
+    display: none;
+  }
+  .share[data-mode='native'] .share__native {
+    display: list-item;
+  }
+  .share[data-mode='native'] .share__link {
+    display: none;
+  }
+
+  @media (pointer: coarse), (max-width: 40rem) {
+    .share__btn {
+      min-width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+</style>

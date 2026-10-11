@@ -4,10 +4,12 @@
  */
 import { getCollection } from 'astro:content';
 import { tagSlug, type Post } from './blog';
-import { getPosts } from './collections';
+import { READING_TYPE_LABEL, getPosts } from './collections';
 
 interface ReadingItem {
   title: string;
+  /** "Paper", "Blog", "Report" or "Book". */
+  kind: string;
   /** Note page on this site, else the DOI or URL, else /reading/. */
   href: string;
   external: boolean;
@@ -26,11 +28,12 @@ export interface Tag {
 
 const visible = (draft: unknown) => import.meta.env.DEV || draft !== true;
 
-/** Reading entries with their tags (the entry's tags plus its note's tags). Read-only use of the reading data. */
+/** Reading entries with their tags (tags live only on the entry in reading.yaml). Read-only use of the reading data. */
 async function readingItems(): Promise<{ item: ReadingItem; tags: string[] }[]> {
   const entries = await getCollection('reading', ({ data }) => visible(data.draft));
   const notes = await getCollection('readingNotes', ({ data }) => visible(data.draft));
   const noteById = new Map(notes.map((n) => [n.id, n]));
+  const postIds = new Set((await getCollection('blog', ({ data }) => visible(data.draft))).map((p) => p.id));
   return entries
     .map(({ data }) => {
       // Loose access: the reading data format may gain or rename fields.
@@ -40,18 +43,19 @@ async function readingItems(): Promise<{ item: ReadingItem; tags: string[] }[]> 
       const doi = typeof r.doi === 'string' ? r.doi : undefined;
       const url = typeof r.url === 'string' ? r.url : undefined;
       const venue = (r.venue ?? r.journal) as string | undefined;
-      const href = note ? `/reading/${note.id}/` : doi ? `https://doi.org/${doi}` : (url ?? '/reading/');
-      const noteTags = ((note?.data as { tags?: string[] } | undefined)?.tags ?? []) as string[];
+      const post = typeof r.post === 'string' && postIds.has(r.post) ? r.post : undefined;
+      const href = note ? `/reading/${note.id}/` : post ? `/blog/${post}/` : doi ? `https://doi.org/${doi}` : (url ?? '/reading/');
       return {
         item: {
           title: String(r.title),
+          kind: READING_TYPE_LABEL[r.type as keyof typeof READING_TYPE_LABEL] ?? 'Paper',
           href,
           external: /^https?:/.test(href),
           source: [r.authors, venue, r.year].filter(Boolean).join(' · '),
           why: typeof r.why === 'string' ? r.why : undefined,
           read: String(r.read ?? ''),
         },
-        tags: [...((r.tags as string[] | undefined) ?? []), ...noteTags],
+        tags: (r.tags as string[] | undefined) ?? [],
       };
     })
     .sort((a, b) => b.item.read.localeCompare(a.item.read));

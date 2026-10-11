@@ -5,10 +5,12 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import CopyButton from '../../components/CopyButton.astro';
 import CodeCopy from '../../components/blog/CodeCopy.astro';
 import Icon from '../../components/Icon.astro';
+import ShareRow from '../../components/ShareRow.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
 import { getSoftware } from '../../lib/collections';
 import { formatDate, formatMonth } from '../../lib/format';
 import { renderInline } from '../../lib/markdown';
+import { ogCardPath } from '../../lib/og';
 
 export const getStaticPaths = (async () => {
   const items = (await getSoftware()).filter((s) => s.data.page);
@@ -47,6 +49,8 @@ const stats = s.stats;
   eyebrowHref="/software/"
   intro={s.tagline ?? s.description}
   description={page.data.description ?? s.tagline ?? s.description}
+  image={ogCardPath('software', item.id)}
+  imageAlt={s.tagline ? `${s.name}: ${s.tagline}` : s.name}
   ridges={5}
   narrow
 >
@@ -195,6 +199,8 @@ const stats = s.stats;
     }
 
     {page.data.updated && <p class="updated">Page last checked against the current release in {formatMonth(page.data.updated)}.</p>}
+
+    <ShareRow text={s.tagline ? `${s.name}: ${s.tagline}` : s.name} description={s.description} />
   </article>
   <CodeCopy />
 </PageLayout>

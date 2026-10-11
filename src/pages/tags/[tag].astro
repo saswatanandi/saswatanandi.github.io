@@ -16,7 +16,7 @@ interface Props {
 }
 const { tag } = Astro.props;
 const n = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
-const summary = [tag.posts.length && n(tag.posts.length, 'post'), tag.reading.length && n(tag.reading.length, 'paper')]
+const summary = [tag.posts.length && n(tag.posts.length, 'post'), tag.reading.length && n(tag.reading.length, 'reading item')]
   .filter(Boolean)
   .join(', ');
 ---
@@ -26,7 +26,7 @@ const summary = [tag.posts.length && n(tag.posts.length, 'post'), tag.reading.le
   eyebrow="Tags"
   eyebrowHref="/tags/"
   intro={summary}
-  description={`Blog posts and papers tagged "${tag.label}".`}
+  description={`Blog posts and reading tagged "${tag.label}".`}
   ridges={7}
   search={false}
 >
@@ -52,7 +52,8 @@ const summary = [tag.posts.length && n(tag.posts.length, 'post'), tag.reading.le
                 {r.external && <Icon name="external" size={13} class="reading__ext" />}
               </p>
               <p class="reading__src">
-                {r.source}
+                {r.kind}
+                {r.source && ` · ${r.source}`}
                 {/^\d{4}-\d{2}$/.test(r.read) && <span> · read {formatYearMonth(r.read)}</span>}
               </p>
               {r.why && <p class="reading__why">{r.why}</p>}

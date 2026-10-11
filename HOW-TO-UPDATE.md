@@ -11,7 +11,7 @@ the log names the file and the field, and the live site stays as it was until yo
 3. [Add a news item](#add-a-news-item)
 4. [Write a blog post](#write-a-blog-post)
 5. [Write a post as a Jupyter notebook](#write-a-post-as-a-jupyter-notebook)
-6. [Add a paper to Reading](#add-a-paper-to-reading)
+6. [Add something to Reading](#add-something-to-reading)
 7. [Update citation numbers](#update-citation-numbers)
 8. [Software (packages and dashboards)](#software)
 9. [Update the CV](#update-the-cv)
@@ -204,7 +204,7 @@ simply not shown.
 
 ## Write a blog post
 
-1. Copy the folder `src/content/blog/example-post/` to `src/content/blog/snow-drought/`.
+1. Create the folder `src/content/blog/snow-drought/` and copy `templates/blog-post/index.md` into it.
    The folder name becomes the address: `/blog/snow-drought/`. Use lowercase and hyphens.
 2. In `snow-drought/index.md`, replace the block between the `---` lines (the front matter).
 3. Write the post in Markdown below it.
@@ -257,7 +257,7 @@ $$
 
 ```python
 import imdlib as imd
-data = imd.get_data('rain', 2020, 2021)
+data = imd.load('rain', 2020, 2021)
 ```
 
 ## Note boxes
@@ -290,23 +290,25 @@ The post appears on /blog/, on its tag pages, in `/rss.xml`, and as "Latest post
 ## Write a post as a Jupyter notebook
 
 1. Create the folder `src/content/blog/rainfall-notebook/`.
-2. Put your notebook in it, named `index.ipynb`.
-3. Make the **first cell a Markdown cell** containing only the front matter:
+2. Put your notebook in it, named `index.ipynb`. Run it and save it **with its outputs**. The site
+   shows the saved outputs and runs nothing.
+3. Copy `templates/notebook-post/meta.yaml` next to it and fill in the details.
 
-   ```yaml
+   **Or, instead of `meta.yaml`:** put the details in the notebook itself. Add a new **Markdown**
+   cell at the very top of the notebook and write:
+
+   ```
    ---
    title: Wet days from IMD rainfall
-   description: Counting wet days in IMD gridded rainfall with IMDLIB and xarray.
+   description: Counting wet days in IMD gridded rainfall with IMDLIB.
    date: 2026-10-25
-   tags: [imdlib, python, rainfall]
-   draft: false
+   tags: [imdlib, python]
    ---
    ```
 
-   All the fields of a Markdown post work here too.
-4. Run the notebook and save it **with its outputs**. The site shows the saved outputs and runs
-   nothing.
-5. Commit `index.ipynb` (and any picture files you added). Do not commit `index.ipynb.md` or
+   The `---` lines must be the first and last lines of that cell. Use either this cell or
+   `meta.yaml`, not both.
+4. Commit `index.ipynb` and `meta.yaml` (and any picture files you added). Do not commit `index.ipynb.md` or
    `nb-output/`: they are made from the notebook at every build.
 
 Pictures:
@@ -324,43 +326,72 @@ sidebar (gear icon, Property Inspector) and add the tag under Cell Tags:
 | `remove-input` | Only the output is shown (hides the code). |
 | `remove-output` | Only the code is shown. |
 
-Warnings and progress bars (stderr) are left out automatically. `src/content/blog/example-notebook/`
-is a working example (a draft).
+Warnings and progress bars (stderr) are left out automatically. `templates/notebook-post/` is a
+working example.
 
 ---
 
-## Add a paper to Reading
+## Add something to Reading
 
-File: `src/data/reading.yaml`
+File: `src/data/reading.yaml`. Papers, blog posts, reports and books all go here.
 
-Add a block to the top of the list:
+You can write at three levels:
+1. **One line** — only `reading.yaml`.
+2. **A note** — add `note: <name>` and a file `src/content/reading/notes/<name>.md`.
+3. **A blog post** — add `post: <post folder>`.
+
+Levels 2 and 3 both show as "My note →".
+
+Add a block to the top of the list. **With a DOI**, this is enough:
 
 ```yaml
-- title: Snow drought and its hydrological impacts in the western United States
-  authors: Harpold, A., Dettinger, M. and Rajagopal, S.
-  venue: Water Resources Research
-  year: 2017
-  doi: 10.1002/2017WR020803
+- doi: 10.1002/2017WR020803
   read: 2026-10
-  tags: [snow, drought]
   why: Clear definitions of warm and dry snow drought, with a useful map of where each occurs.
-  note: harpold-2017
+  tags: [snow, drought]
 ```
 
-- `authors` is typed as you want it shown.
-- `year` is a number (no quotes). `read` is the month you read it, `YYYY-MM`.
-- `doi` without `https://doi.org/`. If there is no DOI, use `url: https://...` instead.
-- `venue`, `doi`/`url` and `note` are optional.
-- Add `draft: true` to hide the entry. If it has a note, add `draft: true` to the note too, or the
-  build stops.
+**Without a DOI** (a blog post, a report), give the link and the title:
 
-For a longer note, keep `note: harpold-2017` and create `src/content/reading/notes/harpold-2017.md`:
+```yaml
+- url: https://example.org/drought-report.pdf
+  title: State of the snowpack 2026
+  type: report
+  read: 2026-10
+  why: Good summary of this winter's snow drought.
+```
+
+- `read` is the month you read it, `YYYY-MM`.
+- `doi` without `https://doi.org/`.
+- Optional lines:
+  - `type: blog` (or `report`, `book`). Without it, the entry is a paper.
+  - `must_read: true` puts a star on it and lists it under the "Must reads" button.
+  - `note: harpold-2017` links a longer note (see below).
+  - `post: equifinality-manifesto` links a blog post you wrote about it (the post's folder name).
+    Both show as "My note →". The `why` line can be a why or a what: one line, your takeaway.
+  - `authors`, `venue`, `year` (and `title`): type them to override what the DOI lookup finds.
+    `authors` is typed as you want it shown, e.g. `Harpold, A., Dettinger, M. and Rajagopal, S.`;
+    `year` is a number (no quotes).
+  - `draft: true` hides the entry. If it has a note, add `draft: true` to the note too, or the
+    build stops.
+
+How the DOI lookup works:
+
+- When the site is built on GitHub, the title, authors, journal and year are looked up from the DOI
+  (Crossref). Each DOI is looked up once and remembered.
+- What you type always wins over what is looked up.
+- If the lookup fails (Crossref down, DOI not found), the build still works: the entry shows the
+  DOI as its title, and the next build tries again. To fix it for good, type `title:` (and
+  `authors:`, `venue:`, `year:`) in the entry.
+- An entry needs a `doi` or a `url`. Without a `doi` it also needs a `title`. Otherwise the build
+  stops with a message.
+
+For a longer note, add `note: harpold-2017` to the entry and create `src/content/reading/notes/harpold-2017.md`:
 
 ```markdown
 ---
 title: Notes on warm and dry snow drought
 date: 2026-10-12
-tags: [snow-drought]
 ---
 
 The paper separates **warm** snow drought (normal precipitation, too warm to fall as snow)
@@ -371,13 +402,15 @@ from **dry** snow drought (too little precipitation).
 - The definitions, for the Sierra Nevada basins.
 ```
 
-All front matter fields are optional (`title` defaults to the paper title). Without `note:`,
+All front matter fields are optional (`title` defaults to the entry's title). Without `note:`,
 delete that line from the entry and skip the file.
 
-Afterwards the entry appears on /reading/ under "October 2026" with a "Read note" link, the note at
+Tags go only on the entry in `reading.yaml`. A note has no `tags:`.
+
+Afterwards the entry appears on /reading/ under "October 2026" with a "My note" link, the note at
 `/reading/harpold-2017/`, the tags on `/tags/snow/` and `/tags/drought/`, and the newest entry on
-the home page. When the entries use two or more different tags, /reading/ shows a
-"Filter by tag" row.
+the home page. When the entries use two or more different tags, or some are `must_read`,
+/reading/ shows a "Filter" row.
 
 A `note:` without a matching file, or a note file that no entry links to, stops the build with a
 message. A template is in `templates/reading-entry.yaml`.
@@ -458,8 +491,10 @@ Only `name` and `description` are required. Other fields you can add:
 - `citation:` with `text`, `doi`, `bib` (a key in publications.bib) and `software_doi` (see IMDLIB).
 - `links:` extra links on the detail page, for example `- { label: Tutorial, url: https://... }`.
 - `snippet:` a short code example, shown on the featured card only.
-- `page: true` gives the package its own page `/software/snowdrought/`. Then also create
-  `src/content/software/snowdrought.md` (copy `imdlib.md` and rewrite the text), or the build stops.
+- `page: true` gives the package its own page and a "More about" link. You also need a text file in
+  `src/content/software/`, or the build stops (copy `imdlib.md` and rewrite the text).
+  **File name:** the `slug` if the entry has one, otherwise the `name` in lowercase with spaces as dashes
+  (`name: FLARE` → `flare.md`, `name: My Tool` → `my-tool.md`).
 
 The card appears under Packages on /software/. It shows the badges (`language`, `license`,
 `version`, `status`), the first `install` line with a Copy button, and buttons for the links.
@@ -504,8 +539,12 @@ File: `src/content/software/imdlib.md`
 
 ## Update the CV
 
-File: `src/data/cv.yaml`. The CV is only the PDF at `/cv.pdf`. It is rebuilt on every deploy.
-Publications come from `publications.bib`, so do not list them here.
+**The CV PDF is made automatically.** Every time you push, GitHub builds `/cv.pdf` from three
+files. You never build it yourself.
+
+- `src/data/cv.yaml`: jobs, education, grants, awards, teaching, and so on (this section)
+- `src/data/publications.bib`: papers, added to the CV by themselves, so do not list them here
+- `site.config.yaml`: name, email and links
 
 Rules for all sections:
 
@@ -605,15 +644,8 @@ pdf:
   paper: a4
 ```
 
-**Check the PDF on your computer** (needs Typst, see
-[First-time setup](#first-time-setup-on-your-computer)):
-
-```sh
-npm run cv:pdf
-```
-
-This writes `public/cv.pdf` (not committed). Open it, or run `npm run dev` and visit
-http://localhost:4321/cv.pdf. `npm run cv:data` checks `cv.yaml` without making the PDF.
+**Optional, on your computer:** `npm run cv:pdf` makes the PDF locally so you can check it before
+pushing (needs Typst, see [First-time setup](#first-time-setup-on-your-computer)).
 
 The `summary` at the top of `cv.yaml` has hand-typed numbers (papers, citations, downloads).
 Update them when you update the metrics.
@@ -864,7 +896,7 @@ in `npm run dev`):
 | Blog post | front matter of `index.md` (or the notebook's first cell) |
 | News item | the item in `news.yaml` |
 | Reading entry | the entry in `reading.yaml`. If it has a note, also in the note file (otherwise the build stops). |
-| Reading note only | front matter of the note file. The entry stays and its "Read note" link disappears. |
+| Reading note only | front matter of the note file. The entry stays and its "My note" link disappears. |
 | CV item | the item in `cv.yaml` (positions, education, grants, awards, talks, teaching, mentoring, service items, press, software, references) |
 
 **No draft option:**
@@ -981,15 +1013,16 @@ Before each editing session, run `git pull` to get changes you made on GitHub.
 
 | What | File |
 | --- | --- |
+| Templates for everything | `templates/` |
 | Papers, talks, abstracts | `src/data/publications.bib` (template: `templates/new-paper.bib`) |
 | Paper PDFs and figures | `public/papers/`, `public/images/papers/` |
-| News | `src/data/news.yaml` |
-| Blog posts | `src/content/blog/<name>/index.md` or `index.ipynb`, pictures in the same folder |
+| News | `src/data/news.yaml` (template: `templates/news-item.yaml`) |
+| Blog posts | `src/content/blog/<name>/index.md` or `index.ipynb`, pictures in the same folder (templates: `templates/blog-post/`, `templates/notebook-post/`) |
 | Reading list | `src/data/reading.yaml` (template: `templates/reading-entry.yaml`) |
-| Reading notes | `src/content/reading/notes/<name>.md` |
-| Research themes | `src/content/research/<theme>.md` |
+| Reading notes | `src/content/reading/notes/<name>.md` (template: `templates/reading-note.md`) |
+| Research themes | `src/content/research/<theme>.md` (template: `templates/research-theme.md`) |
 | Research pictures | `src/assets/research/` |
-| Software cards (packages and dashboards) | `src/data/software.yaml` |
+| Software cards (packages and dashboards) | `src/data/software.yaml` (template: `templates/software-entry.yaml`) |
 | IMDLIB page text | `src/content/software/imdlib.md`, pictures in `src/content/software/images/` |
 | CV | `src/data/cv.yaml` |
 | Name, role, bio, links, menu, metrics, badges, analytics, comments | `site.config.yaml` |

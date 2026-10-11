@@ -20,9 +20,14 @@ interface Options {
   path: string;
   /** Build an id for a list item (defaults to a slug of `id` / `name` / `title`, else the index). */
   id?: (item: Item, index: number) => string;
+  /**
+   * Change the items after reading the file and before validation, e.g. fill in fields from a cache.
+   * Ids are made from the items as typed, so they do not change when this hook adds fields.
+   */
+  prepare?: (items: Item[], root: URL) => Item[] | Promise<Item[]>;
 }
 
-function slugify(input: string): string {
+export function slugify(input: string): string {
   return input
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
@@ -71,7 +76,6 @@ export function yamlLoader(opts: Options): Loader {
           throw new Error(`\n✖ ${opts.path} is not valid YAML:\n  ${detail}\n`);
         }
 
-        store.clear();
         if (data == null) data = [];
         if (!Array.isArray(data)) {
           throw new Error(`\n✖ ${opts.path} must be a YAML list (each item starts with "- ").\n`);
@@ -81,14 +85,18 @@ export function yamlLoader(opts: Options): Loader {
             throw new Error(`\n✖ ${opts.path}: item #${index + 1} must be a mapping of "key: value" fields.\n`);
           }
         }
-        const items = data as Item[];
-        // Unique ids without making the author care about it.
-        const ids = listIds(items, opts.id);
+        // Unique ids without making the author care about it (from the items as typed).
+        const ids = listIds(data as Item[], opts.id);
+        const items = opts.prepare ? await opts.prepare(data as Item[], config.root) : (data as Item[]);
+        // Check every item first; only then replace the stored entries. A mistake while the dev
+        // server is running then keeps the last good list on screen instead of an empty page.
+        const entries = [];
         for (const [index, item] of items.entries()) {
           const id = ids[index]!;
-          const parsed = await parseData({ id, data: item, filePath });
-          store.set({ id, data: parsed, filePath: opts.path });
+          entries.push({ id, data: await parseData({ id, data: item, filePath }), filePath: opts.path });
         }
+        store.clear();
+        for (const e of entries) store.set(e);
       };
 
       await sync();

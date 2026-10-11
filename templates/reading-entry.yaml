@@ -1,20 +1,28 @@
-# Copy this block to the top of src/data/reading.yaml and fill it in.
-# Delete the lines you do not need (venue, doi, url, note).
+# Copy one of these blocks to the top of src/data/reading.yaml and fill it in.
 
-- title: Paper title
-  authors: Surname, A., Surname, B. and Surname, C.
-  venue: Water Resources Research
-  year: 2025
-  doi: 10.1029/2025WR000000
+# 1. With a DOI (most papers): title, authors, journal and year are looked up from the DOI.
+- doi: 10.1029/2025WR000000
   read: 2026-10
-  tags: [snowmelt, remote-sensing]
   why: One line on why it is worth reading.
-  # note: surname-2025        # optional: src/content/reading/notes/surname-2025.md
+  tags: [snowmelt, remote-sensing]
+
+# 2. Without a DOI (blog post, report, book): give the link and the title.
+- url: https://example.org/post
+  title: Post title
+  type: blog                   # paper, blog, report or book (default: paper)
+  read: 2026-10
+  why: One line on why it is worth reading.
+  tags: [snowmelt]
+
+# Optional lines for either form:
+#   must_read: true            # star it and list it under "Must reads"
+#   note: surname-2025         # longer note: src/content/reading/notes/surname-2025.md
+#   post: my-post-folder       # or: link a blog post you wrote about it
+#   authors: Surname, A. and Surname, B.   # type these to override the looked-up ones
+#   venue: Water Resources Research
+#   year: 2025
+#   draft: true                # hide it on the live site
 
 # Optional note file, src/content/reading/notes/surname-2025.md:
-#
-# ---
-# tags: [snowmelt]
-# ---
 #
 # Your note in Markdown.

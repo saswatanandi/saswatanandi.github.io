@@ -34,7 +34,7 @@
   pypi: imdlib
   language: Python
   license: MIT
-  version: 0.1.22            # latest release on PyPI (21 Sep 2026)
+  version: 0.3.1             # latest release on PyPI (9 Oct 2026)
   featured: true
   page: true
   install:
@@ -43,7 +43,7 @@
   snippet: |
     # daily rainfall over India, 2020 to 2023
     >>> import imdlib as imd
-    >>> data = imd.get_data('rain', 2020, 2023)
+    >>> data = imd.load('rain', 2020, 2023)
     >>> ds = data.get_xarray()
     >>> ds['rain'].mean('time').plot()
   stats:

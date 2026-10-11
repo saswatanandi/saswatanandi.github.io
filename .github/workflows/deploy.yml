@@ -46,8 +46,19 @@ jobs:
       - name: Build CV PDF
         run: npm run cv:pdf
 
+      # Titles/authors/venues/years that scripts/reading-meta.mjs looked up from Crossref for
+      # DOI-only entries in src/data/reading.yaml. Keeping the file between builds means each DOI is
+      # looked up once. A new key every run saves the updated file; restore-keys loads the latest one.
+      - name: Cache reading-list lookups
+        uses: actions/cache@v4
+        with:
+          path: .cache/reading-meta.json
+          key: reading-meta-${{ github.run_id }}
+          restore-keys: reading-meta-
+
       # npm run build = notebook posts → Markdown (scripts/notebooks.mjs, saved outputs, nothing
-      # executed), then astro build, then the Pagefind search index (dist/pagefind/).
+      # executed), reading-list lookups (scripts/reading-meta.mjs), then astro build, then the
+      # Pagefind search index (dist/pagefind/).
       - name: Build
         run: npm run build
 

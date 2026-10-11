@@ -1,29 +1,46 @@
 # ─────────────────────────────────────────────────────────────────────────────
-#  Papers I have read, shown on /reading/ (newest `read` month first).
-#  Copy the block in templates/reading-entry.yaml to the top of this list.
+#  Things I have read (papers, blog posts, reports, books), shown on /reading/,
+#  newest `read` month first. Add new entries at the top of the list.
+#  Template: templates/reading-entry.yaml
+#
+#  With a DOI, this is enough (title, authors, journal and year are filled in
+#  from the DOI when the site is built on GitHub):
+#
+#    - doi: 10.1016/j.jhydrol.2005.07.007
+#      read: 2026-10
+#      why: Many models fit the data equally well.
+#      tags: [equifinality]
+#
+#  Without a DOI, give a link and a title:
+#
+#    - url: https://example.org/report.pdf
+#      title: Report title
+#      type: report
+#      read: 2026-10
+#      why: One line on why it is worth reading.
 #
 #  Fields:
-#    title    paper title
-#    authors  as you want them shown, e.g. "Beven, K." or "Smith, J., Lee, K. and Rao, P."
-#    venue    journal (or book, preprint server)          optional
-#    year     2024 (a number, no quotes)
-#    doi      10.1029/2024WR012345 (no https://doi.org/)    optional
-#    url      link used when there is no DOI                optional
-#    read     month you read it: 2026-09
-#    tags     [snow, remote-sensing]  (lowercase)
-#    why      one line: why it is worth reading
-#    note     file name of a longer note in src/content/reading/notes/ (without .md)   optional
-#    draft    true = hidden on the live site
+#    doi        10.1029/2024WR012345 (no https://doi.org/)
+#    url        link, when there is no DOI
+#    title      needed only without a DOI
+#    read       month you read it: 2026-10
+#    why        one line: why it is worth reading
+#    tags       [snow, remote-sensing]  (lowercase)               optional
+#    type       paper, blog, report or book (default: paper)      optional
+#    must_read  true = star it and list it under "Must reads"     optional
+#    note       file name of a longer note in src/content/reading/notes/ (without .md)   optional
+#    post       folder name of a blog post about it, e.g. equifinality-manifesto        optional
+#               (note or post: either one shows a "My note →" link)
+#    authors, venue, year   type them to override the looked-up ones                     optional
+#    draft      true = hidden on the live site                    optional
+#
+#  Fields you type always win. If the DOI lookup fails, the DOI is shown as the
+#  title and the next build tries again; to fix it for good, type the field.
 # ─────────────────────────────────────────────────────────────────────────────
 
-# EXAMPLE (a draft, so it never appears on the live site). Replace it with a real paper.
-- title: A manifesto for the equifinality thesis
-  authors: Beven, K.
-  venue: Journal of Hydrology
-  year: 2006
-  doi: 10.1016/j.jhydrol.2005.07.007
-  read: 2026-09
-  tags: [uncertainty, calibration]
-  why: Example entry. Replace it with a paper you have just read.
-  note: example-note
-  draft: true
+- doi: 10.1016/j.jhydrol.2005.07.007
+  read: 2026-10
+  why: Why a good fit to streamflow does not mean we have found the right model.
+  tags: [equifinality, uncertainty, calibration]
+  must_read: true
+  post: equifinality-manifesto

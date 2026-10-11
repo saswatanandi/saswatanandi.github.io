@@ -5,6 +5,11 @@
 #   text: New paper in **Journal** on …
 #   link: https://doi.org/…     # optional
 
+
+- date: 2026-10-09
+  text: Released **IMDLIB 0.3**, with one function to load IMD gridded data and named regions of India (states, districts, basins and cities).
+  link: /blog/imdlib-0-3/
+
 - date: 2026-06-01   # TODO(Saswata): exact publication date
   text: New paper in **Frontiers in Water** on crop water use in the San Joaquin Valley, and how much water other land uses could save.
   link: https://doi.org/10.3389/frwa.2026.1879797

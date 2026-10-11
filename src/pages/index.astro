@@ -202,8 +202,14 @@ const latestReading = (await getReading())[0];
               <span class="note-card__title">{latestReading.data.title}</span>
               <span class="note-card__desc">{latestReading.data.why}</span>
               <span class="note-card__date">
-                {[latestReading.data.authors, latestReading.data.venue, latestReading.data.year].filter(Boolean).join(' · ')} · read{' '}
-                {formatYearMonth(latestReading.data.read)}
+                {[
+                  latestReading.data.authors,
+                  latestReading.data.venue,
+                  latestReading.data.year,
+                  `read ${formatYearMonth(latestReading.data.read)}`,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
               </span>
             </a>
           )}

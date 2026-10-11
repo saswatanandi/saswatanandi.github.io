@@ -6,6 +6,7 @@
 import type { GetStaticPaths } from 'astro';
 import { getImage, Image } from 'astro:assets';
 import { render, type CollectionEntry } from 'astro:content';
+import ShareRow from '../../components/ShareRow.astro';
 import Giscus from '../../components/blog/Giscus.astro';
 import SeriesNav from '../../components/blog/SeriesNav.astro';
 import TagList from '../../components/blog/TagList.astro';
@@ -15,6 +16,7 @@ import { readingTime, seriesOf } from '../../lib/blog';
 import { getPosts } from '../../lib/collections';
 import { site } from '../../lib/config';
 import { formatDate, isoDate } from '../../lib/format';
+import { ogCardPath } from '../../lib/og';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts();
@@ -60,7 +62,8 @@ const jsonLd = [
   eyebrowHref="/blog/"
   intro={d.description}
   description={d.description}
-  image={ogImage}
+  image={ogCardPath('blog', post.id)}
+  imageAlt={d.title}
   type="article"
   jsonLd={jsonLd}
   ridges={21}
@@ -99,6 +102,8 @@ const jsonLd = [
     <article class="prose post-body">
       <Content />
     </article>
+
+    {d.share !== false && <ShareRow text={d.title} description={d.description} />}
 
     {
       (newer || older) && (

@@ -1,7 +1,7 @@
 ---
 title: Modelling a changing water cycle
 order: 2
-summary: I develop large-scale hydrological models that represent the water cycle as it changes, from soil moisture and evapotranspiration to streamflow, floods and reservoirs.
+summary: Vegetation and rivers change through disturbance and human management, and coupled models that follow these changes link soil moisture and evapotranspiration to streamflow, floods and reservoirs.
 image: cwis-pipeline
 thumbnail: modelling-water-cycle-card.svg
 figures:
@@ -14,12 +14,12 @@ collaborators: []
 funding: []
 ---
 
-Large-scale hydrological models usually treat vegetation as fixed, either static or prescribed from a seasonal climatology. Yet vegetation changes after wildfire and drought mortality, under forest treatments such as thinning and prescribed burning, and with changes in cropping and irrigation. It also keeps changing as landscapes recover. Because vegetation governs how much water returns to the atmosphere and how much remains for soils and rivers, a model that holds it fixed misses both the loss and the recovery.
+Large-scale hydrological models usually treat vegetation as fixed, prescribed from a seasonal climatology that repeats each year. Vegetation, however, changes after wildfire and drought mortality, under forest treatments such as thinning and prescribed burning, and with shifts in cropping and irrigation, and it keeps changing as landscapes recover. Because vegetation governs how much water returns to the atmosphere and how much remains for soils and rivers, a model that holds it fixed misses both the loss and the recovery.
 
-With colleagues, I developed the California Water Information System (CWIS) to address this gap. CWIS is a real-time modelling framework built on the VIC land-surface model and run at 1 km resolution, the finest configuration of its kind at the scale of California. It incorporates satellite observations of vegetation as they become available, allowing the model to capture the hydrological response to natural disturbance. CWIS provides current estimates of soil moisture, evapotranspiration, snow water equivalent and runoff across the state, supporting drought monitoring and post-fire assessment.
+My current work addresses this gap through the California Water Information System (CWIS). CWIS is a real-time modelling framework built on the VIC land-surface model and run at 1 km resolution across California. It assimilates satellite observations of vegetation as they become available, so the simulated water balance follows the landscape through disturbance, management and recovery. The system provides current estimates of soil moisture, evapotranspiration, snow water equivalent and runoff across the state, supporting drought monitoring and post-fire assessment.
 
 <!-- figure -->
 
-CWIS extends my earlier work in Indian river basins. There, I developed one of the first frameworks to couple a land-surface model with river-routing and hydrodynamic models, simulating streamflow and floodplain inundation within a single system. I later added reservoir operations to the routing model, bringing human regulation of rivers into the simulation. The broader aim is an integrated representation of the terrestrial water cycle under the joint influence of climate, land cover and human management.
+CWIS builds on my earlier work in Indian river basins, where I coupled the VIC land-surface model with the RAPID river-routing model and the LISFLOOD-FP hydrodynamic model, so that streamflow and floodplain inundation could be simulated within a single system. I later added reservoir operations to the routing model, bringing human regulation of rivers into the simulation. Together, these efforts work toward an integrated representation of the terrestrial water cycle, shaped jointly by climate, land cover and human management.
 
 <!-- figure 2 -->

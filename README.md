@@ -14,7 +14,7 @@ Step-by-step instructions for each kind of update are in **[HOW-TO-UPDATE.md](HO
 | Software (packages, dashboards) / IMDLIB stats | `src/data/software.yaml`     |
 | Reading list                          | `src/data/reading.yaml` (+ notes in `src/content/reading/notes/`) |
 | Research themes (text, picture) | `src/content/research/<slug>.md` — see below |
-| Blog posts                            | `src/content/blog/<slug>/index.md` (copy `example-post/`) or `index.ipynb` (see below) |
+| Blog posts                            | `src/content/blog/<slug>/index.md` (copy `templates/blog-post/`) or `index.ipynb` (see below) |
 | CV (the PDF at /cv.pdf)               | `src/data/cv.yaml`                     |
 | Headshot / social card                | `public/images/headshot.jpg`, `public/og-default.png` |
 
@@ -93,17 +93,21 @@ and SST-anomaly fields are synthetic, drawn for illustration.
 
 ## Reading
 
-`/reading/` lists papers from **`src/data/reading.yaml`**, grouped by the month you read them, with a tag filter.
+`/reading/` lists papers, blog posts, reports and books from **`src/data/reading.yaml`**, grouped by the
+month you read them, with a filter (tags, and "Must reads" for entries with `must_read: true`).
 Until the file has a published entry, the page says "Nothing here yet".
 
-**Adding a paper to Reading:**
+**Adding something to Reading:**
 
-1. Copy the block in `templates/reading-entry.yaml` to the top of `src/data/reading.yaml`.
-2. Fill in `title`, `authors`, `year`, `read` (e.g. `2026-10`), `why` (one line) and `tags`.
-   Add `venue` and `doi` (or `url`) if there are any. All fields are typed by hand; nothing is fetched.
+1. Copy a block from `templates/reading-entry.yaml` to the top of `src/data/reading.yaml`.
+2. With a DOI, `doi`, `read` (e.g. `2026-10`), `why` (one line) and `tags` are enough: title, authors,
+   venue and year are looked up from Crossref by `scripts/reading-meta.mjs` before each build and kept in
+   `.cache/reading-meta.json` (git-ignored; cached between GitHub builds). Typed fields always win, and a
+   failed lookup never stops the build (the DOI is shown as the title until a later build succeeds).
+   Without a DOI, give `url` and `title` (and `type: blog`, `report` or `book`).
 3. For a longer note, add `note: surname-2025` and write `src/content/reading/notes/surname-2025.md`
    (front matter: optional `tags`, `date`, `title`; then Markdown). It appears at `/reading/surname-2025/`
-   and the entry gets a "Read note →" link.
+   and the entry gets a "My note →" link.
 
 A `note:` with no matching file, or a note file that no entry links to, stops the build with a message.
 The newest entry also shows on the home page under "Blog and reading".
@@ -146,7 +150,7 @@ use it, so the site and the PDF always agree.
 ## Blog
 
 One folder per post: `src/content/blog/<slug>/index.md`, pictures next to it. The folder name is the
-address (`/blog/<slug>/`). Copy `src/content/blog/example-post/`; its front matter lists every field
+address (`/blog/<slug>/`). Copy `templates/blog-post/index.md`; its front matter lists every field
 (`title`, `description`, `date`, `tags`, optional `updated`, `series`, `cover` + `cover_alt`, `toc`,
 `comments`, `draft`).
 
@@ -163,7 +167,7 @@ must be a Markdown cell holding the front matter between `---` lines (or put it 
 the notebook). Save the notebook with its outputs: the site uses the saved outputs and runs nothing.
 `scripts/notebooks.mjs` turns it into `index.ipynb.md` plus `nb-output/` pictures before every
 `npm run dev` / `npm run build` (both git-ignored; commit only the notebook). Cell tags `remove-cell`,
-`remove-input` and `remove-output` hide parts. Example: `src/content/blog/example-notebook/` (a draft).
+`remove-input` and `remove-output` hide parts. Example: `templates/notebook-post/`.
 
 **Comments (giscus):** off until set up. Enable Discussions on the repository, install the giscus app
 (https://github.com/apps/giscus), pick a category at https://giscus.app and copy `repo`, `repo_id`,

@@ -41,6 +41,14 @@ export const blogSchema = ({ image }: SchemaContext) =>
       /** Optional picture shown under the title and used for social cards: a file next to index.md. */
       cover: image().optional(),
       cover_alt: z.string().optional(),
+      /**
+       * Optional picture for the share card only (when the post is shared on LinkedIn, X, …):
+       * a file next to index.md. Defaults to `cover`; with neither, the card shows the ridgeline pattern.
+       */
+      social_image: image().optional(),
+      social_image_alt: z.string().optional(),
+      /** false = no "Share" row at the end of this post. */
+      share: z.boolean().default(true),
       /** false = no table of contents even with many headings. */
       toc: z.boolean().default(true),
       /** false = no comment box under this post (when comments are set up). */
@@ -62,7 +70,11 @@ export const readingNoteSchema = z
     title: z.string().min(1).optional(),
     /** When you wrote the note (optional). */
     date: z.coerce.date().optional(),
-    tags,
+    /** Not used: tags live only in the entry in reading.yaml (one place). */
+    tags: z
+      .unknown()
+      .refine(() => false, { error: 'put tags on the entry in src/data/reading.yaml, not in the note' })
+      .optional(),
     draft: z.boolean().default(false),
   })
   .strict();
@@ -139,20 +151,32 @@ export const newsSchema = z
   })
   .strict();
 
+/** What a reading entry is (`type:`); a paper when left out. */
+export const READING_TYPES = ['paper', 'blog', 'report', 'book'] as const;
+
+/**
+ * One thing read. Shortest form: `doi`, `read`, `why` (title, authors, venue and year are then
+ * filled in from Crossref by scripts/reading-meta.mjs; see src/lib/reading-meta.ts).
+ * Without a DOI: `url` and `title`. Typed fields always win over looked-up ones.
+ */
 export const readingSchema = z
   .object({
-    title: z.string().min(1),
+    type: z
+      .enum(READING_TYPES, { error: 'type must be paper, blog, report or book (or leave it out for a paper)' })
+      .default('paper'),
+    /** Filled in from the DOI when left out. Required when there is no DOI. */
+    title: z.string().min(1).optional(),
     /** As you want them shown, e.g. "Beven, K." or "Smith, J., Lee, K. and Rao, P." */
-    authors: z.string().min(1),
-    /** Journal (or book, preprint server, report series). */
+    authors: z.string().min(1).optional(),
+    /** Journal (or book, preprint server, report series, blog name). */
     venue: z.string().min(1).optional(),
-    year: z.number({ error: 'year must be a number like 2024 (no quotes)' }).int().min(1800).max(2100),
+    year: z.number({ error: 'year must be a number like 2024 (no quotes)' }).int().min(1800).max(2100).optional(),
     doi: z
       .string()
       .trim()
       .regex(/^10\.\d{4,9}\/\S+$/, 'doi should look like 10.1029/2024WR012345 (no https://doi.org/ prefix)')
       .optional(),
-    /** Link used when there is no DOI (preprint, report). */
+    /** Link used when there is no DOI (blog post, report, preprint). */
     url: url.optional(),
     /** When you read it: YYYY-MM. */
     read: yearMonth,
@@ -165,9 +189,27 @@ export const readingSchema = z
       .trim()
       .regex(/^[a-z0-9-]+$/, 'note is the note file name without .md, e.g. beven-2006 (lowercase, digits, hyphens)')
       .optional(),
+    /** Slug of a blog post about this item: src/content/blog/<slug>/ (optional). Shown as "My note →". */
+    post: z
+      .string()
+      .trim()
+      .regex(/^[a-z0-9-]+$/, 'post is the blog post folder name, e.g. equifinality-manifesto (lowercase, digits, hyphens)')
+      .optional(),
+    /** Shown with a star and under the "Must reads" filter. */
+    must_read: z.boolean({ error: 'must_read: write true (or leave the line out)' }).default(false),
     draft: z.boolean().default(false),
   })
-  .strict();
+  .strict()
+  .refine((d) => !!d.doi || !!d.url, {
+    error: 'add a doi (like 10.1029/2024WR012345) or, if there is none, a url (https://...) and a title',
+    path: ['doi'],
+  })
+  .refine((d) => !!d.doi || !!d.title, {
+    error: 'title: an entry without a doi needs a title',
+    path: ['title'],
+  })
+  // If the DOI could not be looked up (yet), show the DOI as the title; the next build retries.
+  .transform((d) => ({ ...d, title: d.title ?? (d.doi ? `doi:${d.doi}` : (d.url ?? 'Untitled')) }));
 
 /** Text of a software detail page (src/content/software/<slug>.md). Facts live in software.yaml. */
 export const softwarePageSchema = z

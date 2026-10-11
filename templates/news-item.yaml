@@ -1,0 +1,7 @@
+# NEWS ITEM TEMPLATE: copy the block below into src/data/news.yaml (anywhere: newest first is automatic).
+# Shown on the home page. `text` accepts Markdown (links, **bold**). Keep it to one or two lines.
+
+- date: 2026-10-10                  # YYYY-MM-DD
+  text: New paper in **Journal of Hydrology** on …
+  link: https://doi.org/10.xxxx/xxxxx   # optional: a web address, or a page on this site like /blog/my-post/
+  # draft: true                     # hide it on the live site

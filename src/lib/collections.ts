@@ -28,6 +28,18 @@ export async function getReading(): Promise<CollectionEntry<'reading'>[]> {
       );
     }
   }
+  const posts = await getCollection('blog');
+  const postIds = new Set(posts.map((p) => p.id));
+  for (const r of items) {
+    if (r.data.post && !postIds.has(r.data.post)) {
+      throw new Error(
+        `\n✖ src/data/reading.yaml: "${r.data.title}" has post: ${r.data.post}, but there is no blog post ` +
+          `src/content/blog/${r.data.post}/. Check the spelling (it is the post's folder name).\n`,
+      );
+    }
+  }
+  // A blog post set to draft: true is hidden, so drop the link to it.
+  const hiddenPosts = new Set(posts.filter((p) => !visible(p.data.draft)).map((p) => p.id));
   const linked = new Set(items.map((r) => r.data.note).filter(Boolean));
   for (const n of notes) {
     if (!n.data.draft && !linked.has(n.id)) {
@@ -37,11 +49,14 @@ export async function getReading(): Promise<CollectionEntry<'reading'>[]> {
       );
     }
   }
-  // A note set to draft: true is hidden, so drop its "Read note" link instead of pointing at a missing page.
+  // A note set to draft: true is hidden, so drop its "My note" link instead of pointing at a missing page.
   const hiddenNotes = new Set(notes.filter((n) => !visible(n.data.draft)).map((n) => n.id));
-  const withLinks = items.map((r) =>
-    r.data.note && hiddenNotes.has(r.data.note) ? { ...r, data: { ...r.data, note: undefined } } : r,
-  );
+  const withLinks = items.map((r) => {
+    let data = r.data;
+    if (data.note && hiddenNotes.has(data.note)) data = { ...data, note: undefined };
+    if (data.post && hiddenPosts.has(data.post)) data = { ...data, post: undefined };
+    return data === r.data ? r : { ...r, data };
+  });
   return withLinks.sort((a, b) => b.data.read.localeCompare(a.data.read) || a.data.title.localeCompare(b.data.title));
 }
 
@@ -82,6 +97,25 @@ export async function getSoftware(): Promise<CollectionEntry<'software'>[]> {
   const at = (s: CollectionEntry<'software'>) => position.get(s.id) ?? Infinity;
   return items.sort((a, b) => Number(b.data.featured) - Number(a.data.featured) || at(a) - at(b));
 }
+
+/** Label shown above a reading entry, by `type`. */
+export const READING_TYPE_LABEL = { paper: 'Paper', blog: 'Blog', report: 'Report', book: 'Book' } as const;
+
+/** Button text on a note page when the entry has no DOI, by `type`. */
+export const READING_TYPE_ACTION = {
+  paper: 'Read the paper',
+  blog: 'Read the post',
+  report: 'Read the report',
+  book: 'Read the book',
+} as const;
+
+/** "authors · venue · year", leaving out the parts an entry does not have. */
+export const readingSource = (d: CollectionEntry<'reading'>['data']) =>
+  [d.authors, d.venue, d.year].filter(Boolean).join(' · ');
+
+/** Where an entry's "My note →" link goes: its note page, else its blog post. */
+export const readingNoteHref = (r: CollectionEntry<'reading'>) =>
+  r.data.note ? `/reading/${r.data.note}/` : r.data.post ? `/blog/${r.data.post}/` : undefined;
 
 /** Where a reading entry links: its DOI, else its url. */
 export const readingHref = (r: CollectionEntry<'reading'>) =>

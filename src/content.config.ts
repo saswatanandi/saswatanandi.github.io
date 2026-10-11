@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { yamlLoader } from './lib/yaml-loader';
+import { fillFromCache } from './lib/reading-meta';
+import { slugify, yamlLoader } from './lib/yaml-loader';
 import {
   blogSchema,
   newsSchema,
@@ -59,8 +60,23 @@ const news = defineCollection({
   schema: newsSchema,
 });
 
+/**
+ * Reading list. Entries with only a DOI get title/authors/venue/year from .cache/reading-meta.json
+ * (written from Crossref by scripts/reading-meta.mjs before dev/build); typed fields always win.
+ * Ids come from what is typed: title, else DOI, else url.
+ */
 const reading = defineCollection({
-  loader: yamlLoader({ path: 'src/data/reading.yaml' }),
+  loader: yamlLoader({
+    path: 'src/data/reading.yaml',
+    id: (item, i) => {
+      for (const key of ['title', 'doi', 'url']) {
+        const v = item[key];
+        if (typeof v === 'string' && v.trim()) return slugify(v);
+      }
+      return String(i + 1);
+    },
+    prepare: fillFromCache('.cache/reading-meta.json'),
+  }),
   schema: readingSchema,
 });
 

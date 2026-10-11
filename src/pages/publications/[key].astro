@@ -9,10 +9,12 @@ import CopyButton from '../../components/CopyButton.astro';
 import Icon from '../../components/Icon.astro';
 import PubBadges from '../../components/PubBadges.astro';
 import PublicationItem from '../../components/PublicationItem.astro';
+import ShareRow from '../../components/ShareRow.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
 import { formatCitation, getPublications, PUBTYPE_LABEL, venueDetails, type Publication } from '../../lib/bibtex';
 import { getThemes } from '../../lib/collections';
 import { site } from '../../lib/config';
+import { ogCardPath } from '../../lib/og';
 
 export const getStaticPaths = (() =>
   getPublications().map((pub) => ({ params: { key: pub.key }, props: { pub } }))) satisfies GetStaticPaths;
@@ -40,6 +42,9 @@ const details = venueDetails(pub);
 const fullName = (a: Publication['authors'][number]) => (a.firstName ? `${a.firstName} ${a.lastName}` : a.lastName);
 const doiUrl = pub.doi ? `https://doi.org/${pub.doi}` : undefined;
 const abs = (u: string) => new URL(u, Astro.site).toString();
+// Shared link: the DOI when there is one (the paper itself), else this page.
+const shareUrl = doiUrl ?? abs(pub.href);
+const shareText = [pub.title, pub.venue].filter(Boolean).join(', ') + (pub.year ? ` (${pub.year})` : '');
 
 const links = [
   doiUrl && { href: doiUrl, label: 'DOI', icon: 'doi' as const, primary: true },
@@ -115,6 +120,8 @@ const description = pub.summary ?? (pub.abstract ? `${pub.abstract.slice(0, 180)
   eyebrow="Publications"
   eyebrowHref="/publications/"
   description={description}
+  image={ogCardPath('publications', pub.key)}
+  imageAlt={pub.title}
   type="article"
   meta={meta}
   jsonLd={[jsonLd]}
@@ -229,6 +236,8 @@ const description = pub.summary ?? (pub.abstract ? `${pub.abstract.slice(0, 180)
         </section>
       )
     }
+
+    <ShareRow url={shareUrl} text={shareText} description={description} />
 
     <p class="back">
       <a class="more-link" href="/publications/"><span aria-hidden="true">←</span> All publications</a>

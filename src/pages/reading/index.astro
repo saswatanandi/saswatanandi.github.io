@@ -1,8 +1,11 @@
 ---
-/** /reading/: papers from src/data/reading.yaml, grouped by the month read, with a tag filter. */
+/**
+ * /reading/: papers, posts, reports and books from src/data/reading.yaml, grouped by the month read,
+ * with a filter (tags, and "Must reads" when some entries have must_read: true).
+ */
 import Icon from '../../components/Icon.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
-import { getReading, readingHref } from '../../lib/collections';
+import { READING_TYPE_LABEL, getReading, readingHref, readingNoteHref } from '../../lib/collections';
 
 const items = await getReading();
 
@@ -27,11 +30,13 @@ for (const r of items) {
 const counts = new Map<string, number>();
 for (const r of items) for (const t of r.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
 const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([t]) => t);
+const mustReads = items.filter((r) => r.data.must_read).length;
+const showFilter = tags.length > 1 || (mustReads > 0 && mustReads < items.length);
 ---
 
 <PageLayout
   title="Reading"
-  description="Papers I have read, with a line on why each one is worth reading."
+  description="Papers, reports and posts I have read, with a line on why each one is worth reading."
   ridges={7}
 >
   {
@@ -42,23 +47,30 @@ const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeComp
         </span>
         <div>
           <h2 class="empty__title">Nothing here yet</h2>
-          <p>I add papers as I read them. The first ones will appear here soon.</p>
+          <p>I add papers, reports and posts as I read them. The first ones will appear here soon.</p>
         </div>
       </div>
     ) : (
       <div class="reading" data-reading>
-        {tags.length > 1 && (
+        {showFilter && (
           <div class="filter" data-filter hidden>
             <p class="filter__label" id="filter-label">
-              Filter by tag
+              Filter
             </p>
             <ul role="list" class="filter__tags" aria-labelledby="filter-label">
+              {mustReads > 0 && (
+                <li>
+                  <button type="button" class="tag tag--must" data-must aria-pressed="false">
+                    <Icon name="star" size={13} /> Must reads
+                  </button>
+                </li>
+              )}
               <li>
                 <button type="button" class="tag" data-tag="" aria-pressed="true">
                   All
                 </button>
               </li>
-              {tags.map((t) => (
+              {tags.length > 1 && tags.map((t) => (
                 <li>
                   <button type="button" class="tag" data-tag={t} aria-pressed="false">
                     {t}
@@ -79,24 +91,33 @@ const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeComp
               {g.items.map((r) => {
                 const href = readingHref(r);
                 return (
-                  <li class="entry" data-tags={r.data.tags.join(' ')}>
+                  <li class="entry" data-tags={r.data.tags.join(' ')} data-must-read={r.data.must_read ? 'true' : undefined}>
+                    <p class="entry__kind">
+                      <span>{READING_TYPE_LABEL[r.data.type]}</span>
+                      {r.data.must_read && (
+                        <span class="entry__must">
+                          <Icon name="star" size={12} /> Must read
+                        </span>
+                      )}
+                    </p>
                     <h3 class="entry__title">
                       {href ? <a href={href}>{r.data.title}</a> : r.data.title}
                       {r.data.draft && <span class="chip">draft</span>}
                     </h3>
-                    <p class="entry__src">
-                      {r.data.authors}
-                      {r.data.venue && (
-                        <>
-                          {' · '}
-                          <em>{r.data.venue}</em>
-                        </>
-                      )}
-                      {' · '}
-                      {r.data.year}
-                    </p>
+                    {(r.data.authors || r.data.venue || r.data.year) && (
+                      <p class="entry__src">
+                        {r.data.authors}
+                        {r.data.venue && (
+                          <>
+                            {r.data.authors && ' · '}
+                            <em>{r.data.venue}</em>
+                          </>
+                        )}
+                        {r.data.year && (r.data.authors || r.data.venue ? ` · ${r.data.year}` : r.data.year)}
+                      </p>
+                    )}
                     <p class="entry__why">{r.data.why}</p>
-                    {(r.data.tags.length > 0 || r.data.note) && (
+                    {(r.data.tags.length > 0 || readingNoteHref(r)) && (
                       <div class="entry__foot">
                         {r.data.tags.length > 0 && (
                           <ul role="list" class="entry__tags" aria-label="Tags">
@@ -109,9 +130,9 @@ const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeComp
                             ))}
                           </ul>
                         )}
-                        {r.data.note && (
-                          <a class="more-link entry__note" href={`/reading/${r.data.note}/`}>
-                            Read note <span aria-hidden="true">→</span>
+                        {readingNoteHref(r) && (
+                          <a class="more-link entry__note" href={readingNoteHref(r)}>
+                            My note <span aria-hidden="true">→</span>
                             <span class="visually-hidden">on “{r.data.title}”</span>
                           </a>
                         )}
@@ -129,47 +150,71 @@ const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeComp
 </PageLayout>
 
 <script>
-  // Tag filter (the list works without it). ?tag=x in the address selects a tag.
+  // Filter (the list works without it): one tag and/or "Must reads".
+  // ?tag=x and ?must=1 in the address select them.
   const root = document.querySelector<HTMLElement>('[data-reading]');
   const bar = root?.querySelector<HTMLElement>('[data-filter]');
   if (root && bar) {
     bar.hidden = false;
     const buttons = [...bar.querySelectorAll<HTMLButtonElement>('button[data-tag]')];
+    const mustButton = bar.querySelector<HTMLButtonElement>('button[data-must]');
     const entries = [...root.querySelectorAll<HTMLElement>('.entry')];
     const months = [...root.querySelectorAll<HTMLElement>('[data-month]')];
     const status = bar.querySelector<HTMLElement>('[data-status]')!;
+    let tag = '';
+    let must = false;
 
-    const apply = (tag: string, push = false) => {
+    const apply = (push = false) => {
       if (tag && !buttons.some((b) => b.dataset.tag === tag)) tag = '';
+      if (!mustButton) must = false;
       for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.tag === tag));
+      mustButton?.setAttribute('aria-pressed', String(must));
       let shown = 0;
       for (const e of entries) {
-        const on = !tag || (e.dataset.tags ?? '').split(' ').includes(tag);
+        const on =
+          (!tag || (e.dataset.tags ?? '').split(' ').includes(tag)) && (!must || e.dataset.mustRead === 'true');
         e.hidden = !on;
         if (on) shown++;
       }
       for (const m of months) m.hidden = !m.querySelector('.entry:not([hidden])');
-      status.textContent = tag ? `${shown} ${shown === 1 ? 'paper' : 'papers'} tagged “${tag}”` : '';
+      const what = [must ? 'must reads' : '', tag ? `tagged “${tag}”` : ''].filter(Boolean).join(', ');
+      status.textContent = what ? `${shown} ${shown === 1 ? 'item' : 'items'}: ${what}` : '';
       if (push) {
         const url = new URL(location.href);
         if (tag) url.searchParams.set('tag', tag);
         else url.searchParams.delete('tag');
+        if (must) url.searchParams.set('must', '1');
+        else url.searchParams.delete('must');
         history.replaceState(null, '', url);
       }
     };
 
     bar.addEventListener('click', (ev) => {
-      const b = (ev.target as Element).closest<HTMLButtonElement>('button[data-tag]');
-      if (b) apply(b.dataset.tag ?? '', true);
+      const target = ev.target as Element;
+      if (target.closest('button[data-must]')) {
+        must = !must;
+        apply(true);
+        return;
+      }
+      const b = target.closest<HTMLButtonElement>('button[data-tag]');
+      if (b) {
+        tag = b.dataset.tag ?? '';
+        if (!tag) must = false; // "All" clears everything
+        apply(true);
+      }
     });
     root.addEventListener('click', (ev) => {
       const a = (ev.target as Element).closest<HTMLAnchorElement>('a[data-tag-link]');
-      if (!a) return;
+      if (!a || !buttons.some((b) => b.dataset.tag === a.dataset.tagLink)) return;
       ev.preventDefault();
-      apply(a.dataset.tagLink ?? '', true);
+      tag = a.dataset.tagLink ?? '';
+      apply(true);
       bar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
-    apply(new URLSearchParams(location.search).get('tag') ?? '');
+    const params = new URLSearchParams(location.search);
+    tag = params.get('tag') ?? '';
+    must = params.get('must') === '1';
+    apply();
   }
 </script>
 
@@ -260,6 +305,33 @@ const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeComp
   }
   .entry[hidden] {
     display: none;
+  }
+  .entry__kind {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .entry__must {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    color: var(--color-accent);
+  }
+  .entry__must :global(svg),
+  .tag--must :global(svg) {
+    fill: currentColor;
+  }
+  .tag--must {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
   }
   .entry__title {
     font-size: var(--text-lg);

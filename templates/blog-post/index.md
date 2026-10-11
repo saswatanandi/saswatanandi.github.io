@@ -1,9 +1,11 @@
 ---
-title: Example post (copy me)
-description: A template showing the front-matter fields every post uses. It is a draft, so it never appears on the live site.
-date: 2026-09-27
-tags: [example]
-draft: true
+# BLOG POST TEMPLATE: copy this file to src/content/blog/<post-name>/index.md
+# (the folder name becomes the address /blog/<post-name>/). Pictures go in the same folder.
+title: Post title
+description: One or two sentences about the post (shown in lists and on social cards).
+date: 2026-10-10                  # YYYY-MM-DD
+tags: [python]
+# draft: true                   # hide it on the live site while you write
 # Optional:
 # updated: 2026-10-01
 # series: IMDLIB tutorials       # posts with the same series name are linked together
@@ -13,8 +15,7 @@ draft: true
 # comments: false                # no comment box on this post
 ---
 
-This is an **example draft**. Copy this folder to `src/content/blog/<your-slug>/`, edit the
-front matter above, set `draft: false` and commit. Images go next to `index.md`.
+Write the post here. The sections below show what you can use; delete what you do not need.
 
 ## Maths
 
@@ -30,7 +31,7 @@ $$
 ```python
 import imdlib as imd
 
-data = imd.open_data('rain', 2020, 2021, 'yearwise', '../data')
+data = imd.load('rain', 2020, 2021)
 ```
 
 ## Pictures and notes

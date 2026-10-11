@@ -7,6 +7,9 @@ cover: ./cover.png
 cover_alt: Map of daily rainfall over India from IMD gridded data, plotted with IMDLIB.
 ---
 
+> [!NOTE]
+> This post uses an older version of IMDLIB. For the current way, see the [IMDLIB page](/software/imdlib/).
+
 ## Description
 
 Tutorial showcasing IMDLIB for real-time data processing.

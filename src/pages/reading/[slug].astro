@@ -1,12 +1,14 @@
 ---
-/** A longer note on a paper: /reading/<note>/, text from src/content/reading/notes/<note>.md. */
+/** A longer note on something read: /reading/<note>/, text from src/content/reading/notes/<note>.md. */
 import type { GetStaticPaths } from 'astro';
 import { render, type CollectionEntry } from 'astro:content';
 import Icon from '../../components/Icon.astro';
+import ShareRow from '../../components/ShareRow.astro';
 import CodeCopy from '../../components/blog/CodeCopy.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
-import { getReadingNotes, readingHref } from '../../lib/collections';
+import { READING_TYPE_ACTION, READING_TYPE_LABEL, getReadingNotes, readingHref } from '../../lib/collections';
 import { formatDate, formatYearMonth, isoDate } from '../../lib/format';
+import { ogCardPath } from '../../lib/og';
 
 export const getStaticPaths = (async () => {
   const pairs = await getReadingNotes();
@@ -21,12 +23,15 @@ const { entry, note } = Astro.props;
 const r = entry.data;
 const { Content } = await render(note);
 const href = readingHref(entry);
-const tags = [...new Set([...r.tags, ...note.data.tags])];
+const tags = r.tags;
+const pageTitle = note.data.title ?? r.title;
 ---
 
 <PageLayout
-  title={note.data.title ?? r.title}
+  title={pageTitle}
   eyebrow="Reading"
+  image={ogCardPath('reading', note.id)}
+  imageAlt={pageTitle}
   eyebrowHref="/reading/"
   description={r.why}
   ridges={9}
@@ -34,23 +39,32 @@ const tags = [...new Set([...r.tags, ...note.data.tags])];
 >
   <Fragment slot="header">
     <div class="ref">
-      {note.data.title && <p class="ref__title">{r.title}</p>}
-      <p class="ref__src">
-        {r.authors}
-        {r.venue && (
-          <>
-            {' · '}
-            <em>{r.venue}</em>
-          </>
+      <p class="ref__kind">
+        <span>{READING_TYPE_LABEL[r.type]}</span>
+        {r.must_read && (
+          <span class="ref__must">
+            <Icon name="star" size={12} /> Must read
+          </span>
         )}
-        {' · '}
-        {r.year}
       </p>
+      {note.data.title && <p class="ref__title">{r.title}</p>}
+      {(r.authors || r.venue || r.year) && (
+        <p class="ref__src">
+          {r.authors}
+          {r.venue && (
+            <>
+              {r.authors && ' · '}
+              <em>{r.venue}</em>
+            </>
+          )}
+          {r.year && (r.authors || r.venue ? ` · ${r.year}` : r.year)}
+        </p>
+      )}
       <p class="ref__meta">
         {
           href && (
             <a class="btn" href={href}>
-              <Icon name={r.doi ? 'doi' : 'external'} /> {r.doi ? `doi:${r.doi}` : 'Read the paper'}
+              <Icon name={r.doi ? 'doi' : 'external'} /> {r.doi ? `doi:${r.doi}` : READING_TYPE_ACTION[r.type]}
             </a>
           )
         }
@@ -61,7 +75,7 @@ const tags = [...new Set([...r.tags, ...note.data.tags])];
   </Fragment>
 
   <article class="article">
-    <p class="why"><span>Why read it:</span> {r.why}</p>
+    <p class="why"><span>In one line:</span> {r.why}</p>
     <div class="prose">
       <Content />
     </div>
@@ -78,6 +92,7 @@ const tags = [...new Set([...r.tags, ...note.data.tags])];
         </ul>
       )
     }
+    <ShareRow text={pageTitle} description={r.why} />
     <p class="back">
       <a class="more-link" href="/reading/"><span aria-hidden="true">←</span> All reading</a>
     </p>
@@ -88,6 +103,26 @@ const tags = [...new Set([...r.tags, ...note.data.tags])];
 <style>
   .ref {
     margin-top: var(--space-4);
+  }
+  .ref__kind {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .ref__must {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    color: var(--color-accent);
+  }
+  .ref__must :global(svg) {
+    fill: currentColor;
   }
   .ref__title {
     font-family: var(--font-display);

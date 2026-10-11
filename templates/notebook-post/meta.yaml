@@ -1,0 +1,8 @@
+# NOTEBOOK POST TEMPLATE: copy index.ipynb (your own notebook, run and saved, so the plots are
+# inside) and this meta.yaml to src/content/blog/<post-name>/.
+# The folder name becomes the address /blog/<post-name>/.
+title: Notebook post title
+description: One or two sentences about the post (shown in lists and on social cards).
+date: 2026-10-10                  # YYYY-MM-DD
+tags: [python]
+# draft: true                     # hide it on the live site while you write

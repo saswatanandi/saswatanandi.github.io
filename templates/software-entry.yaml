@@ -1,0 +1,19 @@
+# SOFTWARE TEMPLATE: copy the block below into src/data/software.yaml.
+# Cards appear in the order of that file. Only `name` and `description` are required;
+# delete the lines you do not need.
+
+- name: My Tool
+  tagline: One short line, shown under the name.
+  description: One or two sentences on what it does and who it is for.
+  # kind: dashboard                 # a web app; leave out for an installable package
+  repo: https://github.com/iamsaswata/my-tool
+  docs: https://my-tool.readthedocs.io
+  pypi: my-tool
+  language: Python
+  license: MIT
+  version: 0.1.0
+  status: Beta
+  install:
+    - pip install my-tool
+  # page: true                      # own page + "More about" link; then also create
+  #                                 # src/content/software/my-tool.md (name in lowercase, spaces as dashes)

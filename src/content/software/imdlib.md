@@ -1,7 +1,6 @@
 ---
 # Text of /software/imdlib/. Names, links, version, stats and the citation are in
-# src/data/software.yaml. `updated` is when this page was last checked against a release.
-updated: 2026-09-28
+# src/data/software.yaml.
 description: IMDLIB is a Python package to download and process the gridded rainfall and temperature data of the India Meteorological Department (IMD).
 ---
 
@@ -31,57 +30,44 @@ From the source on GitHub:
 pip install git+https://github.com/iamsaswata/imdlib.git
 ```
 
-> **Updated September 2026.** IMDLIB is now on conda-forge (the `iamsaswata` channel still works). Version 0.1.22 needs Python 3.10 or newer and pandas 2.2 or newer. conda and pip install the other dependencies (numpy, xarray, scipy, matplotlib, requests and a few small ones), so the old table of pinned versions is gone. For GeoTIFF output, also install `rioxarray`.
-
 ## Usage
 
-### Downloading data from IMD
+### Loading data
 
-IMDLIB can download gridded rainfall and temperature (minimum and maximum) data from [IMD Pune](https://imdpune.gov.in/).
-
-```python
-import imdlib as imd
-
-# Download 9 years of rainfall data for India
-start_yr = 2010
-end_yr = 2018
-variable = 'rain'  # other options are 'tmin' and 'tmax'
-file_dir = 'dataFolder'
-data = imd.get_data(variable, start_yr, end_yr, fn_format='yearwise', file_dir=file_dir)
-```
-
-The options of `get_data`:
-
-- `fn_format`: the file name format. `None` (the default) keeps the IMD file names. `'yearwise'` renames the files to `<year>.grd`, for example `2018.grd`.
-- `file_dir`: the folder for the downloaded files. If `None`, the current working directory is used.
-- `sub_dir`: `True` puts each variable in its own subfolder. `False` saves the files directly in `file_dir`.
-- `proxies`: proxy settings, for example `{'http': 'http://uname:password@ip:port'}`.
-
-`get_data` returns the same IMD object as `open_data` below. Files that are already in `file_dir` are not downloaded again.
-
-### Reading downloaded data
-
-One major purpose of IMDLIB is to process the gridded IMD meteorological datasets. The original data is in the binary `.grd` format. IMDLIB reads the `.grd` files and creates an *IMD class* object. For data you have already downloaded, use `imd.open_data()`.
+IMDLIB downloads gridded rainfall and temperature (minimum and maximum) data from [IMD Pune](https://imdpune.gov.in/). One function, `imd.load()`, downloads the files and opens them.
 
 ```python
 import imdlib as imd
 
-start_yr = 2018
-end_yr = 2018
-variable = 'rain'         # other options are 'tmin' and 'tmax'
-file_format = 'yearwise'  # or None for the IMD file names
-file_dir = '/home/data/imd'
-data = imd.open_data(variable, start_yr, end_yr, file_format, file_dir)
-data
+# Daily rainfall for India, 2010 to 2018
+data = imd.load('rain', 2010, 2018)   # other options are 'tmin' and 'tmax'
+
+# Or a range of days
+data = imd.load('tmax', '2023-04-01', '2023-06-30')
 ```
 
-```text
-<imdlib.core.IMD at 0x7f39b0960750>
+The files are kept in a cache folder, so later calls for the same years do not download them again. `load()` returns an *IMD class* object at once and reads the files only when the data is first used.
+
+The main options of `load`:
+
+- `source`: `'archive'` (the default) for the quality-controlled yearly files, or `'realtime'` for the provisional daily files. Real-time data also has GPM rainfall, `'rain_gpm'`.
+- `cache_dir`: the cache folder. You can also set it once with `imd.cache.set_dir()` or the `IMDLIB_CACHE` environment variable. Otherwise IMDLIB uses the default cache folder of your user account.
+- `offline`: `True` never uses the network, and gives an error that lists any files missing from the cache.
+- `parallel`: the number of files downloaded at the same time (default 4).
+
+`get_data` and `open_data` (and `get_real_data` and `open_real_data`) still work, without warnings, so older code keeps running. One change: since 0.3, `clip()` returns the clipped data and no longer changes the object, so write `data = data.clip(...)`. `open_data` is still the way to read `.grd` files that you downloaded yourself into a folder.
+
+### Regions
+
+IMDLIB knows the names of India's 36 states and union territories, 782 districts, 25 CWC river basins, 99 sub-basins and about 548,000 cities, towns and villages. Names are forgiving: case and accents are ignored, and old names such as `'Gurgaon'` work too.
+
+```python
+imd.regions.search('pun')                       # find region names
+ts = data.region(district=['Pune', 'Nashik'])   # area-weighted mean, one column per district
+kerala = data.clip(state='Kerala')              # IMD object for one region
 ```
 
-- `file_dir` should be the top-level folder. It should contain three subfolders: `rain`, `tmin` and `tmax`.
-- If `file_dir` exists but has no subfolders, IMDLIB looks for the files in `file_dir` itself. Be careful with `'yearwise'` file names: IMDLIB cannot tell `2018.grd` for rainfall from `2018.grd` for tmin.
-- If `file_dir` is not given, IMDLIB looks for the subfolders and files in the current directory.
+`region()` also takes `state`, `city`, `basin`, `subbasin` or a `shapefile`, and `by='district'` gives one column per district of a state.
 
 ### Shape of the IMD object
 
@@ -145,15 +131,15 @@ For GeoTIFF output IMDLIB uses the [rioxarray](https://corteva.github.io/rioxarr
 
 > **Updated September 2026.** This section is new. Since the first version of this page, IMDLIB has added:
 
-- real-time daily data (rainfall at 0.25°, temperature at 0.5°): `imd.get_real_data()` and `imd.open_real_data()`, with dates such as `'2020-01-31'`;
+- real-time daily data (rainfall at 0.25°, temperature at 0.5°): `imd.load(..., source='realtime')`, with dates such as `'2020-01-31'`;
 - annual climate indices, for example rainy days, consecutive dry and wet days, heavy rainfall days, maximum 1-day and 5-day rainfall, and the diurnal temperature range, with trend tests (modified Mann-Kendall, Spearman's rho, Sen's slope);
 - the drought indices SPI and SPEI;
 - heat wave and cold wave days following the IMD criteria: `heatwave()` and `coldwave()`;
 - monthly climatology and anomalies: `climatology()` and `anomaly()`;
-- clipping to a shapefile (`clip()`), area-weighted spatial means (`spatial_mean()`), filling gaps (`fill_na()`) and regridding (`remap()`).
+- clipping to a named region or a shapefile (`clip()`), area-weighted spatial means (`spatial_mean()`, `region()`), filling gaps (`fill_na()`) and regridding (`remap()`).
 
 ```python
-rain = imd.open_data('rain', 1991, 2020, 'yearwise', file_dir)
+rain = imd.load('rain', 1991, 2020)
 
 # compute() changes the object in place, so work on a copy
 heavy = rain.copy().compute('d64', 'A', threshold=64.5)   # heavy rainfall days per year
