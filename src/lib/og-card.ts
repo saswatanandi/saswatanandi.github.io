@@ -5,7 +5,8 @@
  *   title    large serif title; the font shrinks for long titles
  *   picture  optional: shown on the right (cover-fit, rounded); without one the
  *            card is full width with the site's hydrograph ridgelines along the bottom
- *   footer   the site mark, the owner's name (site.config.yaml) and the site domain
+ *   byline   the site mark, the owner's name (site.config.yaml) and the site domain, at the top
+ *            (the bottom-left is left clear: X lays its own label over that corner)
  *
  * Layout by satori (HTML/CSS-like tree → SVG, text as outlines), rasterised by sharp.
  * Colours are the light "Topographic" palette from src/styles/tokens.css; fonts are the
@@ -133,11 +134,11 @@ async function markPng(size: number): Promise<string> {
   return dataUri(await sharp(Buffer.from(svg)).png().toBuffer(), 'image/png');
 }
 
-/** Picture resized to exactly fill its box (centre crop), as a JPEG data URI. */
+/** Picture fitted whole inside its box (no cropping), on white, as a JPEG data URI. */
 async function picture(path: string, width: number, height: number): Promise<string> {
   const buf = await sharp(readFileSync(path))
     .rotate()
-    .resize(width * 2 > 1400 ? width : width * 2, height * 2 > 1400 ? height : height * 2, { fit: 'cover', position: 'attention' })
+    .resize(width * 2 > 1400 ? width : width * 2, height * 2 > 1400 ? height : height * 2, { fit: 'contain', background: '#ffffff' })
     .flatten({ background: '#ffffff' })
     .jpeg({ quality: 82 })
     .toBuffer();
@@ -237,15 +238,23 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
       justifyContent: 'space-between',
       width: withPic ? textW + PAD : OG_WIDTH,
       height: withPic ? OG_HEIGHT : OG_HEIGHT - RIDGE_H + 40,
-      padding: `56px ${withPic ? 0 : PAD}px ${withPic ? 56 : 8}px ${PAD}px`,
+      justifyContent: 'flex-start',
+      padding: `56px ${withPic ? 0 : PAD}px ${withPic ? 96 : 8}px ${PAD}px`,
     },
-    [kicker, el('div', { display: 'flex', flexDirection: 'column' }, [title, ...(sub ? [sub] : [])]), footer],
+    [
+      footer,
+      el('div', { display: 'flex', flexDirection: 'column', marginTop: 'auto', marginBottom: 'auto' }, [
+        el('div', { display: 'flex', marginBottom: 18 }, [kicker]),
+        title,
+        ...(sub ? [sub] : []),
+      ]),
+    ],
   );
 
   const children: Node[] = [textCol];
   if (withPic) {
     children.push(
-      el('img', { position: 'absolute', right: 48, top: 48, width: PIC_W, height: PIC_H, objectFit: 'cover', borderRadius: 20 }, undefined, {
+      el('img', { position: 'absolute', right: 48, top: 48, width: PIC_W, height: PIC_H, objectFit: 'contain', borderRadius: 20, background: '#ffffff' }, undefined, {
         src: await picture(input.image!, PIC_W, PIC_H),
         width: PIC_W,
         height: PIC_H,
@@ -265,5 +274,5 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
 
   const root = el('div', { display: 'flex', position: 'relative', width: OG_WIDTH, height: OG_HEIGHT, background: C.bg }, children);
   const svg = await satori(root as Parameters<typeof satori>[0], { width: OG_WIDTH, height: OG_HEIGHT, fonts: loadFonts() });
-  return sharp(Buffer.from(svg)).png({ compressionLevel: 9, palette: false }).toBuffer();
+  return sharp(Buffer.from(svg)).jpeg({ quality: 86, mozjpeg: true }).toBuffer();
 }

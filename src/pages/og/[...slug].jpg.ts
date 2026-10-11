@@ -1,5 +1,5 @@
 /**
- * Share cards: /og/<section>/<id>.png for every blog post, reading note, software page and
+ * Share cards: /og/<section>/<id>.jpg for every blog post, reading note, software page and
  * publication page, drawn at build time (src/lib/og-card.ts). Other pages use /og-default.png.
  * Picture on the card: blog `social_image`, else `cover`; a publication's `image` (a file in
  * public/); otherwise the ridgeline pattern.
@@ -70,5 +70,5 @@ export const GET: APIRoute = async ({ props, params, site: siteUrl }) => {
     domain: siteUrl ? siteUrl.host : '',
     seed: params.slug ?? card.title,
   });
-  return new Response(new Uint8Array(png), { headers: { 'Content-Type': 'image/png' } });
+  return new Response(new Uint8Array(png), { headers: { 'Content-Type': 'image/jpeg' } });
 };
