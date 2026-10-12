@@ -10,13 +10,6 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="container site-footer__inner">
-    <div class="site-footer__id">
-      <p class="site-footer__name">{site.name}</p>
-      <p class="site-footer__role">
-        {site.role}{site.affiliation.name && <> · {site.affiliation.name}</>}
-      </p>
-    </div>
-
     <ul role="list" class="site-footer__social" aria-label="Profiles and feeds">
       {
         site.email && (
@@ -56,21 +49,16 @@ const year = new Date().getFullYear();
     font-size: var(--text-sm);
   }
   .site-footer__inner {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--space-4) var(--space-6);
-    padding-block: var(--space-6) var(--space-6);
-  }
-  .site-footer__name {
-    font-family: var(--font-display);
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--color-text);
+    gap: var(--space-2);
+    padding-block: var(--space-5);
   }
   .site-footer__social {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-1);
   }
   .site-footer__social :global(.icon-link) {
@@ -89,16 +77,6 @@ const year = new Date().getFullYear();
     background: var(--color-accent-soft);
   }
   .site-footer__meta {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border);
-    color: var(--color-text-faint);
-    font-size: var(--text-xs);
-  }
-  @media (max-width: 40rem) {
-    .site-footer__inner {
-      grid-template-columns: 1fr;
-    }
+    color: var(--color-text-muted);
   }
 </style>

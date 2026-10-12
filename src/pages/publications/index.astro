@@ -6,7 +6,6 @@
  * the tabs and filters are added on top when JS runs.
  */
 import Icon from '../../components/Icon.astro';
-import MetricsStrip from '../../components/MetricsStrip.astro';
 import PublicationItem from '../../components/PublicationItem.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
 import { getPublications, groupOf, PUB_GROUPS, type Publication } from '../../lib/bibtex';
@@ -36,7 +35,6 @@ const profiles = [
   ridges={2}
 >
   <Fragment slot="header">
-    <MetricsStrip />
     {
       profiles.length > 0 && (
         <p class="profiles">

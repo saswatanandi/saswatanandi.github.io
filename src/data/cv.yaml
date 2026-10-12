@@ -23,8 +23,8 @@ updated: ""
 # Note: the numbers here are typed by hand; update them with the metrics in site.config.yaml.
 summary: >-
   Hydrologist working on wildfire, forest, and hydroclimate extremes — and turning those models into
-  tools agencies actually use. **22 papers** (h-index 11; 567 citations); lead developer of **IMDLIB**
-  (**251,000+ downloads**) and **ARWIN** (decision-support dashboard for El Dorado County Water Agency).
+  tools agencies actually use. **22 papers** (h-index 11; 605 citations, Google Scholar, Oct 2026); lead developer of **IMDLIB**
+  (**285,000+ downloads**) and **ARWIN** (decision-support dashboard for El Dorado County Water Agency).
 
 pdf:
   paper: us-letter          # us-letter or a4
@@ -110,7 +110,7 @@ talks:
 software:
   - name: IMDLIB
     url: https://imdlib.readthedocs.io
-    description: Open-source Python package for retrieval, processing, and spatiotemporal analysis of gridded India Meteorological Department (IMD) observational datasets. 251,000+ downloads; community-adopted across India-focused hydroclimate research.
+    description: Open-source Python package for retrieval, processing, and spatiotemporal analysis of gridded India Meteorological Department (IMD) observational datasets. 285,000+ downloads; community-adopted across India-focused hydroclimate research.
   - name: prismdata
     url: https://prismdata.readthedocs.io
     description: Python package for programmatic access to PRISM climate data over the continental United States.
